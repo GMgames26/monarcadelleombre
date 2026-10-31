@@ -356,7 +356,7 @@ var PRICE=[120,300,650,2400,7500,20000,50000];
 
 /* specializzazioni (livello 20) */
 var SPEC={
- necro:{n:'Evocatore',d:'Ombre +15% di forza e HP, ARISE +12%. Abilità Comando d’ombra: le ombre agiscono due volte.',s:'Comando',f:.45,m:[.8],cmd:true},
+ necro:{n:'Evocatore',d:'Ombre +15% di forza e HP, ARISE +10%. Abilità Comando d’ombra: le ombre agiscono due volte.',s:'Comando',f:.45,m:[.8],cmd:true},
  bers:{n:'Berserker',d:'+20% attacco. Abilità Frenesia: 4 colpi da 0,9×.',s:'Frenesia',f:.4,m:[.9,.9,.9,.9]},
  sin:{n:'Assassino d’ombra',d:'+15% critico, +10% schivata. Abilità Colpo fatale: 3,4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[3.4],force:true,pierce:true}};
 
@@ -382,7 +382,7 @@ var DOORS={
  ambush:{n:'Imboscata',d:'La prossima stanza ospita un’élite, con ricompense maggiorate.'},
  blood:{n:'Altare del sangue',d:'Perdi il 15% degli HP e ottieni 2 frammenti d’ombra.'},
  forge:{n:'Fucina d’ombra',d:'Un’ombra a caso ottiene un potenziamento gratuito.'},
- oracle:{n:'Oracolo',d:'La prossima estrazione ARISE ha +25% di probabilità.'},
+ oracle:{n:'Oracolo',d:'La prossima estrazione ARISE ha +5% di probabilità.'},
  gamble:{n:'Scommessa',d:'Una volta su due vinci oro extra, altrimenti ne perdi un po’.'},
  training:{n:'Sala di addestramento',d:'Ottieni subito EXP, come per due nemici sconfitti.'}};
 /* ogni Gate ha un ambiente con una regola sua e un proprio set di porte */
@@ -1093,7 +1093,7 @@ function lose(){
   else{c.lost=Math.floor(p.gold*.15);p.gold-=c.lost}
   c.phase='lost';healAll();save();render();
 }
-function ariseChance(e){return Math.min(.9,(c&&c.oracle?.25:0)+(e.boss?.2+p.st.int*.015:.28+p.st.int*.012)-(e.el?.05:0)+(p.spec==='necro'?.12:0))}
+function ariseChance(e){return Math.min(.75,(c&&c.oracle?.05:0)+(e.boss?.08+p.st.int*.005:e.el?.15+p.st.int*.006:.22+p.st.int*.008)+(p.spec==='necro'?.1:0))}
 function rollRarity(e){
   var x=Math.random();
   if(e.boss)return x<.3?2:1;
@@ -1178,7 +1178,7 @@ function chooseDoor(k){
     var fc=p.shadows.filter(function(s){return s.up<UPMAX});
     if(fc.length){var fs=fc[Math.floor(Math.random()*fc.length)];upgrade(fs);log('La fucina potenzia '+fs.name+' (+'+fs.up+').','good')}
     else{var fg=Math.round(20+4*L);p.gold+=fg;c.gg+=fg;log('Nessuna ombra da potenziare: il fabbro ti paga '+fg+' oro.','sys')}
-  }else if(k==='oracle'){c.oracle=true;log('L’Oracolo guida la tua prossima estrazione: +25% di probabilità.','good')}
+  }else if(k==='oracle'){c.oracle=true;log('L’Oracolo guida la tua prossima estrazione: +5% di probabilità.','good')}
   else if(k==='gamble'){
     var gb=Math.max(20,Math.round((10+3*L)*2));
     if(Math.random()<.5){p.gold+=gb;c.gg+=gb;log('Scommessa vinta: +'+gb+' oro!','good')}
