@@ -33,7 +33,7 @@ button{font-family:inherit}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px;margin-bottom:12px;min-width:0}
 .lbl{font:600 11px var(--display);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 10px;display:flex;justify-content:space-between;gap:8px}
 .lbl em{font-style:normal;color:var(--muted)}
-.bar{height:8px;background:#0a0f22;border:1px solid #1d2a5c;border-radius:2px;overflow:hidden;margin-top:5px}
+.bar{height:8px;background:#0a0f22;border:1px solid #1d2a5c;border-radius:2px;overflow:hidden;margin-top:3px}
 .bar.big{height:12px}
 .bar i{display:block;height:100%;transition:width .3s}
 .hp{background:linear-gradient(90deg,#e63e62,#ff7a8f)}
@@ -105,9 +105,9 @@ button{font-family:inherit}
 .cap{display:flex;gap:6px;margin:2px 0 4px}
 .cap i{flex:1;height:8px;border-radius:2px;background:#0a0f22;border:1px solid #1d2a5c}
 .cap i.f{background:var(--violet);border-color:var(--violet)}
-.qrow{padding:12px 0}
+.qrow{padding:4px 0}
 .qrow+.qrow{border-top:1px solid #1a2552}
-.qrow .t{display:flex;justify-content:space-between;gap:8px;font:600 14px var(--display)}
+.qrow .t{display:flex;justify-content:space-between;gap:8px;font:600 13px var(--display)}
 .qrow .t.ok{color:var(--good)}
 .qrow .d{font-size:13px;color:var(--muted);margin:2px 0 4px}
 .qrow .rw{font-size:12px;color:var(--gold);margin:6px 0 8px;font-variant-numeric:tabular-nums}
@@ -125,7 +125,7 @@ button{font-family:inherit}
 .loot{text-align:left;margin:0 0 14px;padding:10px 12px;background:var(--panel2);border-radius:3px}
 .loot div{font-size:13px;padding:2px 0}
 .loot div.rare{color:var(--gold);font-weight:600}
-.warnbox{font-size:13px;color:var(--muted);margin:12px 0 0}
+.warnbox{font-size:12px;color:var(--muted);margin:6px 0 0}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .chip{font:600 13px var(--display);letter-spacing:.06em;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:3px;min-height:40px;min-width:44px;padding:6px 12px;cursor:pointer}
 .chip.on{color:var(--fg);border-color:var(--cc,var(--accent));box-shadow:inset 0 -2px 0 var(--cc,var(--accent))}
@@ -477,16 +477,27 @@ var STORY=[
  {t:'Sangue nobile',x:'I mostri d’élite sorvegliano i Gate più profondi. Dai loro la caccia.',n:5,ref:12,f:function(){return p.cnt.elite}},
  {t:'Il Capitano',x:'Un Capitano Orco guarda dall’alto il rango D. Abbattilo.',n:1,ref:14,f:function(){return p.cnt.bossR[1]}},
  {t:'La via del Monarca',x:'Al livello 20 il Sistema ti chiede di scegliere la tua strada.',n:1,ref:20,f:function(){return p.spec?1:0}},
- {t:'La Torre',x:'Una Torre senza fine si apre all’orizzonte. Sali fino al piano 10.',n:10,ref:22,f:function(){return p.tower}},
+ {t:'La Torre',x:'Una Torre senza fine si apre all’orizzonte. Sconfiggi il boss del piano 5.',n:5,ref:21,f:function(){return p.tower}},
+ {t:'Il Guardiano',x:'Il boss del piano 10 custodisce il primo checkpoint. Abbattilo.',n:10,ref:24,f:function(){return p.tcp}},
+ {t:'Rango C',x:'I Gate di rango C ti aspettano. Raggiungi il livello 25.',n:25,ref:25,f:function(){return p.lv}},
+ {t:'Cacciatore di boss',x:'I boss temprano il Monarca. Sconfiggine dieci, nei Gate o nella Torre.',n:10,ref:30,f:function(){return p.cnt.boss}},
+ {t:'Oltre le nuvole',x:'Il boss del piano 20 non è mai stato battuto. Fallo cadere.',n:20,ref:38,f:function(){return p.tcp}},
+ {t:'Rango B',x:'Solo i migliori arrivano al rango B. Raggiungi il livello 45.',n:45,ref:45,f:function(){return p.lv}},
  {t:'Il Titano',x:'Nel rango B un Titano di pietra blocca la strada. Spezzalo.',n:1,ref:50,f:function(){return p.cnt.bossR[3]}},
- {t:'Verso il Monarca',x:'Solo i Monarchi superano il livello 100. Raggiungilo.',n:100,ref:100,f:function(){return p.lv}}];
+ {t:'Mietitore',x:'Un esercito si forgia sul campo. Abbatti 300 nemici.',n:300,ref:55,f:function(){return p.cnt.kill}},
+ {t:'Il Re dei piani',x:'Il boss del piano 30 siede su un trono d’ombra. Detronizzalo.',n:30,ref:60,f:function(){return p.tcp}},
+ {t:'Rango A',x:'Le leggende del rango A ti riconoscono. Raggiungi il livello 70.',n:70,ref:70,f:function(){return p.lv}},
+ {t:'La vetta della Torre',x:'Il boss del piano 40 è il guardiano dell’abisso. Sconfiggilo.',n:40,ref:80,f:function(){return p.tcp}},
+ {t:'Verso il Monarca',x:'Solo i Monarchi superano il livello 100. Raggiungilo.',n:100,ref:100,f:function(){return p.lv}},
+ {t:'Il Risveglio',x:'Il Sistema ti offre di rinascere più forte. Compi il primo Risveglio.',n:1,ref:100,f:function(){return p.awk}}];
 
 var p, c=null, tab='stato', relId=null, timer=null, tt=null, pendingMsg=null;
 var saveBox=null,openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gq:{},tv:2,qv:2,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gq:{},tv:2,qv:2,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
+  if(o.stv===undefined&&o.story!==undefined){o.story=[0,1,2,3,4,5,6,7,9,14,19][Math.max(0,Math.min(o.story|0,10))];o.stv=2}
   var shift=(o.tv===undefined),hadCnt=!!o.cnt;
   if(o.wev===undefined)o.wev=Math.min(5,Math.floor((o.w||0)/5));
   if(o.qv!==2){var oldDone=0;for(var qk in (o.gq||{})){if(o.gq[qk].s===2)oldDone++}o.gq={};o.qv=2;if(oldDone)o.gold=(o.gold||0)+oldDone*(150+20*(o.lv||1))}
@@ -1350,15 +1361,15 @@ function vQuest(){
   }else h+='<div class="panel story"><div class="lbl"><span>Storia</span></div><p class="sm">Hai completato tutti i capitoli. Il regno delle ombre è tuo, Monarca.</p></div>';
   h+='<div class="panel"><div class="lbl"><span>Quest giornaliera</span><em>Reset tra '+hh+'h '+mm+'m</em></div>';
   h+=p.quest.t.map(function(t){var ok=t.v>=t.g;return '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>'+t.n+'</span><span>'+t.v+' / '+t.g+'</span></div>'+bar(t.v,t.g,ok?'mp':'xp')+'</div>'}).join('');
-  h+='<p class="sm" style="margin-top:12px">Ricompensa: '+r.pts+' punti attributo, '+fmt(r.gold)+' oro, '+fmt(r.exp)+' EXP</p>';
-  h+='<button class="btn pri full" style="margin-top:10px" data-a="claim" '+((done&&!p.quest.claimed)?'':'disabled')+'>'+(p.quest.claimed?'Ricompensa ritirata':(done?'Ritira ricompensa':'Quest in corso'))+'</button>';
+  h+='<p class="sm" style="margin-top:6px">Ricompensa: '+r.pts+' punti attributo, '+fmt(r.gold)+' oro, '+fmt(r.exp)+' EXP</p>';
+  h+='<button class="btn pri full" style="margin-top:6px" data-a="claim" '+((done&&!p.quest.claimed)?'':'disabled')+'>'+(p.quest.claimed?'Ricompensa ritirata':(done?'Ritira ricompensa':'Quest in corso'))+'</button>';
   h+='<p class="warnbox">Se a mezzanotte la quest non è completata, finisci nella zona di penalità e perdi il 25% dell’oro.</p></div>';
   /* settimanale */
   var wr=weeklyReward(),wd=weeklyDone(),wl=new Date(),dow=(wl.getDay()+6)%7,days=7-dow;
   h+='<div class="panel"><div class="lbl"><span>Quest settimanale</span><em>Reset tra '+days+' giorni</em></div>';
   h+=p.weekly.t.map(function(t){var ok=t.v>=t.g;return '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>'+t.n+'</span><span>'+t.v+' / '+t.g+'</span></div>'+bar(t.v,t.g,ok?'mp':'xp')+'</div>'}).join('');
-  h+='<p class="sm" style="margin-top:12px">Ricompensa: '+wr.pts+' punti, '+wr.frag+' frammenti, '+fmt(wr.gold)+' oro, '+fmt(wr.exp)+' EXP</p>';
-  h+='<button class="btn gld full" style="margin-top:10px" data-a="wclaim" '+((wd&&!p.weekly.claimed)?'':'disabled')+'>'+(p.weekly.claimed?'Ricompensa ritirata':(wd?'Ritira ricompensa':'Quest in corso'))+'</button></div>';
+  h+='<p class="sm" style="margin-top:6px">Ricompensa: '+wr.pts+' punti, '+wr.frag+' frammenti, '+fmt(wr.gold)+' oro, '+fmt(wr.exp)+' EXP</p>';
+  h+='<button class="btn gld full" style="margin-top:6px" data-a="wclaim" '+((wd&&!p.weekly.claimed)?'':'disabled')+'>'+(p.weekly.claimed?'Ricompensa ritirata':(wd?'Ritira ricompensa':'Quest in corso'))+'</button></div>';
 
   var list=QD.filter(function(x){return x.g===qRank});
   var nd=list.filter(function(x){var q=p.gq[x.id];return q&&q.s===3}).length;
