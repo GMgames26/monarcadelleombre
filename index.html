@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Monarca delle Ombre</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070912">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Monarca">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow "System window" column, bottom tab bar, combat takes over the column. Dark world by choice. */
+:root{--bg:#070912;--panel:#0d1226;--panel2:#141c3d;--line:#26356f;--accent:#4aa8ff;--violet:#9266ff;--fg:#e2e8ff;--muted:#8c98c6;--danger:#ff5472;--good:#3ddc97;--gold:#f2c14e;--display:"Chakra Petch",system-ui,sans-serif;--body:"Barlow",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg)}
+body{color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;padding-block:12px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:radial-gradient(130% 50% at 50% -8%,#1b2260 0%,transparent 62%),var(--bg)}
+#app{max-width:560px;margin:0 auto}
+button{font-family:inherit}
+.top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin-bottom:14px}
+.rk{width:52px;height:52px;border:2px solid var(--rk);color:var(--rk);display:grid;place-items:center;font:700 30px var(--display);border-radius:4px;text-shadow:0 0 14px var(--rk);box-shadow:0 0 18px -6px var(--rk),inset 0 0 12px -8px var(--rk)}
+.who{min-width:0}
+.nm{font:600 17px var(--display);letter-spacing:.03em}
+.nm span{color:var(--accent);margin-left:6px;font-size:14px}
+.sm{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:3px}
+.gold{font:700 18px var(--display);color:var(--gold);text-align:right;font-variant-numeric:tabular-nums}
+.gold small.syn{font:500 10px var(--body);letter-spacing:0;text-transform:none;margin-top:3px}
+.gold small{display:block;font:500 10px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px;margin-bottom:12px;min-width:0}
+.lbl{font:600 11px var(--display);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 10px;display:flex;justify-content:space-between;gap:8px}
+.lbl em{font-style:normal;color:var(--muted)}
+.bar{height:8px;background:#0a0f22;border:1px solid #1d2a5c;border-radius:2px;overflow:hidden;margin-top:5px}
+.bar.big{height:12px}
+.bar i{display:block;height:100%;transition:width .3s}
+.hp{background:linear-gradient(90deg,#e63e62,#ff7a8f)}
+.mp{background:linear-gradient(90deg,#2a6cff,#4aa8ff)}
+.xp{background:linear-gradient(90deg,#6a3df0,#a885ff)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0}
+.row+.row{border-top:1px solid #1a2552}
+.grow{flex:1;min-width:0}
+.rn{font:600 15px var(--display);letter-spacing:.02em}
+.val{font:700 20px var(--display);min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.btn{font:600 13px var(--display);letter-spacing:.07em;text-transform:uppercase;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:3px;min-height:46px;padding:8px 12px;cursor:pointer;line-height:1.2}
+.btn small{display:block;font:500 10px var(--body);letter-spacing:.04em;color:var(--muted);text-transform:none;margin-top:2px}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.pri{background:linear-gradient(180deg,#2c6fff,#1b49c9);border-color:#5b95ff}
+.btn.gld{border-color:#8a6a1f;color:var(--gold)}
+.btn.dng{border-color:#7a2a3b;color:var(--danger)}
+.btn.sq{width:46px;padding:0;font-size:20px}
+.btn.full{width:100%}
+.btn.sm2{min-height:38px;padding:6px 10px;font-size:12px}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cell{background:var(--panel2);border-radius:3px;padding:8px 6px;text-align:center}
+.cell b{display:block;font:700 17px var(--display);font-variant-numeric:tabular-nums}
+.cell span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hint{border-color:#3a4f9e;background:linear-gradient(180deg,#111a3c,var(--panel))}
+.hint p{margin:0 0 6px}
+.gate{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px;margin-bottom:10px;color:var(--fg)}
+.gate .g{width:46px;height:46px;border:2px solid var(--rk);color:var(--rk);display:grid;place-items:center;font:700 25px var(--display);border-radius:4px;text-shadow:0 0 12px var(--rk)}
+.gate .gt{font:600 15px var(--display);letter-spacing:.03em}
+.gate.lock{opacity:.45}
+.gate button{grid-column:1/-1}
+.tag{display:inline-block;font:700 10px var(--display);letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;border-radius:2px;padding:1px 5px;margin-right:6px;vertical-align:2px}
+.tag.boss{color:var(--danger)}
+.tag.warn{color:var(--gold)}
+.tag.vio{color:var(--violet)}
+.tag.cls{color:var(--cc)}
+.enemy{text-align:center;padding:10px 6px 6px}
+.enemy .en{font:700 19px var(--display);margin-bottom:8px;letter-spacing:.02em}
+.enemy.hit{animation:shake .28s}
+.enemy.dead{opacity:.35}
+.ally{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ally>div{min-width:0}
+.ally .n{font:600 13px var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ally .down{opacity:.4}
+.ally .me.hit{animation:shake .28s}
+.log{height:152px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.enemy{min-height:112px}
+.enemy .en{min-height:2.4em;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 0}
+#actbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#0a0e20;border-top:1px solid var(--line);max-height:62vh;overflow-y:auto;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+#actbar>div{max-width:560px;margin:0 auto}
+#actbar .panel{margin:0}
+#actbar .acts{grid-template-columns:repeat(4,1fr);gap:6px}
+#actbar .acts .btn{min-height:56px;padding:6px 3px;font-size:11px;letter-spacing:.02em;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.lg{font-size:13px;padding:2px 0;color:var(--muted)}
+.lg.hit{color:var(--fg)}
+.lg.shadow{color:#b79cff}
+.lg.good{color:var(--good)}
+.lg.bad{color:var(--danger)}
+.lg:last-child{color:var(--fg)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.arise{text-align:center;border-color:#5b3fc0;background:linear-gradient(180deg,#171040,var(--panel))}
+.arise .big{font:700 20px var(--display);margin:0 0 4px}
+.arisebtn{width:100%;min-height:62px;font-size:24px;letter-spacing:.3em;color:#fff;background:linear-gradient(180deg,#7a4bff,#4a24c8);border-color:#9d7dff;animation:pulse 1.8s ease-in-out infinite;margin:12px 0 8px}
+.full-warn{border:1px solid #8a6a1f;background:#1b1708;color:var(--gold);border-radius:3px;padding:8px 10px;font-size:13px;margin:10px 0 0;text-align:left}
+.sum{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:10px 0 14px;font-variant-numeric:tabular-nums}
+.sum span:nth-child(even){text-align:right;font-weight:600}
+.cap{display:flex;gap:6px;margin:2px 0 4px}
+.cap i{flex:1;height:8px;border-radius:2px;background:#0a0f22;border:1px solid #1d2a5c}
+.cap i.f{background:var(--violet);border-color:var(--violet)}
+.qrow{padding:12px 0}
+.qrow+.qrow{border-top:1px solid #1a2552}
+.qrow .t{display:flex;justify-content:space-between;gap:8px;font:600 14px var(--display)}
+.qrow .t.ok{color:var(--good)}
+.qrow .d{font-size:13px;color:var(--muted);margin:2px 0 4px}
+.qrow .rw{font-size:12px;color:var(--gold);margin:6px 0 8px;font-variant-numeric:tabular-nums}
+.qc{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:9px 0}
+.qc+.qc{border-top:1px solid #1a2552}
+.qc .qi{min-width:0}
+.qc .t{display:flex;justify-content:space-between;gap:8px;font:600 14px var(--display)}
+.qc .t.ok{color:var(--good)}
+.qc .d{font-size:12px;color:var(--muted);margin:1px 0 0}
+.qc .rw{font-size:11px;color:var(--gold);margin-top:3px;font-variant-numeric:tabular-nums}
+.qc .bar{height:5px;margin-top:4px}
+.qc .btn{min-width:84px}
+.qc.fin{opacity:.5;padding:6px 0}
+.qc.fin .t{font-size:13px}
+.loot{text-align:left;margin:0 0 14px;padding:10px 12px;background:var(--panel2);border-radius:3px}
+.loot div{font-size:13px;padding:2px 0}
+.loot div.rare{color:var(--gold);font-weight:600}
+.warnbox{font-size:13px;color:var(--muted);margin:12px 0 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{font:600 13px var(--display);letter-spacing:.06em;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:3px;min-height:40px;min-width:44px;padding:6px 12px;cursor:pointer}
+.chip.on{color:var(--fg);border-color:var(--cc,var(--accent));box-shadow:inset 0 -2px 0 var(--cc,var(--accent))}
+.chip:disabled{opacity:.35;cursor:not-allowed}
+.shadowcard{--cc:var(--accent)}
+.shadowcard .nm{font-size:15px;display:flex;flex-wrap:wrap;gap:4px 0;align-items:center}
+.btns{display:flex;gap:8px;margin-top:8px}
+.btns .btn{flex:1;min-height:42px}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.slot{text-align:left;background:var(--panel2);border:1px solid #1f2b60;border-radius:3px;padding:8px 10px;color:var(--fg);cursor:pointer;min-width:0;min-height:54px}
+.slot.on{border-color:var(--accent)}
+.slot b{display:block;font:600 11px var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.slot span{display:block;font-size:13px;overflow-wrap:anywhere}
+.slot.empty span{color:#5a679c}
+.pick{background:#0a0f22;border:1px solid #1d2a5c;border-radius:3px;padding:8px 10px;margin-top:8px}
+.pick .row{padding:8px 0}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:13px;font-variant-numeric:tabular-nums;margin:8px 0}
+.pend{--cc:var(--violet);text-align:left;background:#120d33;border:1px solid #5b3fc0;border-radius:3px;padding:10px 12px;margin:10px 0}
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);background:#0a0e20;border-top:1px solid var(--line);padding:0 max(6px,env(safe-area-inset-left,0px)) env(safe-area-inset-bottom,0px) max(6px,env(safe-area-inset-right,0px))}
+#nav button{background:none;border:0;color:var(--muted);font:600 11px var(--display);letter-spacing:.08em;text-transform:uppercase;min-height:58px;position:relative;cursor:pointer}
+#nav button.on{color:var(--fg);box-shadow:inset 0 2px 0 var(--accent)}
+#nav button.dot::after{content:"";position:absolute;top:12px;left:calc(50% + 22px);width:7px;height:7px;border-radius:50%;background:var(--gold)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bar-h,64px) + 12px + env(safe-area-inset-bottom,0px));background:#10183a;border:1px solid var(--accent);padding:10px 14px;border-radius:4px;font:600 13px var(--display);opacity:0;pointer-events:none;transition:opacity .2s;width:max-content;max-width:calc(100% - 32px);z-index:30;text-align:center}
+#toast.show{opacity:1}
+#toast.up{border-color:var(--gold);color:var(--gold)}
+#toast.bad{border-color:var(--danger);color:var(--danger)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px 0 #7a4bff66}50%{box-shadow:0 0 26px 4px #9266ffaa}}
+@media (prefers-reduced-motion:reduce){.enemy.hit,.ally .me.hit,.arisebtn{animation:none}.bar i{transition:none}}
+@media (max-width:380px){.stats4{grid-template-columns:repeat(2,1fr)}}
+.telebox{min-height:40px;margin-top:6px;font-size:12px;color:var(--danger);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.3}
+.telebox b{letter-spacing:.1em;margin-right:6px}
+.stline{min-height:24px;margin-bottom:4px}
+.door{display:block;width:100%;text-align:left;background:#0d1330;border:1px solid var(--line);border-radius:4px;padding:12px;margin-bottom:8px;color:var(--fg);cursor:pointer;min-height:56px}
+.door b{display:block;font:600 15px var(--display);letter-spacing:.03em;margin-bottom:2px}
+.door span{font-size:13px;color:var(--muted)}
+.door:hover{border-color:var(--accent)}
+.fbox{margin-top:8px;padding:8px 10px;border:1px solid #1d2a5c;border-radius:4px;font-size:12px;color:var(--gold)}
+.trs{margin:4px 0}
+.panel.story{border-color:#3a2d7a}
+.panel.tower{border-color:#5a3d9a}
+#actbar .acts .btn.spc{border-color:var(--violet)}
+/* compatto per telefono, combattimento senza scroll */
+body.cb{padding-block:6px 0;font-size:13px}
+.cb .top{margin-bottom:6px;gap:8px}
+.cb .rk{width:34px;height:34px;font-size:20px;border-width:1px}
+.cb .nm{font-size:14px}.cb .nm span{font-size:12px}
+.cb .who .sm,.cb .gold small{display:none}
+.cb .gold{font-size:14px}
+.cb .bar{margin-top:3px}
+.cb .who .bar{height:5px}
+.cb .panel{padding:8px 10px;margin-bottom:6px}
+.cb .lbl{margin:0 0 4px;font-size:10px;letter-spacing:.14em}
+.cb .enemy{min-height:0;padding:0}
+.cb .enemy .en{font-size:16px;min-height:0;margin-bottom:3px}
+.cb .bar.big{height:9px}
+.cb .enemy .sm{margin-top:2px;font-size:11px}
+.cb .telebox{min-height:30px;margin-top:2px;font-size:11px}
+.cb .stline{min-height:19px;margin-bottom:2px}
+.cb .stline .tag{font-size:9px;margin-right:4px}
+.cb .ally{gap:4px 8px}
+.cb .ally .n{font-size:11px}
+.cb .ally .sm{font-size:11px;margin-top:1px}
+.cb .log{height:88px}
+.cb .lg{font-size:12px;padding:1px 0;line-height:1.3}
+.cb .btn{min-height:40px;padding:6px 10px}
+.cb #actbar{padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
+.cb #actbar .acts{gap:5px}
+.cb #actbar .acts .btn{min-height:42px;font-size:10.5px}
+.cb #actbar .acts .btn small{font-size:9px;margin-top:1px}
+.cb .door{padding:8px 10px;min-height:44px;margin-bottom:5px}
+.cb .door b{font-size:14px}.cb .door span{font-size:12px}
+.cb .panel.arise .big{font-size:16px;margin:0 0 2px}
+.cb .row{padding:6px 0}
+.cb .full-warn{padding:6px 8px;font-size:11px;margin:6px 0}
+.cb .sum,.cb .loot{font-size:12px}
+@media (max-height:700px){.cb .log{height:70px}}
+/* v9: schermate compatte */
+.cb .log{height:66px}
+.cb .lg{font-size:11px;padding:0;line-height:1.25}
+.duo{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:8px}
+.duo .btn{margin:0;min-height:48px}
+.duo .arisebtn{font-size:20px;letter-spacing:.2em;min-height:48px}
+.cb .panel.arise p.sm{margin:2px 0}
+.doors3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cb .doors3 .door{margin:0;padding:8px 6px;text-align:center;min-height:0;display:flex;flex-direction:column;gap:3px}
+.cb .doors3 .door b{font-size:12.5px;margin:0}
+.cb .doors3 .door span{font-size:10.5px;line-height:1.25}
+.cb .sum{margin:4px 0 8px;gap:3px 12px}
+.cb .loot{margin:0 0 8px;padding:6px 10px}
+.cb .loot div{font-size:12px;padding:1px 0}
+@media (max-height:700px){.cb .log{height:58px}}
+/* v13: viste compatte (tranne Ombre) */
+body.cp:not(.tomb){font-size:14px;line-height:1.35;padding-block:8px 74px}
+.cp:not(.tomb) .top{margin-bottom:8px;gap:10px}
+.cp:not(.tomb) .rk{width:40px;height:40px;font-size:23px}
+.cp:not(.tomb) .panel{padding:10px;margin-bottom:8px}
+.cp:not(.tomb) .lbl{margin-bottom:6px}
+.cp:not(.tomb) .row{padding:6px 0}
+.cp:not(.tomb) .btn{min-height:40px;padding:6px 10px}
+.cp:not(.tomb) .btn.sm2{min-height:34px}
+.cp:not(.tomb) .rn{font-size:14px}
+.cp:not(.tomb) .gate{padding:8px 10px;margin-bottom:6px;gap:4px 10px}
+.cp:not(.tomb) .gate .g{width:36px;height:36px;font-size:20px}
+.cp:not(.tomb) .gate .gt{font-size:14px}
+.cp:not(.tomb) .gate .sm{margin-top:1px}
+.cp:not(.tomb) .qc{padding:6px 8px}
+.cp:not(.tomb) .qrow{margin-bottom:6px}
+.cp:not(.tomb) .warnbox{padding:6px 8px;font-size:11px;margin-top:8px}
+.cp:not(.tomb) .chips{margin-bottom:6px}
+.cp:not(.tomb) .chip{min-height:34px}
+.cp:not(.tomb) .cell{padding:5px 4px}
+.cp:not(.tomb) .cell b{font-size:15px}
+.attrs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.at{display:flex;align-items:center;gap:8px;background:var(--panel2);border-radius:3px;padding:6px 8px}
+.at .grow .rn{font-size:13px}.at .grow .sm{margin:0;font-size:10.5px}
+.at .val{font-size:18px;min-width:26px}
+.at .btn.sq{width:36px;min-height:36px;font-size:18px}
+/* v16 */
+.mini{font:600 11px var(--display);letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--accent);border:1px solid var(--line);border-radius:3px;padding:3px 8px;min-height:0;cursor:pointer}
+.mini.off{color:var(--muted)}
+.mini.dng{color:var(--danger);border-color:#7a2a3b}
+.lbl .mini{margin:-3px 0}
+.leaverow{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:var(--muted)}
+/* v17 */
+.stats3{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stats3 .cell b{font-size:13px}
+.stats3 .cell span{font-size:9px}
+.hrow{display:grid;grid-template-columns:auto 1fr;gap:0 8px;padding:5px 0;border-top:1px solid #1a2552;font-size:12px}
+.hrow .hr{font:700 10px var(--display);letter-spacing:.08em;text-transform:uppercase;align-self:center}
+.hrow .hs{grid-column:2;color:var(--muted);font-size:11px}
+@media (max-width:380px){.stats3{grid-template-columns:repeat(3,1fr)}}
+/* v18 ombre */
+.sech{display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;padding:5px 10px;border-radius:3px;background:#141a3a;font:700 11px var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.sech.act{background:#2a1f6b;color:#d7caff}
+.sech em{font-style:normal;font-size:10px;letter-spacing:.06em}
+.sh{position:relative;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--cc);border-radius:4px;padding:0;margin-bottom:6px;display:grid;grid-template-columns:1fr auto;align-items:stretch}
+.sh.act{border-color:#5b3fc0;border-left-color:var(--cc);background:linear-gradient(90deg,#171040,var(--panel))}
+.sh.ben{border-style:dashed;border-left-style:solid;opacity:.88}
+.sh.empty{display:block;border-left-color:#26356f;border-style:dashed;padding:9px 10px;font-size:12px;color:var(--muted);background:transparent;grid-template-columns:none}
+.shh{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 6px 8px 8px;cursor:pointer;min-width:0}
+.shc{font:700 11px var(--display);color:var(--cc);border:1px solid var(--cc);border-radius:2px;padding:2px 4px;letter-spacing:.06em}
+.shm{display:flex;flex-direction:column;gap:2px;min-width:0}
+.shn{font:600 14px var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shn i{font-style:normal;color:var(--accent);font-size:12px}.shn i.u{color:var(--danger);font-size:10px;text-transform:uppercase;letter-spacing:.1em}
+.shs{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;flex-wrap:wrap;gap:2px 4px}
+.tg{font-size:10px;color:#b79cff;border:1px solid #3a2d7a;border-radius:2px;padding:0 4px}
+.chev{font-size:10px;color:var(--muted)}
+.shb{align-self:center;margin:0 8px 0 0;font:600 10px var(--display);letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:7px 8px;min-height:36px;cursor:pointer;max-width:92px}
+.shb.go{color:var(--fg);border-color:var(--accent);background:#10265a}
+.shb:disabled{opacity:.4;cursor:not-allowed}
+.sh .shd{grid-column:1/-1;padding:0 8px 8px;border-top:1px solid #1a2552;margin-top:2px}
+.sh .shd .sm{margin-top:5px}
+.sh .shd .btns{margin-top:6px}
+.sh .shd .slots{margin-top:6px}
+</style>
+
+</head>
+<body>
+<div id="app"><div id="top"></div><main id="view"></main></div>
+<nav id="nav" aria-label="Sezioni"></nav>
+<div id="actbar" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var KEY='monarca-ombre-v1';
+var RANKS=['E','D','C','B','A','S'];
+var RK_COL=['#8fa3c9','#3ddc97','#4aa8ff','#9266ff','#ff5fa8','#f2c14e'];
+var LO=[1,10,25,45,70,100];          /* livello a cui inizia il rango */
+var HI=[9,24,44,69,99,150];          /* livello massimo dei nemici del Gate */
+var REPL=[5,17,35,57,85,115];        /* livello di riferimento per le ricompense delle quest */
+var MOBS=[
+ [{n:'Cinghiale corazzato',c:'tank'},{n:'Goblin sciamano',c:'mago'},{n:'Lupo grigio',c:'assassino'},{n:'Goblin guaritore',c:'guaritore'}],
+ [{n:'Orco di guardia',c:'tank'},{n:'Stregone errante',c:'mago'},{n:'Scheletro assassino',c:'assassino'},{n:'Sacerdote caduto',c:'guaritore'}],
+ [{n:'Cavaliere non morto',c:'tank'},{n:'Evocatore osseo',c:'mago'},{n:'Lucertoloide d’ombra',c:'assassino'},{n:'Monaco spettrale',c:'guaritore'}],
+ [{n:'Gargoyle di pietra',c:'tank'},{n:'Spettro velato',c:'mago'},{n:'Predatore notturno',c:'assassino'},{n:'Driade corrotta',c:'guaritore'}],
+ [{n:'Golem di ossidiana',c:'tank'},{n:'Arcimago del vuoto',c:'mago'},{n:'Lama del vuoto',c:'assassino'},{n:'Oracolo del vuoto',c:'guaritore'}],
+ [{n:'Guardiano dell’abisso',c:'tank'},{n:'Demone stregone',c:'mago'},{n:'Cavaliere cremisi',c:'assassino'},{n:'Serafino caduto',c:'guaritore'}]];
+var BOSS=[{n:'Re dei Goblin',c:'tank'},{n:'Capitano Orco',c:'tank'},{n:'Signore dei Non Morti',c:'mago'},{n:'Titano di pietra',c:'tank'},{n:'Cavaliere della Rovina',c:'assassino'},{n:'Sovrano del Vuoto',c:'mago'}];
+/* meccaniche dei boss: tl = attacchi annunciati, ev = ogni quanti turni, pas = tratti passivi */
+var BT=[
+ {tl:['charge'],ev:4,pas:['poison']},
+ {tl:['charge','stun'],ev:4,pas:['shield']},
+ {tl:['curse','charge'],ev:4,pas:['regen','poison']},
+ {tl:['stun','charge'],ev:3,pas:['shield','enrage']},
+ {tl:['charge','curse','stun'],ev:3,pas:['enrage','poison']},
+ {tl:['charge','curse','stun'],ev:3,pas:['shield','regen','enrage']}];
+var PASN={poison:'Veleno',shield:'Scudo a metà vita',regen:'Rigenerazione',enrage:'Furia crescente'};
+var TELE={
+ charge:{t:'Colpo devastante in arrivo: Difendi dimezza il danno.',l:'carica un colpo devastante!'},
+ stun:{t:'Colpo stordente in arrivo: Difendi o schiva per evitarlo.',l:'si prepara a stordirti!'},
+ curse:{t:'Maledizione in arrivo: Difendi per bloccarla.',l:'recita una maledizione!'}};
+var STN={poison:'il veleno',stun:'lo stordimento',curse:'la maledizione'};
+var WN=['Pugnale arrugginito','Pugnale di ferro','Lame gemelle','Lame del Cacciatore','Lame del Re','Lame del Monarca'];
+
+/* classi delle ombre */
+var CLK=['tank','mago','assassino','guaritore'];
+var CL={
+ tank:{n:'Tank',s:'TNK',col:'#4aa8ff',atk:.7,hp:1.7,w:2.5,dr:.75,d:'Attira i colpi nemici e subisce meno danni.'},
+ mago:{n:'Mago',s:'MAG',col:'#b27cff',atk:1.5,hp:.7,w:1,dr:1,d:'Danno molto alto, ma fragile.'},
+ assassino:{n:'Assassino',s:'ASS',col:'#ff5472',atk:1,hp:.8,w:1,dr:1,d:'Il 25% dei colpi è critico e fa danno doppio.'},
+ guaritore:{n:'Guaritore',s:'GUA',col:'#3ddc97',atk:.3,hp:.9,w:1,dr:1,d:'Ogni turno cura l’alleato più ferito.'}};
+/* rarità e tratti delle ombre */
+var RARITY=[{n:'Soldato',m:1,col:'#8c98c6'},{n:'Cavaliere',m:1.35,col:'#4aa8ff'},{n:'Generale',m:1.8,col:'#f2c14e'}];
+var TRAITS={
+ furia:{n:'Furia',d:'+20% attacco'},
+ corazza:{n:'Corazza',d:'+25% HP, −10% danni subiti'},
+ cecchino:{n:'Cecchino',d:'+15% critico'},
+ rapido:{n:'Rapido',d:'25% di agire due volte'},
+ vampiro:{n:'Vampiro',d:'Recupera il 30% del danno inflitto'},
+ spine:{n:'Spine',d:'Riflette il 20% dei danni subiti'},
+ devoto:{n:'Devoto',d:'Cura il Cacciatore del 2% HP a turno'},
+ purifica:{n:'Purifica',d:'40% di rimuovere uno status a turno'}};
+var TRK=Object.keys(TRAITS);
+/* equipaggiamento: ogni classe ha due slot, w = arma, a = abbigliamento/accessorio */
+var IT={
+ tank:{w:['Spada',1],a:['Scudo',0]},
+ mago:{w:['Bastone',0],a:['Mantello',0]},
+ assassino:{w:['Pugnale',0],a:['Cappuccio d’ombra',0]},
+ guaritore:{w:['Bacchetta',1],a:['Veste lunare',1]}};
+var ADJM=['rozzo','rinforzato','temprato','runico','antico','draconico','abissale'];
+var ADJF=['rozza','rinforzata','temprata','runica','antica','draconica','abissale'];
+var PCT=[.10,.14,.18,.28,.40,.55,.75];
+var PRICE=[120,300,650,2400,7500,20000,50000];
+
+/* specializzazioni (livello 20) */
+var SPEC={
+ necro:{n:'Evocatore',d:'Ombre +15% di forza e HP, ARISE +12%. Abilità Comando d’ombra: le ombre agiscono due volte.',s:'Comando',f:.45,m:[.8],cmd:true},
+ bers:{n:'Berserker',d:'+20% attacco. Abilità Frenesia: 4 colpi da 0,9×.',s:'Frenesia',f:.4,m:[.9,.9,.9,.9]},
+ sin:{n:'Assassino d’ombra',d:'+15% critico, +10% schivata. Abilità Colpo fatale: 3,4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[3.4],force:true,pierce:true}};
+
+/* modificatori dei Gate */
+var MODS={
+ rosso:{n:'Gate rosso',d:'Nemici +40% di forza, EXP e oro doppi.',pw:1.4,rw:2,gm:2,lm:1.6},
+ nebbia:{n:'Nebbia fitta',d:'Nessun colpo critico per nessuno. EXP +20%.',pw:1,rw:1.2,nocrit:true},
+ maledetto:{n:'Gate maledetto',d:'Le cure valgono la metà. EXP +25%.',pw:1,rw:1.25,heal:.5},
+ veleno:{n:'Palude velenosa',d:'Quasi ogni colpo avvelena. Oro +25%, più antidoti.',pw:1.05,rw:1,gm:1.25,poison:true,am:2.5},
+ breve:{n:'Gate breve',d:'Solo 2 stanze più il boss. Ricompense −10%.',pw:1,rw:.9,gm:.9,rooms:2},
+ tesoro:{n:'Tesoro nascosto',d:'Oro doppio, nemici +15% di forza.',pw:1.15,rw:1,gm:2},
+ elite:{n:'Covo d’élite',d:'Tutti i nemici sono élite. EXP +40%.',pw:1,rw:1.4,allElite:true,lm:1.2}};
+var MODK=Object.keys(MODS);
+function rollMod(){return Math.random()<.4?'':MODK[Math.floor(Math.random()*MODK.length)]}
+
+/* porte tra una stanza e l'altra */
+var DOORS={
+ chest:{n:'Forziere',d:'Oro, pozioni o una trappola. Non si sa.'},
+ shrine:{n:'Fonte curativa',d:'Recuperi il 45% di HP, MP e ombre.'},
+ altar:{n:'Altare della forza',d:'+25% ai danni di tutti nella prossima stanza.'},
+ trap:{n:'Stanza maledetta',d:'Perdi l’8% degli HP, ma la prossima stanza dà il 70% di ricompense in più.'},
+ merchant:{n:'Mercante errante',d:'Una pozione di cura e un antidoto al prezzo di una sola pozione.'},
+ ambush:{n:'Imboscata',d:'La prossima stanza ospita un’élite, con ricompense maggiorate.'},
+ blood:{n:'Altare del sangue',d:'Perdi il 15% degli HP e ottieni 2 frammenti d’ombra.'},
+ forge:{n:'Fucina d’ombra',d:'Un’ombra a caso ottiene un potenziamento gratuito.'},
+ oracle:{n:'Oracolo',d:'La prossima estrazione ARISE ha +25% di probabilità.'},
+ gamble:{n:'Scommessa',d:'Una volta su due vinci oro extra, altrimenti ne perdi un po’.'},
+ training:{n:'Sala di addestramento',d:'Ottieni subito EXP, come per due nemici sconfitti.'}};
+/* ogni Gate ha un ambiente con una regola sua e un proprio set di porte */
+var GATES=[
+ {n:'Foresta dei Goblin',sig:'herb',d:'Erbe medicinali: dopo ogni stanza recuperi l’8% di HP.',doors:['chest','shrine','altar','merchant','training','ambush']},
+ {n:'Cripta ossea',sig:'undead',d:'I morti si rialzano: il 20% dei nemici risorge con il 40% di HP.',doors:['chest','altar','trap','forge','gamble','ambush','training']},
+ {n:'Santuario maledetto',sig:'curse',d:'Ogni 4 turni una maledizione ti colpisce, a meno che tu non stia difendendo.',doors:['shrine','trap','oracle','blood','merchant','forge','chest']},
+ {n:'Fortezza di pietra',sig:'armor',d:'Armature pesanti: i nemici subiscono −15% di danni, ma l’EXP è +15%.',doors:['altar','forge','oracle','blood','gamble','ambush','training','shrine']},
+ {n:'Cratere infuocato',sig:'fire',d:'Il calore ti brucia: perdi l’1,5% degli HP a ogni turno. Oro +30%.',doors:['shrine','merchant','oracle','chest','trap','blood','gamble']},
+ {n:'Abisso del Vuoto',sig:'void',d:'Il Vuoto infuria: i nemici diventano più forti turno dopo turno. EXP +20%.',doors:['shrine','altar','forge','blood','oracle','training','trap','ambush','chest']}];
+var TB=[
+ {k:'swarm',n:'Sciame',d:'Orde di nemici: i loro attacchi colpiscono tutto il gruppo.'},
+ {k:'bastion',n:'Bastioni',d:'Armature spesse: i colpi fanno molto meno danno.'},
+ {k:'hunt',n:'Cacciatori',d:'I nemici puntano sempre chi \u00e8 pi\u00f9 ferito.'},
+ {k:'toxic',n:'Nebbia tossica',d:'Veleno a quasi ogni colpo e nessun critico.'},
+ {k:'titan',n:'Titani',d:'Nemici enormi e lenti che si rigenerano.'},
+ {k:'abyss',n:'Abisso',d:'Furia crescente e cure dimezzate.'}];
+function band(f){return Math.floor((f-1)/10)%6}
+function sig(){return c?(c.tower?TB[band(c.floor)].k:GATES[c.g].sig):''}
+
+/* quest dei Gate: 10 per rango, diverse tra loro (per ora E e D) */
+var QL=[
+ [['kill','Battesimo del sangue','Sconfiggi {n} nemici nei Gate E',12,1],
+  ['gate','Aprire le porte','Completa {n} Gate E',3,1],
+  ['skill','Allenamento sul campo','Usa {n} abilità nei Gate E',12,1],
+  ['tele','Scudo alzato','Blocca {n} attacchi annunciati con Difendi nei Gate E',3,2],
+  ['arise','Il primo richiamo','Estrai {n} ombre nei Gate E',2,2],
+  ['crit','Occhio da assassino','Metti a segno {n} colpi critici nei Gate E',10,2],
+  ['elite','Caccia all’élite','Sconfiggi {n} nemici élite nei Gate E',2,2],
+  ['clean','Cacciatore sobrio','Completa {n} Gate E senza usare pozioni',2,3],
+  ['intact','Nessuno resta indietro','Completa {n} Gate E senza perdere ombre (ne serve una)',2,3],
+  ['gate','Veterano dei Gate','Completa {n} Gate E',10,4]],
+ [['kill','Mattanza','Sconfiggi {n} nemici nei Gate D',25,1],
+  ['fury','Furia scatenata','Usa Furia d’ombra {n} volte nei Gate D',6,1],
+  ['skill','Maestro delle abilit\u00e0','Usa {n} abilit\u00e0 nei Gate D',20,1],
+  ['shield','Rompiscudi','Infrangi {n} scudi dei boss nei Gate D',2,2],
+  ['arise','Genitore d’ombre','Estrai {n} ombre nei Gate D',4,2],
+  ['modgate','Gate maledetti','Completa {n} Gate D con un modificatore attivo',2,2],
+  ['nodef','Senza guardia','Completa {n} Gate D senza mai usare Difendi',2,3],
+  ['elite','Predatore d’élite','Sconfiggi {n} nemici élite nei Gate D',5,3],
+  ['lowhp','Sul filo del rasoio','Sconfiggi un boss D con meno del 25% di HP',1,3],
+  ['gate','Maestro dei Gate','Completa {n} Gate D',12,4]],
+ [['kill','Pulizia dei sotterranei','Sconfiggi {n} nemici nei Gate C',40,1],
+  ['mage','Magia al comando','Completa {n} Gate C con un Mago d\u2019ombra vivo a fine Gate',2,1],
+  ['boss','Cacciatore di boss','Sconfiggi {n} boss nei Gate C',2,1],
+  ['tele','Parata perfetta','Blocca {n} attacchi annunciati nei Gate C',8,2],
+  ['arise','Il reclutatore','Estrai {n} ombre nei Gate C',4,2],
+  ['elite','Cacciatore di \u00e9lite','Sconfiggi {n} nemici \u00e9lite nei Gate C',8,2],
+  ['squad','Squadra completa','Completa {n} Gate C con tutte e 4 le classi vive a fine Gate',2,3],
+  ['nodef','Senza guardia','Completa {n} Gate C senza mai usare Difendi',2,3],
+  ['clean','Mani pulite','Completa {n} Gate C senza usare pozioni',3,3],
+  ['gate','Specialista dei Gate','Completa {n} Gate C',15,4]],
+ [['kill','Piazza pulita','Sconfiggi {n} nemici nei Gate B',60,1],
+  ['fury','Furia incessante','Usa Furia d\u2019ombra {n} volte nei Gate B',12,1],
+  ['tele','Guardia ferrea','Blocca {n} attacchi annunciati nei Gate B',4,1],
+  ['crit','Colpi chirurgici','Metti a segno {n} colpi critici nei Gate B',25,2],
+  ['boss','Abbattitore di boss','Sconfiggi {n} boss nei Gate B',3,2],
+  ['modgate','Sfida estrema','Completa {n} Gate B con un modificatore attivo',3,2],
+  ['nodef','Guardia bassa','Completa {n} Gate B senza mai usare Difendi',3,3],
+  ['elite','Re degli \u00e9lite','Sconfiggi {n} nemici \u00e9lite nei Gate B',10,3],
+  ['lowhp','Ultimo respiro','Sconfiggi un boss B con meno del 25% di HP',1,3],
+  ['gate','Veterano dei Gate B','Completa {n} Gate B',18,4]],
+ [['kill','Marea d\u2019ombra','Sconfiggi {n} nemici nei Gate A',80,1],
+  ['skill','Maestro delle abilit\u00e0','Usa {n} abilit\u00e0 nei Gate A',25,1],
+  ['boss','Cacciatore di boss','Sconfiggi {n} boss nei Gate A',3,1],
+  ['arise','Legione crescente','Estrai {n} ombre nei Gate A',6,2],
+  ['crit','Colpi decisivi','Metti a segno {n} colpi critici nei Gate A',20,2],
+  ['tele','Muro di ferro','Blocca {n} attacchi annunciati nei Gate A',8,2],
+  ['squad','Armata perfetta','Completa {n} Gate A con tutte e 4 le classi vive a fine Gate',3,3],
+  ['clean','Cacciatore puro','Completa {n} Gate A senza usare pozioni',4,3],
+  ['intact','Nessun caduto','Completa {n} Gate A senza perdere ombre (ne serve una)',4,3],
+  ['gate','Signore dei Gate A','Completa {n} Gate A',20,4]],
+ [['kill','Sterminio','Sconfiggi {n} nemici nei Gate S',100,1],
+  ['boss','Regicida','Sconfiggi {n} boss nei Gate S',3,1],
+  ['crit','Lama implacabile','Metti a segno {n} colpi critici nei Gate S',40,1],
+  ['elite','Sangue reale','Sconfiggi {n} nemici \u00e9lite nei Gate S',15,2],
+  ['modgate','Oltre ogni limite','Completa {n} Gate S con un modificatore attivo',4,2],
+  ['mage','Arcano supremo','Completa {n} Gate S con un Mago d\u2019ombra vivo a fine Gate',4,2],
+  ['lowhp','Al limite','Sconfiggi un boss S con meno del 25% di HP',2,3],
+  ['nodef','Nessuna paura','Completa {n} Gate S senza mai usare Difendi',4,3],
+  ['squad','Sovrano delle ombre','Completa {n} Gate S con tutte e 4 le classi vive a fine Gate',4,3],
+  ['gate','Monarca dei Gate','Completa {n} Gate S',25,4]]];
+var QD=[];
+QL.forEach(function(list,g){list.forEach(function(t,i){QD.push({id:RANKS[g]+'.'+i,g:g,k:t[0],t:t[1],x:t[2].replace('{n}',t[3]),n:t[3],w:t[4]})})});
+
+/* storia: un capitolo alla volta */
+var STORY=[
+ {t:'Il primo Gate',x:'Un Gate si è aperto sotto casa tua. Entra e chiudilo.',n:1,ref:2,f:function(){return p.cnt.gate}},
+ {t:'Il risveglio',x:'Una voce nella testa ti propone di sfruttare i caduti. Estrai la tua prima ombra.',n:1,ref:3,f:function(){return p.cnt.arise}},
+ {t:'L’esercito',x:'Un’ombra sola non basta. Raccogline tre.',n:3,ref:6,f:function(){return p.shadows.length}},
+ {t:'Rango D',x:'Il Sistema ti riconosce come cacciatore di rango D.',n:10,ref:10,f:function(){return p.lv}},
+ {t:'Sangue nobile',x:'I mostri d’élite sorvegliano i Gate più profondi. Dai loro la caccia.',n:5,ref:12,f:function(){return p.cnt.elite}},
+ {t:'Il Capitano',x:'Un Capitano Orco guarda dall’alto il rango D. Abbattilo.',n:1,ref:14,f:function(){return p.cnt.bossR[1]}},
+ {t:'La via del Monarca',x:'Al livello 20 il Sistema ti chiede di scegliere la tua strada.',n:1,ref:20,f:function(){return p.spec?1:0}},
+ {t:'La Torre',x:'Una Torre senza fine si apre all’orizzonte. Sali fino al piano 10.',n:10,ref:22,f:function(){return p.tower}},
+ {t:'Il Titano',x:'Nel rango B un Titano di pietra blocca la strada. Spezzalo.',n:1,ref:50,f:function(){return p.cnt.bossR[3]}},
+ {t:'Verso il Monarca',x:'Solo i Monarchi superano il livello 100. Raggiungilo.',n:100,ref:100,f:function(){return p.lv}}];
+
+var p, c=null, tab='stato', relId=null, timer=null, tt=null, pendingMsg=null;
+var saveBox=null,openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
+var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
+
+function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gq:{},tv:2,qv:2,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function migrate(o){
+  var shift=(o.tv===undefined),hadCnt=!!o.cnt;
+  if(o.wev===undefined)o.wev=Math.min(5,Math.floor((o.w||0)/5));
+  if(o.qv!==2){var oldDone=0;for(var qk in (o.gq||{})){if(o.gq[qk].s===2)oldDone++}o.gq={};o.qv=2;if(oldDone)o.gold=(o.gold||0)+oldDone*(150+20*(o.lv||1))}
+  var d=fresh();for(var k in d){if(o[k]===undefined)o[k]=d[k]}
+  if(!hadCnt){o.cnt.kill=o.kills||0;o.cnt.gate=o.gates||0}
+  var ic=o.st.int,cp0=(ic>=5?1:0)+(ic>=15?1:0)+(ic>=25?1:0)+(ic>=40?1:0),act0=0;
+  o.shadows.forEach(function(s,i){
+    if(s.a===undefined){s.a=act0<cp0;if(s.a)act0++}
+    if(!s.cls)s.cls=CLK[(s.id||i)%4];
+    if(s.heal===undefined)s.heal=s.cls==='guaritore'?s.atk:0;
+    if(!s.eq)s.eq={w:null,a:null};
+    if(s.r===undefined)s.r=0;
+    if(!s.tr)s.tr=[];
+  });
+  if(shift){
+    o.inv.forEach(function(it){if(it.t>=1)it.t++});
+    o.shadows.forEach(function(s){['w','a'].forEach(function(k){if(s.eq[k]&&s.eq[k].t>=1)s.eq[k].t++})});
+  }
+  o.tv=2;
+  if(!(o.mv>=4)){['D.2','B.2','A.2'].forEach(function(k){if(o.gq&&o.gq[k]&&o.gq[k].s===1)delete o.gq[k]})}
+  if(o.mv!==3&&o.mv!==4){
+    o.mv=3;
+    ['C.2','A.2'].forEach(function(k){if(o.gq&&o.gq[k]&&o.gq[k].s===1)delete o.gq[k]});
+    if(o.shadows.length>8){
+      var sc=function(x){return(x.atk*(1+(x.cls==='guaritore'?0:0))+x.max/8+x.heal)*(RARITY[x.r||0].m)};
+      var srt=o.shadows.slice().sort(function(a,b){return sc(b)-sc(a)}),keep=srt.slice(0,8),out=srt.slice(8);
+      o.shadows=o.shadows.filter(function(x){return keep.indexOf(x)>=0});
+      out.forEach(function(x){['w','a'].forEach(function(k){if(x.eq&&x.eq[k]){o.inv.push(x.eq[k])}});o.frag=(o.frag||0)+3;o.gold=(o.gold||0)+Math.round(x.max*.8)});
+      o.limitMsg=out.length;
+    }
+  }
+  if(o.mv===3)o.mv=4;
+  for(var i=0;i<6;i++){if(typeof o.mods[i]!=='string')o.mods[i]=rollMod()}
+  return o;
+}
+function load(){try{var s=localStorage.getItem(KEY);if(s){var o=JSON.parse(s);if(o&&o.st)return migrate(o)}}catch(e){}return null}
+function persistLocal(){p.run=c;try{localStorage.setItem(KEY,JSON.stringify(p))}catch(e){}}
+function save(){p.sv=Date.now();persistLocal();scheduleCloud()}
+function setSync(t){syncTxt=t;var el=$('#sync');if(el)el.textContent=t}
+function scheduleCloud(){
+  if(!cloud.ref)return;
+  cloud.dirty=true;setSync('Salvataggio…');
+  clearTimeout(cloud.timer);cloud.timer=setTimeout(flushCloud,1500);
+}
+function flushCloud(){
+  clearTimeout(cloud.timer);
+  if(!cloud.ref||cloud.busy||!cloud.dirty)return;
+  cloud.busy=true;cloud.dirty=false;
+  var body={ts:p.sv||Date.now(),json:JSON.stringify(p)};
+  cloud.ref.set(body).then(function(){
+    cloud.busy=false;
+    if(cloud.dirty)flushCloud();else setSync('Salvato online');
+  }).catch(function(e){
+    cloud.busy=false;
+    if(e&&e.code==='invalid_argument'){cloud.ref=null;setSync('Solo su questo dispositivo')}
+    else setSync('Errore di salvataggio online');
+  });
+}
+function newRun(o){
+  var r={g:0,room:0,rooms:3,phase:'fight',log:[],busy:false,def:false,flash:'',gx:0,gg:0,got:[],lost:0,msg:'',ok:false,pend:null,pot:false,fell:false,loot:[],fragGot:0,mod:'',st:{poison:null,stun:0,curse:0},buff:0,rwX:1,forceElite:false,cmd:false,usedDef:false,turns:0,tower:false,floor:0,doors:null};
+  for(var k in o)r[k]=o[k];
+  return r;
+}
+function fixRun(r){
+  var d=newRun({});for(var k in d){if(r[k]===undefined)r[k]=d[k]}
+  var e=r.e;
+  if(e){
+    if(!e.pas)e.pas=[];if(!e.tl)e.tl=[];if(e.ev===undefined)e.ev=4;
+    if(e.sh===undefined){e.sh=0;e.shMax=0;e.shDone=false}
+    if(e.turns===undefined)e.turns=0;if(e.tele===undefined)e.tele=null;
+  }
+  return r;
+}
+function boot(o){
+  p=o;fixTeam();
+  if(p.limitMsg){pendingMsg='Limite di 8 ombre: le pi\u00f9 deboli sono state congedate. Hai ricevuto frammenti e oro, e il loro equipaggiamento \u00e8 nell\u2019inventario.';delete p.limitMsg}
+  c=(o.run&&typeof o.run.g==='number'&&o.run.e)?fixRun(o.run):null;
+  if(c){c.busy=false;c.flash='';p.hp=clamp(p.hp,1,maxHp());p.mp=clamp(p.mp,0,maxMp())}
+  else{p.hp=maxHp();p.mp=maxMp()}
+}
+function adopt(o){
+  clearTimeout(timer);
+  boot(migrate(o));relId=null;selSlot=null;resetArm=false;tab='stato';
+  persistLocal();render();toast('Partita ripresa dal salvataggio online.','up');
+}
+function cloudInit(){
+  if(!(window.claude&&window.claude.use)){setSync('Solo su questo dispositivo');return}
+  Promise.all([window.claude.use('db'),window.claude.use('user')]).then(function(r){
+    var db=r[0],user=r[1];
+    if(!db||!user){setSync('Solo su questo dispositivo');return}
+    return user.id().then(function(id){
+      if(!id){setSync('Solo su questo dispositivo');return}
+      var ref=db.doc('data/users/'+id+'/save');
+      return ref.get().then(function(snap){
+        var rd=snap.exists?snap.data():null;
+        cloud.ref=ref;
+        if(rd&&rd.json&&(rd.ts||0)>(p.sv||0)){
+          var o=null;try{o=JSON.parse(rd.json)}catch(e){}
+          if(o&&o.st){adopt(o);setSync('Salvato online');return}
+        }
+        if(!rd||(p.sv||0)>(rd.ts||0)){cloud.dirty=true;flushCloud()}
+        else setSync('Salvato online');
+      });
+    });
+  }).catch(function(){setSync('Solo su questo dispositivo')});
+}
+
+/* ---------- formule ---------- */
+function awkM(){return 1+.08*p.awk}
+function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM())}
+function maxMp(){return 20+p.st.int*6}
+function atk(){return Math.round((4+p.st.str*2)*(1+.05*p.w)*(1+.1*p.wev)*awkM()*(p.spec==='bers'?1.2:1))}
+function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0))}
+function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0))}
+function cap(){var i=p.st.int;return(i>=5?1:0)+(i>=15?1:0)+(i>=25?1:0)+(i>=40?1:0)}
+var UPMAX=20;
+function team(){return p.shadows.filter(function(s){return s.a})}
+function maxTotal(){return cap()+4}
+function fixTeam(){var t=team();while(t.length>cap()){t.pop().a=false}}
+function upgrade(s){s.atk=r1(s.atk*1.14+.3);s.max=Math.round(s.max*1.14)+2;if(s.heal)s.heal=r1(s.heal*1.14+.3);s.up++;s.hp=sMax(s)}
+function needAt(l){return Math.round(200*Math.pow(l,1.5))}
+function need(){return needAt(p.lv)}
+function rIdx(){var r=0;for(var i=0;i<6;i++){if(p.lv>=LO[i])r=i}return r}
+function rnd(a,b){return a+Math.random()*(b-a)}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function r1(x){return Math.round(x*10)/10}
+function fmt(n){return Math.round(n).toLocaleString('it-IT')}
+function sd(n){return n<10?String(r1(n)).replace('.',','):fmt(n)}
+function pct(x){return Math.max(0,Math.min(1,x))*100}
+function priceP(){return Math.round(12+4*p.lv)}
+function priceW(){return Math.round(60*Math.pow(p.w+1,1.5))}
+function wName(){return WN[p.wev]}
+function ariseCost(){return Math.max(10,Math.round(maxMp()*.08))}
+function mpRegen(){return Math.max(2,Math.round(maxMp()*.015))}
+var SK={atk:{f:0,m:[1],n:'Attacco'},dbl:{f:.15,m:[.75,.75],n:'Doppia lama'},fury:{f:.35,m:[2.6],n:'Furia d’ombra',lv:5},dom:{f:.6,m:[4.6],n:'Dominio del Monarca',lv:15}};
+function skCost(k){return Math.max(1,Math.round(maxMp()*SK[k].f))}
+function spCost(){return p.spec?Math.max(1,Math.round(maxMp()*SPEC[p.spec].f)):0}
+function gOpen(g){return p.lv>=LO[g]-3}
+function eLevel(g){return clamp(p.lv,LO[g],HI[g])}
+function eDanger(g){return 1+.05*Math.max(0,LO[g]-p.lv)}
+function modOf(){return c&&c.mod?MODS[c.mod]:null}
+function healM(){var m=modOf();return(m&&m.heal)||(sig()==='abyss'?.5:1)}
+
+/* ---------- ombre: statistiche ---------- */
+function addB(b,cls,k,t){
+  var f=PCT[t];
+  if(cls==='tank'){if(k==='w')b.atk+=f;else{b.hp+=f*1.3;b.red+=Math.min(.35,f*.4)}}
+  else if(cls==='mago'){if(k==='w')b.atk+=f*1.2;else{b.hp+=f*.8;b.atk+=f*.3}}
+  else if(cls==='assassino'){if(k==='w')b.atk+=f;else{b.crit+=Math.min(.2,f*.3);b.hp+=f*.5}}
+  else{if(k==='w'){b.heal+=f*1.2;b.atk+=f*.3}else{b.hp+=f*.8;b.heal+=f*.4}}
+}
+function nb(){return{atk:0,hp:0,red:0,crit:0,heal:0}}
+function itemB(cls,k,t){var b=nb();addB(b,cls,k,t);return b}
+function eqB(s){var b=nb();['w','a'].forEach(function(k){var it=s.eq&&s.eq[k];if(it)addB(b,s.cls,k,it.t)});return b}
+function hasT(s,k){return !!(s.tr&&s.tr.indexOf(k)>=0)}
+function formation(){
+  var h={},n=0;
+  team().forEach(function(s){if(!h[s.cls]){h[s.cls]=1;n++}});
+  var b={atk:0,hp:0,list:[]};
+  if(h.tank&&h.guaritore){b.hp+=.10;b.list.push('Tank + Guaritore: HP +10%')}
+  if(h.mago&&h.assassino){b.atk+=.10;b.list.push('Mago + Assassino: attacco +10%')}
+  if(n===4){b.atk+=.06;b.hp+=.06;b.list.push('Tutte e 4 le classi: attacco e HP +6%')}
+  return b;
+}
+function sB(s){
+  var b=eqB(s),f=formation();
+  b.atk+=f.atk;b.hp+=f.hp;
+  if(s.eq&&s.eq.w&&s.eq.a&&s.eq.w.t===s.eq.a.t){b.atk+=.08;b.hp+=.08}
+  if(hasT(s,'furia'))b.atk+=.2;
+  if(hasT(s,'corazza')){b.hp+=.25;b.red+=.1}
+  if(hasT(s,'cecchino'))b.crit+=.15;
+  if(p.spec==='necro'){b.atk+=.15;b.hp+=.15}
+  b.red=Math.min(.55,b.red);
+  return b;
+}
+function RAR(s){return RARITY[s.r||0].m}
+function sAtk(s){return Math.max(.1,s.atk*RAR(s)*(1+sB(s).atk))}
+function sMax(s){return Math.round(s.max*RAR(s)*(1+sB(s).hp))}
+function sHeal(s){return s.heal*RAR(s)*(1+sB(s).heal)}
+function bDesc(b){
+  var o=[];
+  if(b.atk)o.push('+'+Math.round(b.atk*100)+'% attacco');
+  if(b.hp)o.push('+'+Math.round(b.hp*100)+'% HP');
+  if(b.red)o.push('−'+Math.round(b.red*100)+'% danni subiti');
+  if(b.crit)o.push('+'+Math.round(b.crit*100)+'% critico');
+  if(b.heal)o.push('+'+Math.round(b.heal*100)+'% cura');
+  return o.join(', ');
+}
+function iName(cls,k,t){var d=IT[cls][k];return d[0]+' '+(d[1]?ADJF:ADJM)[t]}
+function iSlot(cls,k){return IT[cls][k][0]}
+function healAll(){p.shadows.forEach(function(s){s.hp=sMax(s)})}
+function dropShadow(s){['w','a'].forEach(function(k){if(s.eq[k]){p.inv.push(s.eq[k]);s.eq[k]=null}})}
+function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s))}
+function findShadow(id){return p.shadows.filter(function(s){return String(s.id)===String(id)})[0]}
+function addTrait(s){
+  var pool=TRK.filter(function(k){return s.tr.indexOf(k)<0&&((k!=='devoto'&&k!=='purifica')||s.cls==='guaritore')});
+  if(pool.length)s.tr.push(pool[Math.floor(Math.random()*pool.length)]);
+}
+
+/* ---------- quest giornaliera e settimanale ---------- */
+function today(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function weekKey(){var d=new Date(),t=new Date(d.getFullYear(),d.getMonth(),d.getDate()),dow=(t.getDay()+6)%7;t.setDate(t.getDate()-dow);return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()}
+function newQuest(){var r=rIdx();return{date:today(),claimed:false,t:[
+ {k:'kills',n:'Sconfiggi nemici',g:8+r*2,v:0},
+ {k:'gates',n:'Completa un Gate',g:1,v:0},
+ {k:'skills',n:'Usa abilità in combattimento',g:5,v:0}]}}
+function newWeekly(){var r=rIdx();return{wk:weekKey(),claimed:false,t:[
+ {k:'kills',n:'Sconfiggi nemici',g:100+25*r,v:0},
+ {k:'gates',n:'Completa Gate',g:12+2*r,v:0},
+ {k:'bosses',n:'Sconfiggi boss',g:8+r,v:0},
+ {k:'elite',n:'Sconfiggi élite',g:6+r,v:0}]}}
+function questDone(){return p.quest.t.every(function(x){return x.v>=x.g})}
+function weeklyDone(){return p.weekly.t.every(function(x){return x.v>=x.g})}
+function questReward(){return{pts:2,gold:25+10*p.lv,exp:Math.round(need()*.25)}}
+function weeklyReward(){return{pts:4,frag:3,gold:120+30*p.lv,exp:Math.round(need()*.6)}}
+function claimQuest(auto){
+  if(p.quest.claimed||!questDone())return;
+  var r=questReward();p.quest.claimed=true;p.pts+=r.pts;p.gold+=r.gold;gainExp(r.exp);
+  if(!auto)toast('Quest completata! +'+r.pts+' punti, +'+r.gold+' oro','up');
+}
+function claimWeekly(auto){
+  if(p.weekly.claimed||!weeklyDone())return;
+  var r=weeklyReward();p.weekly.claimed=true;p.pts+=r.pts;p.frag+=r.frag;p.gold+=r.gold;gainExp(r.exp);
+  if(!auto)toast('Quest settimanale! +'+r.pts+' punti, +'+r.frag+' frammenti','up');
+}
+function checkQuest(){
+  if(!p.quest){p.quest=newQuest()}
+  if(p.quest.date!==today()){
+    if(questDone()&&!p.quest.claimed){claimQuest(true)}
+    else if(!questDone()){var loss=Math.floor(p.gold*.25);p.gold-=loss;pendingMsg='Zona di penalità: quest non completata, perdi '+loss+' oro.'}
+    p.quest=newQuest();save();
+  }
+  if(!p.weekly){p.weekly=newWeekly()}
+  if(p.weekly.wk!==weekKey()){
+    if(weeklyDone()&&!p.weekly.claimed)claimWeekly(true);
+    p.weekly=newWeekly();save();
+  }
+}
+function quest(k,n){var t=p.quest.t.filter(function(x){return x.k===k})[0];if(t)t.v=Math.min(t.g,t.v+n)}
+function weekly(k,n){var t=p.weekly&&p.weekly.t.filter(function(x){return x.k===k})[0];if(t)t.v=Math.min(t.g,t.v+n)}
+
+/* ---------- quest dei Gate e storia ---------- */
+function qReward(d){
+  var L=REPL[d.g];
+  return{gold:d.w*Math.round(14+4*L),exp:d.w*Math.round(needAt(L)*.07),pts:[0,0,1,2][d.w-1]};
+}
+function qActive(){var n=0;QD.forEach(function(d){var s=p.gq[d.id];if(s&&s.s===1)n++});return n}
+function qev(key,n){
+  if(!c||c.tower)return;
+  QD.forEach(function(d){
+    if(d.g!==c.g||d.k!==key)return;
+    var st=p.gq[d.id];if(!st||st.s!==1)return;
+    st.v=Math.min(d.n,st.v+n);
+    if(st.v>=d.n){st.s=2;toast('Quest completata: '+d.t,'up')}
+  });
+}
+function stVal(i){var s=STORY[i];return Math.min(s.n,s.f())}
+function stReward(i){var s=STORY[i];return{exp:Math.round(needAt(s.ref)*.3),gold:30+10*s.ref,pts:i%2?2:1,frag:i>=4?2:0}}
+
+function toast(m,k){var t=$('#toast');t.textContent=m;t.className='show '+(k||'');clearTimeout(tt);tt=setTimeout(function(){t.className=''},2800)}
+
+function gainExp(n){
+  n=Math.round(n*(1+.15*p.awk));
+  var r0=rIdx(),up=0;p.exp+=n;
+  while(p.exp>=need()){p.exp-=need();p.lv++;p.pts+=3;up++}
+  if(up){
+    p.hp=maxHp();p.mp=maxMp();
+    toast('LEVEL UP! Livello '+p.lv+' · +'+(up*3)+' punti','up');
+    if(rIdx()>r0)setTimeout(function(){toast('Nuovo rango: '+RANKS[rIdx()],'up')},2000);
+    if(p.lv>=20&&!p.spec&&p.lv-up<20)setTimeout(function(){toast('Livello 20: scegli la tua specializzazione nello Stato','up')},4200);
+  }
+}
+
+/* ---------- combattimento ---------- */
+var BN=['Grakk','Orvath','Nerezeth','Monolito','Vael’Karn','Zhar’Uul'];
+var BTR=['furia','corazza','vampiro','corazza','cecchino','rapido'];
+var ABD={tank:'Contrattacco: 25% di rispondere ai colpi subiti',mago:'Esplosione: 25% di colpire con 1,6× danno',assassino:'Esecuzione: danno doppio sotto il 30% di HP nemici',guaritore:'Luce sacra: 30% di curare tutto il gruppo'};
+function rkL(L){var r=0;for(var i=0;i<6;i++){if(L>=LO[i])r=i}return r}
+function hasAb(s){return !!(s.eq&&s.eq.w&&s.eq.w.t>=3)}
+function pickMob(g){return MOBS[g][Math.floor(Math.random()*4)]}
+function mkEnemy(o){
+  var g=o.g,L=o.L||eLevel(g),pen=o.tower?1:eDanger(g),m=modOf(),pw=(m&&m.pw)||1;
+  var rm=(1+.05*(o.room||0))*(1+L/170)*pen*pw*(o.tower?1+.03*o.floor:1);
+  var b=Math.pow(L,1.2),ex=Math.max(0,L-8);
+  var boss=!!o.boss,el=!boss&&!!o.elite;
+  var d=boss?BOSS[g]:pickMob(g);
+  var hm=(boss?4:(el?1.7:1))*(1+.012*ex),am=(boss?1.4:(el?1.25:1))*(1+.018*ex);
+  if(o.tower&&!boss){var tk=sig();if(tk==='titan'){hm*=2.2;am*=.6}if(tk==='swarm')am*=.85}
+  var hp=Math.round((40+9*b)*rm*hm*rnd(.95,1.05));
+  var rw=((m&&m.rw)||1)*(sig()==='armor'?1.15:(sig()==='void'?1.2:1)),gm=((m&&m.gm)||1)*(sig()==='fire'?1.3:1);
+  var e={name:(el?'Élite · ':'')+d.n,cls:d.c,boss:boss,el:el,g:g,hp:hp,max:hp,
+    atk:Math.round((5+1.8*b)*rm*am*rnd(.95,1.05)),
+    exp:Math.max(1,Math.round(needAt(L)/24.5*(boss?4:(el?2.2:1))*pen*rw*(o.tower?1.3:1))),
+    gold:Math.round((4+1.6*L)*(boss?4:(el?2.2:1))*pen*gm),
+    pas:[],tl:[],ev:4,sh:0,shMax:0,shDone:false,turns:0,tele:null};
+  if(boss){var t=BT[g];e.pas=t.pas.slice();e.tl=t.tl.slice();e.ev=t.ev}
+  else if(el){e.pas=[Math.random()<.5?'poison':'regen']}
+  if(o.tower&&!boss&&sig()==='titan'&&e.pas.indexOf('regen')<0)e.pas.push('regen');
+  return e;
+}
+function log(t,k){c.log.push({t:t,k:k||''});if(c.log.length>40)c.log.shift()}
+function eName(){return c.e.name}
+function startRoom(){
+  var o;
+  if(c.tower){
+    var L=clamp(Math.round(4+c.floor*1.5),1,160),g=rkL(L),boss=c.floor%5===0;
+    c.g=g;o={g:g,L:L,floor:c.floor,tower:true,boss:boss,elite:!boss&&c.floor%5===2,room:c.floor-1};
+  }else{
+    var boss=c.room===c.rooms;
+    var el=!boss&&(c.forceElite||(modOf()&&modOf().allElite)||Math.random()<.14);
+    o={g:c.g,room:c.room,boss:boss,elite:el};
+  }
+  c.forceElite=false;
+  c.e=mkEnemy(o);
+  c.e.exp=Math.round(c.e.exp*c.rwX);c.e.gold=Math.round(c.e.gold*c.rwX);c.rwX=1;
+  c.altarOn=c.altar;c.altar=false;
+  c.phase='fight';c.def=false;c.flash='';
+  if(c.tower&&((c.floor-1)%10===0||c.log.length<3))log('Fascia '+TB[band(c.floor)].n+': '+TB[band(c.floor)].d,'sys');
+  var lab=c.e.boss?'BOSS · ':'';
+  log(lab+c.e.name+' appare.','sys');
+  if(c.e.boss&&c.e.pas.length)log('Poteri: '+c.e.pas.map(function(k){return PASN[k]}).join(', ')+'.','sys');
+}
+function enterGate(g){
+  if(!gOpen(g))return;
+  p.hp=maxHp();p.mp=maxMp();healAll();
+  var m=p.mods[g]||'';
+  c=newRun({g:g,mod:m,rooms:(m&&MODS[m].rooms)||3});
+  log(GATES[g].n+': '+GATES[g].d,'sys');
+  if(m)log(MODS[m].n+': '+MODS[m].d,'sys');
+  startRoom();
+}
+function enterTower(st){
+  if(p.lv<10)return;
+  st=Math.max(1,Math.min(+st||1,p.tcp+1));
+  p.hp=maxHp();p.mp=maxMp();healAll();
+  c=newRun({tower:true,floor:st,g:0});
+  log('Entri nella Torre al piano '+st+'.','sys');
+  startRoom();
+}
+function endGate(){
+  clearTimeout(timer);
+  if(c)pushHist(c.tower?'Uscito':'Abbandonato');
+  if(c&&c.tower&&c.floor>p.tower)p.tower=c.floor;
+  c=null;healAll();p.hp=maxHp();p.mp=maxMp();
+  tab='gate';save();render();
+}
+function pm(){return(c.buff>0?1.3:1)*(c.st.curse>0?.7:1)*(c.altarOn?1.25:1)}
+function sm(){return(c.buff>0?1.3:1)*(c.altarOn?1.25:1)}
+function noCrit(){var m=modOf();return !!(m&&m.nocrit)||sig()==='toxic'}
+function hitCalc(m,force){
+  var d=atk()*rnd(.85,1.15)*m*pm(),cr=!noCrit()&&(force||Math.random()<crit());
+  if(cr){d*=1.7;p.sx.crit++}d=Math.max(1,Math.round(d));if(d>p.sx.max)p.sx.max=d;return{d:d,cr:cr};
+}
+/* danni al nemico, con scudo del boss */
+function hurtE(d,pierce,magic){
+  var e=c.e;
+  p.sx.dmg+=d;
+  if(sig()==='bastion'&&!magic)d=Math.max(1,Math.round(d*.6));
+  if(sig()==='armor')d=Math.max(1,Math.round(d*.85));
+  if(e.sh>0&&!pierce){
+    var a=Math.min(e.sh,d);e.sh-=a;d-=a;
+    if(e.sh<=0){log('Lo scudo di '+e.name+' va in frantumi!','good');qev('shield',1)}
+  }
+  e.hp=Math.max(0,e.hp-d);
+  if(e.pas.indexOf('shield')>=0&&!e.shDone&&e.hp>0&&e.hp<=e.max*.5){
+    e.shDone=true;e.shMax=e.sh=Math.round(e.max*.28);log(e.name+' evoca uno scudo di energia!','bad');
+  }
+}
+function applyStatus(k,why){
+  if(k==='poison'){c.st.poison={t:4,d:Math.max(1,Math.round(maxHp()*.05))};log('Sei avvelenato!','bad')}
+  else if(k==='stun'){if(c.stunCd>0)return;c.st.stun=1;log('Sei stordito: perderai il turno!','bad')}
+  else if(k==='curse'){c.st.curse=3;log('Sei maledetto: danni −30% e cure dimezzate!','bad')}
+}
+function healP(h){
+  h=Math.round(h*(c.st.curse>0?.5:1)*healM());
+  var b=p.hp;p.hp=Math.min(maxHp(),p.hp+h);return p.hp-b;
+}
+function healS(s,h){
+  h=Math.max(1,Math.round(h*healM()));
+  var b=s.hp;s.hp=Math.min(sMax(s),s.hp+h);return s.hp-b;
+}
+
+function pAct(k){
+  if(!c||c.busy||c.phase!=='fight')return;
+  var s=SK[k],sp=SPEC[p.spec];
+  if(k==='spec'){
+    if(!sp||p.mp<spCost())return;
+    p.mp-=spCost();quest('skills',1);qev('skill',1);
+    var tot=0,parts=[];
+    sp.m.forEach(function(m){var h=hitCalc(m,sp.force);tot+=h.d;parts.push(h.cr?h.d+'!':String(h.d));if(h.cr)qev('crit',1)});
+    hurtE(tot,sp.pierce);c.flash='e';
+    if(sp.cmd){c.cmd=true;log('Comando d’ombra: '+parts.join(' + ')+' danni. Le ombre agiranno due volte!','hit')}
+    else log(sp.s+': '+parts.join(' + ')+' danni','hit');
+  }else if(s){
+    var cost=k==='atk'?0:skCost(k);
+    if(p.mp<cost||(s.lv&&p.lv<s.lv))return;
+    p.mp-=cost;
+    if(k!=='atk'){quest('skills',1);qev('skill',1)}
+    if(k==='fury')qev('fury',1);
+    var tot2=0,parts2=[];
+    s.m.forEach(function(m){var h=hitCalc(m);tot2+=h.d;parts2.push(h.cr?h.d+'!':String(h.d));if(h.cr){qev('crit',1)}});
+    hurtE(tot2);c.flash='e';
+    log(s.n+': '+parts2.join(' + ')+' danni','hit');
+  }else if(k==='def'){
+    c.def=true;c.usedDef=true;p.mp=Math.min(maxMp(),p.mp+Math.max(8,Math.round(maxMp()*.08)));
+    log('Ti metti in guardia e recuperi MP.','sys');
+  }else if(k==='ph'){
+    if(p.potH<1||p.hp>=maxHp())return;
+    p.potH--;c.pot=true;p.sx.pot++;var h=healP(maxHp()*.5);
+    team().forEach(function(sh){if(sh.hp>0)healS(sh,sMax(sh)*.25)});
+    log('Pozione di cura: +'+h+' HP, le ombre recuperano il 25%.','good');
+  }else if(k==='pm'){
+    if(p.potM<1||p.mp>=maxMp())return;
+    p.potM--;c.pot=true;p.sx.pot++;var m=Math.round(maxMp()*.6);p.mp=Math.min(maxMp(),p.mp+m);log('Pozione di mana: +'+m+' MP','good');
+  }else if(k==='pa'){
+    if(p.potA<1||!(c.st.poison||c.st.curse>0||c.st.stun>0))return;
+    p.potA--;c.pot=true;p.sx.pot++;c.st={poison:null,stun:0,curse:0};log('Antidoto: ogni status è rimosso.','good');
+  }else if(k==='pb'){
+    if(p.potB<1||c.buff>0)return;
+    p.potB--;c.pot=true;p.sx.pot++;c.buff=3;log('Elisir del Monarca: +30% di danni per 3 turni a te e alle ombre!','good');
+  }else if(k==='flee'){endGate();return}
+  else return;
+  if(c.e.hp<=0){win();return}
+  cycle();
+}
+function cycle(){
+  c.busy=true;render();
+  timer=setTimeout(function(){
+    if(!c)return;
+    shadowsTurn();
+    if(c.cmd){c.cmd=false;if(c.e.hp>0)shadowsTurn()}
+    if(c.e.hp<=0){c.busy=false;win();return}
+    enemyTurn();
+    if(p.hp>0)endRound();
+    c.busy=false;
+    if(p.hp<=0){lose();return}
+    if(c.st.stun>0){c.st.stun--;c.stunCd=2;c.def=false;log('Sei stordito: salti il turno.','bad');cycle();return}
+    c.def=false;save();render();c.flash='';
+  },550);
+}
+function endRound(){
+  var st=c.st;
+  c.rt=(c.rt||0)+1;
+  if(sig()==='curse'&&c.rt%4===0&&!c.def&&c.st.curse<=0){log('La maledizione del santuario ti colpisce!','bad');applyStatus('curse')}
+  if(sig()==='fire'&&p.hp>0){var fd=Math.max(1,Math.round(maxHp()*.015));p.hp=Math.max(0,p.hp-fd);c.flash='p';log('Il calore ti brucia: -'+fd+' HP','bad')}
+  if(st.poison){
+    var d=st.poison.d;p.hp=Math.max(0,p.hp-d);c.flash='p';log('Il veleno ti infligge '+d+' danni.','bad');
+    if(--st.poison.t<=0){st.poison=null;log('Il veleno svanisce.','sys')}
+  }
+  if(st.curse>0)st.curse--;
+  if(c.buff>0)c.buff--;
+  if(c.stunCd>0)c.stunCd--;
+  var e=c.e;
+  if(e.hp>0&&e.pas.indexOf('regen')>=0){var h=Math.round(e.max*.03);e.hp=Math.min(e.max,e.hp+h);log(e.name+' si rigenera: +'+fmt(h),'bad')}
+  p.mp=Math.min(maxMp(),p.mp+mpRegen());
+}
+function shadowsTurn(){
+  team().forEach(function(s){
+    if(s.hp<=0||c.e.hp<=0)return;
+    var acts=hasT(s,'rapido')&&Math.random()<.25?2:1;
+    for(var n=0;n<acts;n++){
+      if(c.e.hp<=0)break;
+      if(n)log(s.name+' è rapidissimo e agisce ancora!','shadow');
+      shadowAct(s);
+    }
+    if(hasT(s,'devoto')&&p.hp>0&&p.hp<maxHp()){var dv=healP(maxHp()*.02);if(dv)log(s.name+' ti infonde forza: +'+dv+' HP','good')}
+    if(hasT(s,'purifica')&&Math.random()<.4){
+      if(c.st.poison){c.st.poison=null;log(s.name+' purifica il tuo veleno.','good')}
+      else if(c.st.curse>0){c.st.curse=0;log(s.name+' spezza la maledizione.','good')}
+    }
+  });
+}
+function shadowAct(s){
+  var b=sB(s);
+  if(s.cls==='guaritore'){
+    var best=null,br=.999,pr=p.hp/maxHp();
+    if(pr<br){br=pr;best='p'}
+    team().forEach(function(o){if(o.hp>0){var rr=o.hp/sMax(o);if(rr<br){br=rr;best=o}}});
+    if(best){
+      var h=Math.max(1,Math.round(sHeal(s)*rnd(.9,1.1)));
+      if(best==='p'){var g1=healP(h);log(s.name+' ti cura: +'+g1+' HP','good')}
+      else{var g2=healS(best,h);log(s.name+' cura '+best.name+': +'+g2,'good')}
+      if(hasAb(s)&&Math.random()<.3){
+        team().forEach(function(o){if(o.hp>0)healS(o,sHeal(s)*.6)});
+        healP(sHeal(s)*.6);log(s.name+' scatena una Luce sacra su tutto il gruppo!','good');
+      }
+      return;
+    }
+  }
+  var d=sAtk(s)*rnd(.85,1.15)*sm(),cr=false,tag='';
+  if(!noCrit()){
+    var cc=(s.cls==='assassino'?.25:0)+b.crit;
+    if(cc>0&&Math.random()<cc){d*=2;cr=true}
+  }
+  if(s.cls==='mago'&&hasAb(s)&&Math.random()<.25){d*=1.6;tag=' (Esplosione)'}
+  if(s.cls==='assassino'&&hasAb(s)&&c.e.hp<c.e.max*.3){d*=2;tag=' (Esecuzione)'}
+  d=Math.max(1,Math.round(d));
+  hurtE(d,false,s.cls==='mago');
+  if(hasT(s,'vampiro')){var vh=healS(s,d*.3)}
+  log(s.name+(s.cls==='mago'?' scaglia un incantesimo: ':(cr?' colpisce alla gola: ':' infligge '))+d+(cr?'!':'')+tag,'shadow');
+}
+function enemyTurn(){
+  var e=c.e,tele=e.tele;e.tele=null;
+  var tg=[{w:1,t:'p'}];
+  team().forEach(function(s){if(s.hp>0)tg.push({w:CL[s.cls].w*(s.eq&&s.eq.w&&s.eq.w.t>=3&&s.cls==='tank'?1.3:1),t:'s',s:s})});
+  var tot=tg.reduce(function(a,x){return a+x.w},0),r=Math.random()*tot,x=tg[0];
+  for(var i=0;i<tg.length;i++){r-=tg[i].w;if(r<=0){x=tg[i];break}}
+  if(sig()==='hunt'){var bw=1.01;tg.forEach(function(t){var r2=t.t==='p'?p.hp/maxHp():t.s.hp/sMax(t.s);if(r2<bw){bw=r2;x=t}})}
+  var en=1+(e.pas.indexOf('enrage')>=0?Math.min(1,.07*e.turns):0)+((sig()==='void'||sig()==='abyss')&&!e.boss?Math.min(.5,.05*e.turns):0);
+  var d=e.atk*rnd(.85,1.15)*en;
+  e.turns++;
+  if(tele){
+    var T=TELE[tele];
+    if(Math.random()<dodge()){log('Schivi '+e.name+' che '+T.l.replace(/^[^ ]+ /,''),'good');qev('dodge',1)}
+    else if(c.def&&tele!=='charge'){log('Ti pari: '+STN[tele]+' è bloccato!','good');qev('tele',1)}
+    else{
+      var K=50+2*p.lv,dd=d*(tele==='charge'?2.4:1.2)*K/(K+p.st.vit);
+      if(c.def){dd*=.5;qev('tele',1);log('Pari parzialmente il colpo!','good')}
+      dd=Math.max(1,Math.round(dd));p.hp=Math.max(0,p.hp-dd);c.flash='p';
+      log(e.name+' ti colpisce con forza: -'+dd+' HP','bad');
+      if(tele==='stun')applyStatus('stun');
+    }
+    if(tele==='curse'&&!c.def&&p.hp>0)applyStatus('curse');
+  }else{
+    if(!e.boss&&(sig()==='swarm'||(p.lv>=10&&Math.random()<.25))){
+      /* attacco ad area */
+      var ar=d*.55,K0=50+2*p.lv,pd=Math.max(1,Math.round(ar*K0/(K0+p.st.vit)*(c.def?.5:1)));
+      if(Math.random()<dodge()){log('Schivi l’attacco ad area!','good');qev('dodge',1)}
+      else{p.hp=Math.max(0,p.hp-pd);c.flash='p'}
+      var txt=e.name+' travolge tutti: -'+pd+' a te';
+      team().forEach(function(s){
+        if(s.hp<=0)return;
+        var sd2=Math.max(1,Math.round(ar*CL[s.cls].dr*(1-sB(s).red)));
+        s.hp=Math.max(0,s.hp-sd2);
+        if(s.hp<=0){log(s.name+' cade.','bad');c.fell=true;p.sx.fall++}
+      });
+      log(txt+' e alle ombre.','bad');
+    }else if(x.t==='p'){
+      if(Math.random()<dodge()){log('Schivi l’attacco!','good');qev('dodge',1)}
+      else{
+        var K2=50+2*p.lv,dm=d*K2/(K2+p.st.vit);if(c.def)dm*=.5;dm=Math.max(1,Math.round(dm));
+        p.hp=Math.max(0,p.hp-dm);c.flash='p';log(e.name+' ti colpisce: -'+dm+' HP','bad');
+        if(!c.def&&p.hp>0){
+          var pc=0;
+          if(e.pas.indexOf('poison')>=0)pc=.35;
+          var m=modOf();if(m&&m.poison)pc=Math.max(pc,.35);if(sig()==='toxic')pc=Math.max(pc,.5);
+          if(!e.boss&&e.cls==='mago'&&e.g>=1)pc=Math.max(pc,.2);
+          if(pc&&Math.random()<pc)applyStatus('poison');
+        }
+      }
+    }else{
+      var s=x.s;d=d*CL[s.cls].dr*(1-sB(s).red);d=Math.max(1,Math.round(d));
+      s.hp=Math.max(0,s.hp-d);
+      log(e.name+' colpisce '+s.name+': -'+d,'bad');
+      if(hasT(s,'spine')){var rf=Math.max(1,Math.round(d*.2));hurtE(rf);log(s.name+' riflette '+rf+' danni.','shadow')}
+      if(s.cls==='tank'&&hasAb(s)&&s.hp>0&&Math.random()<.25){var cd=Math.max(1,Math.round(sAtk(s)*.8));hurtE(cd);log(s.name+' contrattacca: '+cd,'shadow')}
+      if(s.hp<=0){log(s.name+' cade.','bad');c.fell=true;p.sx.fall++}
+    }
+  }
+  /* annuncio del prossimo attacco */
+  if(e.boss&&e.tl.length&&e.hp>0&&e.turns%e.ev===0){
+    var nx=e.tl[(e.turns/e.ev-1)%e.tl.length];e.tele=nx;
+    log('ATTENZIONE: '+e.name+' '+TELE[nx].l,'bad');
+  }
+}
+function win(){
+  var e=c.e;
+  if(sig()==='undead'&&!e.boss&&!e.rev&&Math.random()<.2){e.rev=true;e.hp=Math.round(e.max*.4);c.busy=false;c.flash='';log(e.name+' si rialza dai morti!','bad');save();render();return}p.kills++;p.cnt.kill++;quest('kills',1);qev('kill',1);weekly('kills',1);
+  if(e.el){p.cnt.elite++;qev('elite',1);weekly('elite',1)}
+  if(e.boss){p.cnt.boss++;quest('bosses',1);weekly('bosses',1);if(!c.tower){p.cnt.bossR[e.g]++;qev('boss',1);if(p.hp/maxHp()<.25)qev('lowhp',1)}}
+  var fr=0;
+  if(e.boss)fr=c.tower?(c.floor%10===0?3+Math.floor(c.floor/10):1):1+(e.g>=3?1:0)+(c.mod==='rosso'?1:0);
+  else if(e.el&&Math.random()<.3)fr=1;
+  if(fr){p.frag+=fr;c.fragGot+=fr;log('+'+fr+' frammento'+(fr>1?'i':'')+' d’ombra','good')}
+  c.gx+=e.exp;c.gg+=e.gold;p.gold+=e.gold;p.sx.gold+=e.gold;p.sx.exp+=e.exp;gainExp(e.exp);
+  log(e.name+' sconfitto. +'+fmt(e.exp)+' EXP, +'+fmt(e.gold)+' oro','good');
+  if(c.tower&&c.floor>p.tower)p.tower=c.floor;
+  if(c.tower){
+    if(e.boss&&c.floor%10===0&&c.floor>p.tcp){p.tcp=c.floor;toast('Checkpoint: piano '+(c.floor+1),'up')}
+    c.busy=false;c.flash='';nextRoom();return;
+  }
+  if(p.noArise){c.busy=false;c.flash='';nextRoom();return}
+  c.phase='arise';c.busy=false;c.flash='';save();render();
+}
+function pushHist(l){
+  if(!c||c.h)return;c.h=true;
+  p.hist.unshift({n:c.tower?'Torre':GATES[c.g].n,r:c.tower?'T':RANKS[c.g],f:c.floor||0,l:l,x:c.gx,g:c.gg,a:c.got.length,m:c.mod||''});
+  if(p.hist.length>15)p.hist.length=15;
+}
+function lose(){
+  p.sx.def++;pushHist('Sconfitto');
+  if(c.tower){c.lost=0;if(c.floor>p.tower)p.tower=c.floor}
+  else{c.lost=Math.floor(p.gold*.15);p.gold-=c.lost}
+  c.phase='lost';healAll();save();render();
+}
+function ariseChance(e){return Math.min(.9,(c&&c.oracle?.25:0)+(e.boss?.2+p.st.int*.015:.28+p.st.int*.012)-(e.el?.05:0)+(p.spec==='necro'?.12:0))}
+function rollRarity(e){
+  var x=Math.random();
+  if(e.boss)return x<.3?2:1;
+  if(e.el)return x<.08?2:(x<.5?1:0);
+  return x<.02?2:(x<.14?1:0);
+}
+function doArise(){
+  var ac=ariseCost();
+  if(c.phase!=='arise'||p.mp<ac)return;
+  p.mp-=ac;var e=c.e;c.oracle=false;
+  if(Math.random()<ariseChance(e)){
+    p.sx.ok++;
+    var m=CL[e.cls],uid=e.boss?'b'+e.g:'';
+    if(uid&&(p.shadows.some(function(s){return s.u===uid}))){
+      p.frag+=3;c.fragGot+=3;c.ok=true;c.msg=BN[e.g]+' è già nel tuo esercito: ottieni 3 frammenti d’ombra.';c.phase='ariseRes';p.cnt.arise++;qev('arise',1);return;
+    }
+    var r=rollRarity(e);
+    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,u:uid,cls:e.cls,r:r,tr:[],atk:r1(e.atk*.33*m.atk),max:Math.round(e.max*.4*m.hp),heal:e.cls==='guaritore'?r1(e.atk*.28):0,up:0,eq:{w:null,a:null},hp:0};
+    if(e.boss){var ft=BTR[e.g];if(ft==='devoto'&&e.cls!=='guaritore')ft='furia';sh.tr.push(ft);for(var i=0;i<r-1;i++)addTrait(sh)}
+    else for(var j=0;j<r;j++)addTrait(sh);
+    sh.hp=sMax(sh);
+    p.cnt.arise++;qev('arise',1);
+    if(p.shadows.length<maxTotal()){
+      sh.a=team().length<cap();p.shadows.push(sh);c.ok=true;c.msg=sh.name+' ('+RARITY[r].n+') '+(sh.a?'si unisce alla tua squadra come ':'va in panchina come ')+CL[sh.cls].n+'.';c.got.push(sh.name);c.phase='ariseRes';
+    }else{c.pend=sh;c.phase='replace'}
+  }else{p.sx.fail++;c.ok=false;c.msg='Estrazione fallita. L’ombra si dissolve.';c.phase='ariseRes'}
+}
+function doReplace(id){
+  var old=findShadow(id);if(!old||!c.pend)return;
+  var same=old.cls===c.pend.cls&&(old.eq.w||old.eq.a),moved=false;
+  if(same){['w','a'].forEach(function(k){if(old.eq[k]){c.pend.eq[k]=old.eq[k];old.eq[k]=null;moved=true}})}
+  dropShadow(old);
+  c.pend.a=old.a;p.shadows[p.shadows.indexOf(old)]=c.pend;c.pend.hp=sMax(c.pend);
+  c.ok=true;c.msg=c.pend.name+' prende il posto di '+old.name+'.'+(moved?' L\u2019equipaggiamento passa alla nuova ombra.':'');c.got.push(c.pend.name);c.pend=null;c.phase='ariseRes';
+}
+function rollLoot(){
+  var g=c.g,m=(g>rIdx()?1.5:1)*((modOf()&&modOf().lm)||1),out=[],b=Math.min(g,4),mm=modOf();
+  if(Math.random()<.40*m){var n=Math.random()<.15?2:1;p.potH+=n;out.push({t:n+'× Pozione di cura'})}
+  if(Math.random()<.28*m){p.potM++;out.push({t:'1× Pozione di mana'})}
+  if(Math.random()<.22*m*((mm&&mm.am)||1)){p.potA++;out.push({t:'1× Antidoto'})}
+  if(Math.random()<.10*m){p.potB++;out.push({t:'1× Elisir del Monarca',rare:true})}
+  var x=Math.random(),tier=-1,lab='';
+  if(x<.03*m){tier=b+2;lab='raro'}else if(x<.10*m){tier=b+1;lab='pregiato'}else if(x<.25*m){tier=b;lab='comune'}
+  if(tier>=0){
+    var cls=CLK[Math.floor(Math.random()*4)],k=Math.random()<.5?'w':'a';
+    p.inv.push({id:++p.iid,cls:cls,k:k,t:tier});
+    out.push({t:iName(cls,k,tier)+' ('+CL[cls].n+', '+lab+')',rare:tier>=b+1});
+    if(tier===b+2)setTimeout(function(){toast('Drop raro: '+iName(cls,k,tier),'up')},900);
+  }
+  c.loot=out;
+}
+function pickDoors(){
+  var keys=(c.tower?Object.keys(DOORS):GATES[c.g].doors),out=[];
+  while(out.length<3){var k=keys[Math.floor(Math.random()*keys.length)];if(out.indexOf(k)<0)out.push(k)}
+  return out;
+}
+function chooseDoor(k){
+  if(c.phase!=='doors'||c.doors.indexOf(k)<0)return;
+  leaveArm=false;
+  qev('door',1);
+  var L=c.tower?clamp(Math.round(4+c.floor*1.5),1,160):eLevel(c.g);
+  if(k==='chest'){
+    var x=Math.random();
+    if(x<.45){var g=Math.round((10+3*L)*((modOf()&&modOf().gm)||1));p.gold+=g;c.gg+=g;log('Forziere: '+g+' oro!','good')}
+    else if(x<.70){p.potH++;log('Forziere: una pozione di cura!','good')}
+    else if(x<.85){p.potA++;log('Forziere: un antidoto!','good')}
+    else{var tl=Math.max(1,Math.round(maxHp()*.08));p.hp=Math.max(1,p.hp-tl);applyStatus('poison');log('Il forziere è una trappola: -'+tl+' HP.','bad')}
+  }else if(k==='shrine'||k==='rest'){
+    var f=k==='shrine'?.45:.3;
+    healP(maxHp()*f);p.mp=Math.min(maxMp(),p.mp+Math.round(maxMp()*f));
+    team().forEach(function(s){if(s.hp>0)healS(s,sMax(s)*f)});
+    if(k==='shrine'){c.st={poison:null,stun:0,curse:0}}
+    log((k==='shrine'?'Ti bagni nella fonte':'Ti riposi al bivacco')+': recuperi il '+Math.round(f*100)+'%.','good');
+  }else if(k==='altar'){c.altar=true;log('L’altare ti benedice: +25% di danni nella prossima stanza.','good')}
+  else if(k==='trap'){
+    var th=Math.max(1,Math.round(maxHp()*.08));p.hp=Math.max(1,p.hp-th);c.rwX=1.7;log('Stanza maledetta: -'+th+' HP, ma la prossima stanza dà +70% di ricompense.','bad');
+  }else if(k==='merchant'){
+    var pp=priceP();
+    if(p.gold>=pp){p.gold-=pp;p.potH++;p.potA++;log('Il mercante ti vende una pozione di cura e un antidoto per '+pp+' oro.','good')}
+    else{p.potA++;log('Non hai abbastanza oro: il mercante ti regala solo un antidoto.','sys')}
+  }else if(k==='forge'){
+    var fc=p.shadows.filter(function(s){return s.up<UPMAX});
+    if(fc.length){var fs=fc[Math.floor(Math.random()*fc.length)];upgrade(fs);log('La fucina potenzia '+fs.name+' (+'+fs.up+').','good')}
+    else{var fg=Math.round(20+4*L);p.gold+=fg;c.gg+=fg;log('Nessuna ombra da potenziare: il fabbro ti paga '+fg+' oro.','sys')}
+  }else if(k==='oracle'){c.oracle=true;log('L’Oracolo guida la tua prossima estrazione: +25% di probabilità.','good')}
+  else if(k==='gamble'){
+    var gb=Math.max(20,Math.round((10+3*L)*2));
+    if(Math.random()<.5){p.gold+=gb;c.gg+=gb;log('Scommessa vinta: +'+gb+' oro!','good')}
+    else{var gl=Math.min(p.gold,Math.round(gb*.6));p.gold-=gl;log('Scommessa persa: -'+gl+' oro.','bad')}
+  }else if(k==='training'){var tx=Math.round(needAt(L)/24.5*2);c.gx+=tx;gainExp(tx);log('Ti alleni duramente: +'+fmt(tx)+' EXP.','good')}
+  else if(k==='ambush'){c.forceElite=true;c.rwX=Math.max(c.rwX,1.3);log('Imboscata! La prossima stanza ospita un’élite.','bad')}
+  else if(k==='blood'){
+    var bl=Math.max(1,Math.round(maxHp()*.15));p.hp=Math.max(1,p.hp-bl);p.frag+=2;c.fragGot+=2;log('Altare del sangue: -'+bl+' HP, +2 frammenti d’ombra.','good');
+  }
+  if(sig()==='herb')healP(maxHp()*.08);
+  c.doors=null;
+  if(c.tower)c.floor++;else c.room++;
+  team().forEach(function(s){var m=sMax(s);s.hp=Math.min(m,Math.max(0,s.hp)+Math.round(m*.3))});
+  startRoom();save();render();
+}
+function nextRoom(){
+  if(c.e.boss&&!c.tower){
+    p.gates++;p.cnt.gate++;quest('gates',1);weekly('gates',1);qev('gate',1);rollLoot();
+    if(!c.pot)qev('clean',1);
+    if(team().length>0&&!c.fell)qev('intact',1);
+    if(!c.usedDef)qev('nodef',1);
+    if(c.mod)qev('modgate',1);
+    if(team().some(function(s){return s.hp>0&&s.cls==='mago'}))qev('mage',1);
+    if(CLK.every(function(k){return team().some(function(s){return s.hp>0&&s.cls===k})}))qev('squad',1);
+    var b=Math.round((14+5*eLevel(c.g))*((modOf()&&modOf().gm)||1));p.gold+=b;c.gg+=b;
+    p.mods[c.g]=rollMod();
+    pushHist('Completato');c.phase='cleared';
+    toast('Gate completato!','up');save();render();return;
+  }
+  c.doors=pickDoors();c.phase='doors';
+  log('Davanti a te si aprono tre porte.','sys');
+  save();render();
+}
+
+/* ---------- viste ---------- */
+function bar(cur,max,cls,big){return '<div class="bar'+(big?' big':'')+'"><i class="'+cls+'" style="width:'+pct(cur/max)+'%"></i></div>'}
+function clsTag(cl){return '<span class="tag cls" style="--cc:'+CL[cl].col+'">'+CL[cl].n+'</span>'}
+function rarTag(s){return '<span class="tag" style="color:'+RARITY[s.r||0].col+'">'+RARITY[s.r||0].n+'</span>'}
+function vTop(){
+  var r=rIdx();
+  return '<div class="top"><div class="rk" style="--rk:'+RK_COL[r]+'" aria-label="Rango '+RANKS[r]+'">'+RANKS[r]+'</div>'+
+  '<div class="who"><div class="nm">Cacciatore <span>Lv '+p.lv+(p.awk?' · Risveglio '+p.awk:'')+'</span></div>'+bar(p.exp,need(),'xp')+
+  '<div class="sm">EXP '+fmt(p.exp)+' / '+fmt(need())+'</div></div>'+
+  '<div class="gold">'+fmt(p.gold)+'<small>oro</small><small class="syn" id="sync">'+syncTxt+'</small></div></div>';
+}
+function vStato(){
+  var S=[['str','Forza','danno'],['agi','Agilità','critico, schivata'],['int','Intelletto','MP, slot ombre'],['vit','Vitalità','HP, difesa']];
+  var h='';
+  if(p.kills===0&&p.gates===0)h+='<div class="panel hint"><p><b>Hai il diritto di salire di livello.</b></p><p class="sm">Entra in un Gate di rango E, sconfiggi i mostri e usa ARISE per trasformarli in ombre.</p><button class="btn pri full" style="margin-top:6px" data-a="tab" data-v="gate">Vai ai Gate</button></div>';
+  h+='<div class="panel"><div class="pair"><div><div class="sm" style="margin:0">HP '+fmt(p.hp)+' / '+fmt(maxHp())+'</div>'+bar(p.hp,maxHp(),'hp')+'</div><div><div class="sm" style="margin:0">MP '+fmt(p.mp)+' / '+fmt(maxMp())+'</div>'+bar(p.mp,maxMp(),'mp')+'</div></div>'+
+   '<div class="stats4" style="margin-top:8px"><div class="cell"><b>'+atk()+'</b><span>Attacco</span></div><div class="cell"><b>'+Math.round(crit()*100)+'%</b><span>Critico</span></div><div class="cell"><b>'+Math.round(dodge()*100)+'%</b><span>Schivata</span></div><div class="cell"><b>'+team().length+'/'+cap()+'</b><span>Squadra</span></div></div>'+
+   '<p class="sm" style="margin-top:6px">'+wName()+' +'+p.w+' · Gate '+fmt(p.gates)+' · Frammenti '+p.frag+' · Torre '+p.tower+'</p></div>';
+  h+='<div class="panel"><div class="lbl"><span>Attributi</span><em>Punti: '+p.pts+'</em></div><div class="attrs">';
+  h+=S.map(function(s){return '<div class="at"><div class="grow"><div class="rn">'+s[1]+'</div><div class="sm">'+s[2]+'</div></div><div class="val">'+p.st[s[0]]+'</div><button class="btn sq" data-a="stat" data-v="'+s[0]+'" '+(p.pts?'':'disabled')+' aria-label="Aumenta '+s[1]+'">+</button></div>'}).join('');
+  h+='</div></div>';
+  if(p.lv>=20||p.spec){
+    h+='<div class="panel"><div class="lbl"><span>Specializzazione</span>'+(p.spec?'<em>'+SPEC[p.spec].n+'</em>':'')+'</div>';
+    if(p.spec)h+='<p class="sm" style="margin:0">'+SPEC[p.spec].d+'</p>';
+    else Object.keys(SPEC).forEach(function(k){
+      h+='<div class="row"><div class="grow"><div class="rn">'+SPEC[k].n+'</div><div class="sm">'+SPEC[k].d+'</div></div><button class="btn '+(specArm===k?'dng':'pri')+' sm2" data-a="spec" data-v="'+k+'">'+(specArm===k?'Conferma':'Scegli')+'</button></div>';
+    });
+    h+='</div>';
+  }
+  if(p.lv>=100){
+    h+='<div class="panel"><div class="lbl"><span>Risveglio</span><em>Risvegli: '+p.awk+'</em></div><p class="sm" style="margin:0 0 6px">Torni al livello 1 mantenendo ombre, oggetti, oro, arma e specializzazione. Ogni Risveglio: +8% HP e attacco, +15% EXP per sempre.</p>'+
+     '<button class="btn '+(awkArm?'dng':'gld')+' full" data-a="awake">'+(awkArm?'Conferma il Risveglio':'Risvegliati')+'</button>'+(awkArm?'<button class="btn full" style="margin-top:6px" data-a="awakeno">Annulla</button>':'')+'</div>';
+  }else if(p.awk){
+    h+='<div class="panel"><p class="sm" style="margin:0">Risvegli: '+p.awk+' · HP e attacco +'+(8*p.awk)+'%, EXP +'+(15*p.awk)+'%.</p></div>';
+  }
+  h+='<div class="panel"><div class="lbl"><span>Backup salvataggio</span></div><div class="btns" style="margin-top:0"><button class="btn sm2" data-a="exp">Esporta</button><button class="btn sm2" data-a="imp">Importa</button></div>'+(saveBox!==null?'<textarea id="savebox" rows="4" style="width:100%;margin-top:8px;background:#0a0f22;color:var(--fg);border:1px solid var(--line);border-radius:3px;padding:6px;font-size:11px" placeholder="Incolla qui il salvataggio da importare">'+saveBox+'</textarea>'+(saveBox===''?'<button class="btn pri full sm2" style="margin-top:6px" data-a="impgo">Carica questo salvataggio</button>':'<p class="sm">Salvataggio copiato. Incollalo nell\u2019altro dispositivo con Importa.</p>')+'':'')+'</div>';
+  h+='<button class="btn full sm2" style="margin-bottom:8px" data-a="stats">Statistiche '+(statsOpen?'\u25b2':'\u25bc')+'</button>';
+  if(statsOpen){
+    var X=p.sx,C=[[fmt(p.cnt.kill),'Nemici'],[fmt(p.cnt.boss),'Boss'],[fmt(p.cnt.elite),'\u00c9lite'],[fmt(p.gates),'Gate vinti'],[fmt(X.def),'Sconfitte'],['Piano '+p.tower,'Torre'],[fmt(X.ok),'Ombre estratte'],[fmt(X.fail),'ARISE falliti'],[fmt(X.fall),'Ombre cadute'],[fmt(X.crit),'Critici'],[fmt(X.max),'Colpo max'],[fmt(X.pot),'Pozioni usate'],[fmt(X.dmg),'Danni totali'],[fmt(X.gold),'Oro guadagnato'],[fmt(X.exp),'EXP da nemici'],[p.frag,'Frammenti']];
+    h+='<div class="panel"><div class="lbl"><span>Statistiche</span><em>alcune contano da questa versione</em></div><div class="stats3">'+C.map(function(x){return '<div class="cell"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join('')+'</div>';
+    h+='<div class="lbl" style="margin-top:10px"><span>Ultime partite</span></div>';
+    if(!p.hist.length)h+='<p class="sm" style="margin:0">Ancora nessuna partita registrata.</p>';
+    p.hist.forEach(function(x){h+='<div class="hrow"><span class="hr" style="color:'+(x.l==='Completato'?'var(--good)':(x.l==='Sconfitto'?'var(--danger)':'var(--muted)'))+'">'+x.l+'</span><span class="hn">'+x.n+(x.r==='T'?' \u00b7 piano '+x.f:' \u00b7 '+x.r)+(x.m?' \u00b7 '+MODS[x.m].n:'')+'</span><span class="hs">'+fmt(x.x)+' EXP \u00b7 '+fmt(x.g)+' oro'+(x.a?' \u00b7 '+x.a+' ombre':'')+'</span></div>'});
+    h+='</div>';
+  }
+  h+='<button class="btn dng full sm2" data-a="reset">'+(resetArm?'Conferma: cancella tutti i progressi':'Ricomincia da zero')+'</button>'+(resetArm?'<button class="btn full sm2" style="margin-top:6px" data-a="resetno">Annulla</button>':'');
+  return h;
+}
+function vGate(){
+  var r=rIdx(),h='';
+  h+='<div class="panel" style="display:flex;align-items:center;gap:10px"><div class="grow"><div class="rn">ARISE dopo i nemici</div><div class="sm" style="margin:0">'+(p.noArise?'Disattivato: nessuna estrazione, si va avanti da soli.':'Attivo: dopo ogni nemico puoi estrarre un\u2019ombra.')+'</div></div><button class="btn sm2 '+(p.noArise?'':'pri')+'" data-a="noarise">'+(p.noArise?'Attiva':'Disattiva')+'</button></div>';
+  if(p.lv>=10){
+    h+='<div class="panel tower"><div class="lbl"><span>La Torre</span><em>Record: piano '+p.tower+'</em></div><p class="sm">Niente ARISE. Un boss ogni 5 piani e un checkpoint ogni 10. Ogni fascia di 10 piani ha regole diverse: scopri quale squadra funziona meglio. Gli HP non si ripristinano tra i piani. Se cadi tieni ciò che hai guadagnato.</p><div class="btns"><button class="btn pri" data-a="tower" data-v="1">Dal piano 1</button>'+(p.tcp>0?'<button class="btn gld" data-a="tower" data-v="'+(p.tcp+1)+'">Dal piano '+(p.tcp+1)+'<small>checkpoint</small></button>':'')+'</div></div>';
+  }else h+='<div class="panel"><div class="lbl"><span>La Torre</span></div><p class="sm">Si sblocca al livello 10.</p></div>';
+  h+='<div class="lbl"><span>Gate disponibili</span><em>Rango '+RANKS[r]+'</em></div>';
+  for(var g=0;g<6;g++){
+    var lock=!gOpen(g),L=eLevel(g),pen=eDanger(g),mk=p.mods[g],M=mk?MODS[mk]:null;
+    var rw=M?M.rw:1,gm=M?(M.gm||1):1,nr=(M&&M.rooms)||3;
+    var ex=(nr+4)*needAt(L)/24.5*pen*rw,go=(nr+4)*(4+1.6*L)*pen*gm+(14+5*L)*gm;
+    var lv=LO[g]+(g<5?'-'+HI[g]:'+');
+    h+='<div class="gate'+(lock?' lock':'')+'" style="--rk:'+RK_COL[g]+'"><div class="g">'+RANKS[g]+'</div><div><div class="gt">'+GATES[g].n+' <span class="tag" style="color:'+RK_COL[g]+'">'+RANKS[g]+'</span>'+(g>r?' <span class="tag warn">Pericoloso</span>':'')+(M?' <span class="tag vio">'+M.n+'</span>':'')+'</div>'+
+     '<div class="sm">Livelli '+lv+' · nemici livello '+L+(pen>1?' (+'+Math.round((pen-1)*100)+'% forza)':'')+'</div>'+'<div class="sm" style="color:var(--gold)">'+GATES[g].d+'</div>'+(M?'<div class="sm" style="color:#b79cff">'+M.d+'</div>':'')+'<div class="sm">'+nr+' stanze + boss · circa '+fmt(ex)+' EXP, '+fmt(go)+' oro</div></div>'+
+     '<button class="btn '+(lock?'':'pri')+'" data-a="enter" data-v="'+g+'" '+(lock?'disabled':'')+'>'+(lock?'Bloccato · serve livello '+(LO[g]-3):'Entra nel Gate')+'</button></div>';
+  }
+  return h;
+}
+function trDesc(s){return (s.tr||[]).map(function(k){return '<span class="tag vio" title="'+TRAITS[k].d+'">'+TRAITS[k].n+'</span>'}).join('')}
+function shadowStats(s){
+  var o='Attacco '+sd(sAtk(s))+' · HP '+fmt(sMax(s));
+  if(s.cls==='guaritore')o+=' · Cura '+sd(sHeal(s));
+  return o;
+}
+function partner(s){
+  if(s.r>=2||s.u)return null;
+  return p.shadows.filter(function(o){return o!==s&&o.name===s.name&&o.cls===s.cls&&o.r===s.r})[0]||null;
+}
+function evoCost(s){return s.r===0?6:14}
+function shDetail(s){
+  var uc=upCost(s),maxed=s.up>=UPMAX,pt=partner(s),h='<div class="shd">';
+  h+='<div class="sm">'+CL[s.cls].d+'</div>';
+  if(s.tr&&s.tr.length)h+='<div class="sm">'+s.tr.map(function(k){return '<b>'+TRAITS[k].n+'</b>: '+TRAITS[k].d}).join(' · ')+'</div>';
+  if(hasAb(s))h+='<div class="sm" style="color:var(--gold)">'+ABD[s.cls]+'</div>';
+  h+='<div class="slots">'+['w','a'].map(function(k){
+    var it=s.eq[k],on=selSlot&&selSlot.sid===s.id&&selSlot.k===k;
+    return '<button class="slot'+(it?'':' empty')+(on?' on':'')+'" data-a="slot" data-v="'+s.id+':'+k+'"><b>'+iSlot(s.cls,k)+'</b><span>'+(it?iName(s.cls,k,it.t):'Vuoto')+'</span></button>';
+  }).join('')+'</div>';
+  if(s.eq.w&&s.eq.a&&s.eq.w.t===s.eq.a.t)h+='<div class="sm" style="color:var(--gold)">Set completo: +8% attacco e HP.</div>';
+  if(selSlot&&selSlot.sid===s.id){
+    var k=selSlot.k,cur=s.eq[k],inv=p.inv.filter(function(it){return it.cls===s.cls&&it.k===k});
+    h+='<div class="pick"><div class="sm" style="margin:0 0 4px">Inventario: '+iSlot(s.cls,k)+'</div>';
+    if(!inv.length)h+='<p class="sm">Nessun oggetto adatto. Compra '+iSlot(s.cls,k).toLowerCase()+' nel Negozio.</p>';
+    inv.forEach(function(it){
+      h+='<div class="row"><div class="grow"><div class="rn">'+iName(it.cls,it.k,it.t)+'</div><div class="sm">'+bDesc(itemB(it.cls,it.k,it.t))+(k==='w'&&it.t>=3?' · abilità speciale':'')+'</div></div><button class="btn pri sm2" data-a="eq" data-v="'+s.id+':'+k+':'+it.id+'">Equipa</button></div>';
+    });
+    if(cur)h+='<button class="btn full sm2" style="margin-top:6px" data-a="uneq" data-v="'+s.id+':'+k+'">Rimuovi '+iName(s.cls,k,cur.t).toLowerCase()+'</button>';
+    h+='</div>';
+  }
+  h+='<div class="btns"><button class="btn gld sm2" data-a="up" data-v="'+s.id+'" '+((maxed||p.gold<uc)?'disabled':'')+'>Potenzia<small>'+(maxed?'Massimo +'+UPMAX:fmt(uc)+' oro')+'</small></button>'+
+   '<button class="btn dng sm2" data-a="rel" data-v="'+s.id+'">'+(relId===s.id?'Conferma':'Rilascia')+'</button></div>';
+  if(pt||s.r<2){
+    h+='<div class="btns">';
+    if(pt)h+='<button class="btn '+(fuseId===s.id?'dng':'pri')+' sm2" data-a="fuse" data-v="'+s.id+'">'+(fuseId===s.id?'Conferma fusione':'Fondi con la copia')+'<small>diventa '+RARITY[s.r+1].n+'</small></button>';
+    if(s.r<2)h+='<button class="btn sm2" data-a="evo" data-v="'+s.id+'" '+((s.up<10||p.frag<evoCost(s))?'disabled':'')+'>Evolvi<small>'+(s.up<10?'serve +10':evoCost(s)+' frammenti')+' · '+RARITY[s.r+1].n+'</small></button>';
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+function shRow(s){
+  var open=openSh===s.id||(selSlot&&selSlot.sid===s.id),full=!s.a&&team().length>=cap();
+  var tr=(s.tr||[]).map(function(k){return '<span class="tg">'+TRAITS[k].n+'</span>'}).join('');
+  return '<div class="sh '+(s.a?'act':'ben')+(open?' open':'')+'" style="--cc:'+CL[s.cls].col+'">'+
+   '<button class="shh" data-a="open" data-v="'+s.id+'"><span class="shc">'+CL[s.cls].s+'</span><span class="shm"><span class="shn">'+s.name+(s.up?' <i>+'+s.up+'</i>':'')+(s.boss?' <i class="u">unica</i>':'')+'</span>'+
+   '<span class="shs"><span style="color:'+RARITY[s.r||0].col+'">'+RARITY[s.r||0].n+'</span> · ATT '+sd(sAtk(s))+' · HP '+fmt(sMax(s))+(s.cls==='guaritore'?' · CURA '+sd(sHeal(s)):'')+'</span>'+(tr?'<span class="shs">'+tr+'</span>':'')+'</span><span class="chev">'+(open?'▲':'▼')+'</span></button>'+
+   '<button class="shb'+(s.a?'':' go')+'" data-a="bench" data-v="'+s.id+'" '+(full?'disabled':'')+'>'+(s.a?'In panchina':(full?'Squadra piena':'Schiera'))+'</button>'+
+   (open?shDetail(s):'')+'</div>';
+}
+function vOmbre(){
+  var tm=team(),bn=p.shadows.filter(function(x){return !x.a});
+  var h='<div class="panel"><div class="lbl"><span>Esercito d’ombra</span><em>Frammenti: '+p.frag+'</em></div><div class="sm" style="margin:0">Slot squadra con Intelletto 5, 15, 25 e 40. Tocca un’ombra per vedere equipaggiamento e potenziamenti.</div>';
+  var fm=formation();
+  if(fm.list.length)h+='<div class="fbox">'+fm.list.join(' · ')+'</div>';
+  h+='</div>';
+  if(!p.shadows.length){
+    return h+'<div class="panel hint"><p><b>Nessuna ombra.</b></p><p class="sm">Dopo ogni nemico sconfitto in un Gate puoi usare ARISE per estrarne l’ombra. Elite e boss danno ombre più rare.</p></div>';
+  }
+  h+='<div class="sech act"><span>Squadra attiva</span><em>'+tm.length+' / '+cap()+'</em></div>';
+  tm.forEach(function(s){h+=shRow(s)});
+  for(var i=tm.length;i<cap();i++)h+='<div class="sh empty">Slot libero · schiera un’ombra dalla panchina</div>';
+  h+='<div class="sech"><span>Panchina</span><em>'+bn.length+' / 4 · non combattono</em></div>';
+  if(!bn.length)h+='<div class="sh empty">Nessuna ombra in panchina</div>';
+  bn.forEach(function(s){h+=shRow(s)});
+  return h;
+}
+function stBar(){return ''}
+function vQuest(){
+  var d=new Date(),left=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)-d,hh=Math.floor(left/36e5),mm=Math.floor(left%36e5/6e4);
+  var done=questDone(),r=questReward();
+  var h='';
+  /* storia */
+  if(p.story<STORY.length){
+    var S=STORY[p.story],v=stVal(p.story),ok=v>=S.n,sr=stReward(p.story);
+    h+='<div class="panel story"><div class="lbl"><span>Storia · capitolo '+(p.story+1)+'/'+STORY.length+'</span><em>'+S.t+'</em></div><p class="sm" style="font-size:14px;color:var(--fg)">'+S.x+'</p>'+
+     '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>Progresso</span><span>'+v+' / '+S.n+'</span></div>'+bar(v,S.n,ok?'mp':'xp')+'</div>'+
+     '<p class="sm" style="margin-top:8px">Ricompensa: '+fmt(sr.gold)+' oro, '+fmt(sr.exp)+' EXP, '+sr.pts+' punt'+(sr.pts>1?'i':'o')+(sr.frag?', '+sr.frag+' frammenti':'')+'</p>'+
+     '<button class="btn pri full" style="margin-top:8px" data-a="stclaim" '+(ok?'':'disabled')+'>'+(ok?'Ritira e continua la storia':'Capitolo in corso')+'</button></div>';
+  }else h+='<div class="panel story"><div class="lbl"><span>Storia</span></div><p class="sm">Hai completato tutti i capitoli. Il regno delle ombre è tuo, Monarca.</p></div>';
+  h+='<div class="panel"><div class="lbl"><span>Quest giornaliera</span><em>Reset tra '+hh+'h '+mm+'m</em></div>';
+  h+=p.quest.t.map(function(t){var ok=t.v>=t.g;return '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>'+t.n+'</span><span>'+t.v+' / '+t.g+'</span></div>'+bar(t.v,t.g,ok?'mp':'xp')+'</div>'}).join('');
+  h+='<p class="sm" style="margin-top:12px">Ricompensa: '+r.pts+' punti attributo, '+fmt(r.gold)+' oro, '+fmt(r.exp)+' EXP</p>';
+  h+='<button class="btn pri full" style="margin-top:10px" data-a="claim" '+((done&&!p.quest.claimed)?'':'disabled')+'>'+(p.quest.claimed?'Ricompensa ritirata':(done?'Ritira ricompensa':'Quest in corso'))+'</button>';
+  h+='<p class="warnbox">Se a mezzanotte la quest non è completata, finisci nella zona di penalità e perdi il 25% dell’oro.</p></div>';
+  /* settimanale */
+  var wr=weeklyReward(),wd=weeklyDone(),wl=new Date(),dow=(wl.getDay()+6)%7,days=7-dow;
+  h+='<div class="panel"><div class="lbl"><span>Quest settimanale</span><em>Reset tra '+days+' giorni</em></div>';
+  h+=p.weekly.t.map(function(t){var ok=t.v>=t.g;return '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>'+t.n+'</span><span>'+t.v+' / '+t.g+'</span></div>'+bar(t.v,t.g,ok?'mp':'xp')+'</div>'}).join('');
+  h+='<p class="sm" style="margin-top:12px">Ricompensa: '+wr.pts+' punti, '+wr.frag+' frammenti, '+fmt(wr.gold)+' oro, '+fmt(wr.exp)+' EXP</p>';
+  h+='<button class="btn gld full" style="margin-top:10px" data-a="wclaim" '+((wd&&!p.weekly.claimed)?'':'disabled')+'>'+(p.weekly.claimed?'Ricompensa ritirata':(wd?'Ritira ricompensa':'Quest in corso'))+'</button></div>';
+
+  var list=QD.filter(function(x){return x.g===qRank});
+  var nd=list.filter(function(x){var q=p.gq[x.id];return q&&q.s===3}).length;
+  var ord=function(x){var q=p.gq[x.id];return q?(q.s===2?0:q.s===1?1:3):2};
+  list=list.map(function(x,i){return{x:x,i:i}}).sort(function(a,b){return ord(a.x)-ord(b.x)||a.i-b.i}).map(function(o){return o.x});
+  h+='<div class="panel"><div class="lbl"><span>Quest dei Gate</span><em>Attive '+qActive()+'/3</em></div><div class="chips">';
+  for(var g=0;g<6;g++){
+    var has=!!QL[g]&&gOpen(g);
+    h+='<button class="chip'+(g===qRank?' on':'')+'" style="--cc:'+RK_COL[g]+'" data-a="qrank" data-v="'+g+'" '+(has?'':'disabled')+' aria-label="Quest Gate '+RANKS[g]+(has?'':' (bloccate)')+'">'+RANKS[g]+'</button>';
+  }
+  h+='</div><p class="sm" style="margin:0 0 2px">Si sbloccano 3 livelli prima del rango. Contano solo i Gate del rango scelto · completate '+nd+'/'+list.length+'</p>';
+  list.forEach(function(x){
+    var st=p.gq[x.id],rw=qReward(x),v=st?st.v:0;
+    if(st&&st.s===3){h+='<div class="qc fin"><div class="qi"><div class="t ok"><span>'+x.t+'</span><span>Ritirata</span></div></div></div>';return}
+    var rs=fmt(rw.gold)+' oro · '+fmt(rw.exp)+' EXP'+(rw.pts?' · '+rw.pts+(rw.pts>1?' punti':' punto'):'');
+    var btn=!st?'<button class="btn pri sm2" data-a="qact" data-v="'+x.id+'" '+(qActive()>=3?'disabled':'')+'>Attiva</button>':
+      (st.s===1?'<button class="btn dng sm2" data-a="qcancel" data-v="'+x.id+'">'+(qConfirm===x.id?'Conferma':'Annulla')+'</button>':'<button class="btn gld sm2" data-a="qclaim" data-v="'+x.id+'">Ritira</button>');
+    h+='<div class="qc"><div class="qi"><div class="t'+(st&&st.s===2?' ok':'')+'"><span>'+x.t+'</span><span>'+(st?v+'/'+x.n:'')+'</span></div><div class="d">'+(qConfirm===x.id?'Annullando perdi i progressi: dovrai rifare la quest da capo.':x.x)+'</div>'+(st?bar(v,x.n,st.s===2?'mp':'xp'):'')+'<div class="rw">'+rs+'</div></div>'+btn+'</div>';
+  });
+  h+='</div>';
+  return h;
+}
+function vShop(){
+  var pp=priceP(),wc=priceW(),maxW=p.w>=30,tMax=Math.min(6,Math.min(rIdx(),4)+2);
+  var blocked=p.w%5===0&&p.w>0&&p.w/5>p.wev&&p.w<30;
+  var h='<div class="lbl"><span>Negozio</span><em>'+fmt(p.gold)+' oro</em></div>';
+  h+='<div class="panel">';
+  h+='<div class="row"><div class="grow"><div class="rn">Pozione di cura</div><div class="sm">Cura il 50% degli HP, le ombre il 25% · ne hai '+p.potH+'</div></div><button class="btn gld" data-a="buyH" '+(p.gold<pp?'disabled':'')+'>'+pp+' oro</button></div>';
+  h+='<div class="row"><div class="grow"><div class="rn">Pozione di mana</div><div class="sm">Recupera il 60% degli MP · ne hai '+p.potM+'</div></div><button class="btn gld" data-a="buyM" '+(p.gold<pp?'disabled':'')+'>'+pp+' oro</button></div>';
+  h+='<div class="row"><div class="grow"><div class="rn">Antidoto</div><div class="sm">Rimuove veleno, stordimento e maledizione · ne hai '+p.potA+'</div></div><button class="btn gld" data-a="buyA" '+(p.gold<Math.round(pp*.8)?'disabled':'')+'>'+Math.round(pp*.8)+' oro</button></div>';
+  h+='<div class="row"><div class="grow"><div class="rn">Elisir del Monarca</div><div class="sm">+30% di danni a te e alle ombre per 3 turni · ne hai '+p.potB+'</div></div><button class="btn gld" data-a="buyB" '+(p.gold<pp*3?'disabled':'')+'>'+(pp*3)+' oro</button></div></div>';
+  h+='<div class="panel"><div class="lbl"><span>Arma</span><em>Livello '+p.w+' / 30</em></div><div class="row"><div class="grow"><div class="rn">'+wName()+'</div><div class="sm">+5% attacco per livello e +10% per ogni evoluzione · attacco attuale '+atk()+'</div></div>';
+  if(blocked){
+    var k=p.w/5,need2=2*k+1,okr=rIdx()>=k;
+    h+='<button class="btn pri" data-a="evolveW" '+((okr&&p.frag>=need2)?'':'disabled')+'>Evolvi<small>'+(okr?need2+' frammenti':'rango '+RANKS[k])+'</small></button></div>';
+    h+='<p class="sm">L’arma ha raggiunto il suo limite: per evolverla servono rango '+RANKS[k]+' e '+need2+' frammenti d’ombra (li lasciano boss, élite e porte speciali). Ne hai '+p.frag+'.</p>';
+  }else h+='<button class="btn gld" data-a="buyW" '+((maxW||p.gold<wc)?'disabled':'')+'>'+(maxW?'Massimo':fmt(wc)+' oro')+'</button></div>';
+  h+='</div>';
+  h+='<div class="panel" style="--cc:'+CL[shopCls].col+'"><div class="lbl"><span>Equipaggiamento ombre</span></div><div class="chips">';
+  CLK.forEach(function(k){h+='<button class="chip'+(k===shopCls?' on':'')+'" style="--cc:'+CL[k].col+'" data-a="shopcls" data-v="'+k+'">'+CL[k].n+'</button>'});
+  h+='</div>';
+  ['w','a'].forEach(function(k){
+    for(var t=Math.max(0,tMax-2);t<=tMax;t++){
+      var own=p.inv.filter(function(it){return it.cls===shopCls&&it.k===k&&it.t===t}).length;
+      h+='<div class="row"><div class="grow"><div class="rn">'+iName(shopCls,k,t)+'</div><div class="sm">'+bDesc(itemB(shopCls,k,t))+(k==='w'&&t>=3?' · abilità speciale':'')+(own?' · in inventario: '+own:'')+'</div></div><button class="btn gld" data-a="buyI" data-v="'+shopCls+':'+k+':'+t+'" '+(p.gold<PRICE[t]?'disabled':'')+'>'+fmt(PRICE[t])+' oro</button></div>';
+    }
+  });
+  h+='<p class="warnbox">Le armi dal quarto livello (runiche in su) danno un’abilità speciale. Un’arma e un abbigliamento dello stesso livello formano un set (+8%). Equipaggia dalla scheda dell’ombra.</p></div>';
+  return h;
+}
+function stLine(){
+  var o=[];
+  if(c.st.poison)o.push('<span class="tag boss">Veleno '+c.st.poison.t+'</span>');
+  if(c.st.curse>0)o.push('<span class="tag vio">Maledetto '+c.st.curse+'</span>');
+  if(c.st.stun>0)o.push('<span class="tag warn">Stordito</span>');
+  if(c.buff>0)o.push('<span class="tag" style="color:var(--good)">Elisir '+c.buff+'</span>');
+  if(c.altarOn)o.push('<span class="tag" style="color:var(--good)">Benedizione</span>');
+  var m=modOf();if(m)o.push('<span class="tag vio">'+m.n+'</span>');
+  return o.join('');
+}
+var actHtml='';
+function vCombat(){
+  var e=c.e,fight=c.phase==='fight'&&!c.busy,h='',B='';
+  var hdr=c.tower?'Torre \u00b7 '+c.floor+' \u00b7 '+TB[band(c.floor)].n:GATES[c.g].n+' · '+RANKS[c.g];
+  var rm=c.tower?(c.floor%10===0?'Boss':''):'Stanza '+(c.room+1)+'/'+(c.rooms+1);
+  h+='<div class="panel"><div class="lbl"><span>'+hdr+'</span><span>'+rm+'</span></div>';
+  if(c.phase!=='cleared'&&c.phase!=='lost'){
+    h+='<div class="enemy'+(c.flash==='e'?' hit':'')+(e.hp<=0?' dead':'')+'"><div class="en">'+(e.boss?'<span class="tag boss">Boss</span>':'')+e.name+'</div>'+bar(e.hp,e.max,'hp',true)+
+     '<div class="sm">'+fmt(e.hp)+' / '+fmt(e.max)+' HP · ATT '+e.atk+(e.sh>0?' · Scudo '+fmt(e.sh):'')+'</div>'+
+     '<div class="telebox">'+(e.tele&&c.phase==='fight'?'<b>ATTENZIONE</b> '+TELE[e.tele].t:(e.pas.length?'<span class="sm">'+e.pas.map(function(k){return PASN[k]}).join(' · ')+'</span>':''))+'</div></div>';
+  }
+  h+='</div>';
+  h+='<div class="panel"><div class="lbl"><span>Il tuo gruppo</span>'+(c.tower?'':'<button class="mini'+(p.noArise?' off':'')+'" data-a="noarise">ARISE: '+(p.noArise?'no':'s\u00ec')+'</button>')+'</div><div class="stline">'+stLine()+'</div><div class="ally"><div class="me'+(c.flash==='p'?' hit':'')+'" style="grid-column:1/-1"><div class="n">Cacciatore</div><div class="pair"><div><div class="sm">HP '+fmt(p.hp)+'/'+fmt(maxHp())+'</div>'+bar(p.hp,maxHp(),'hp')+'</div><div><div class="sm">MP '+fmt(p.mp)+'/'+fmt(maxMp())+'</div>'+bar(p.mp,maxMp(),'mp')+'</div></div></div>';
+  team().forEach(function(s){h+='<div class="'+(s.hp<=0?'down':'')+'"><div class="n" style="color:'+CL[s.cls].col+'">'+CL[s.cls].s+' · '+s.name+'</div>'+bar(s.hp,sMax(s),'xp')+'</div>'});
+  h+='</div></div>';
+  h+='<div class="panel log">'+c.log.slice(-5).map(function(l){return '<div class="lg '+l.k+'">'+l.t+'</div>'}).join('')+'</div>';
+  if(c.phase==='fight'){
+    var pl=p.lv,sp=SPEC[p.spec],poisoned=!!(c.st.poison||c.st.curse>0||c.st.stun>0);
+    B+='<div class="acts">'+
+    '<button class="btn pri" data-a="c" data-v="atk" '+(fight?'':'disabled')+'>Attacco</button>'+
+    '<button class="btn" data-a="c" data-v="def" '+(fight?'':'disabled')+'>Difendi<small>MP, danni ½</small></button>'+
+    '<button class="btn" data-a="c" data-v="dbl" '+((fight&&p.mp>=skCost('dbl'))?'':'disabled')+'>Doppia lama<small>'+skCost('dbl')+' MP</small></button>'+
+    '<button class="btn" data-a="c" data-v="fury" '+((fight&&p.mp>=skCost('fury')&&pl>=5)?'':'disabled')+'>Furia<small>'+(pl>=5?skCost('fury')+' MP':'Liv. 5')+'</small></button>'+
+    '<button class="btn" data-a="c" data-v="dom" '+((fight&&p.mp>=skCost('dom')&&pl>=15)?'':'disabled')+'>Dominio<small>'+(pl>=15?skCost('dom')+' MP':'Liv. 15')+'</small></button>'+
+    '<button class="btn spc" data-a="c" data-v="spec" '+((fight&&sp&&p.mp>=spCost())?'':'disabled')+'>'+(sp?sp.s:'Speciale')+'<small>'+(sp?spCost()+' MP':'Liv. 20')+'</small></button>'+
+    '<button class="btn" data-a="c" data-v="ph" '+((fight&&p.potH>0&&(p.hp<maxHp()||team().some(function(s){return s.hp>0&&s.hp<sMax(s)})))?'':'disabled')+'>Cura<small>ne hai '+p.potH+'</small></button>'+
+    '<button class="btn" data-a="c" data-v="pm" '+((fight&&p.potM>0&&p.mp<maxMp())?'':'disabled')+'>Mana<small>ne hai '+p.potM+'</small></button>'+
+    '<button class="btn" data-a="c" data-v="pa" '+((fight&&p.potA>0&&poisoned)?'':'disabled')+'>Antidoto<small>ne hai '+p.potA+'</small></button>'+
+    '<button class="btn" data-a="c" data-v="pb" '+((fight&&p.potB>0&&c.buff<=0)?'':'disabled')+'>Elisir<small>ne hai '+p.potB+'</small></button>'+
+    '<button class="btn dng" data-a="c" data-v="flee" style="grid-column:span 2" '+(c.busy?'disabled':'')+'>Fuggi</button></div>';
+  }else if(c.phase==='arise'){
+    var full=p.shadows.length>=maxTotal(),ac=ariseCost();
+    B+='<div class="panel arise"><p class="big">'+e.name+' giace a terra.</p><p class="sm">Classe '+CL[e.cls].n+' · probabilità di estrazione '+Math.round(ariseChance(e)*100)+'% · costa '+ac+' MP</p>'+
+     '<p class="sm">Squadra '+team().length+'/'+cap()+' · Panchina '+(p.shadows.length-team().length)+'/4'+(e.boss?' · ombra unica del boss, rarità almeno Cavaliere':(e.el?' · élite: rarità migliore':''))+'</p>'+
+     (full?'<div class="full-warn"><b>Squadra e panchina sono piene.</b> Se l’estrazione riesce, dovrai scegliere quale delle tue ombre sostituire. L’ombra scelta viene eliminata e il suo equipaggiamento torna nell’inventario.</div>':'')+
+     '<div class="duo"><button class="btn arisebtn" data-a="arise" '+(p.mp<ac?'disabled':'')+'>ARISE</button><button class="btn" data-a="next">Lascia andare</button></div></div>';
+  }else if(c.phase==='replace'){
+    var n=c.pend;
+    B+='<div class="panel arise"><p class="big" style="color:#b79cff">Estrazione riuscita</p><p class="sm">Gli slot sono pieni. Scegli quale ombra sostituire.</p>'+
+     '<div class="pend"><div class="nm">'+clsTag(n.cls)+rarTag(n)+(n.boss?'<span class="tag boss">Unica</span>':'')+n.name+'</div><div class="sm">'+shadowStats(n)+'</div><div class="trs">'+trDesc(n)+'</div><div class="sm">'+CL[n.cls].d+'</div></div>';
+    p.shadows.forEach(function(s){
+      B+='<div class="row" style="text-align:left"><div class="grow"><div class="rn" style="color:'+CL[s.cls].col+'">'+CL[s.cls].s+' · '+s.name+' ('+RARITY[s.r||0].n+')'+(s.up?' +'+s.up:'')+'</div><div class="sm">'+shadowStats(s)+(s.eq.w||s.eq.a?' · equipaggiata':'')+'</div></div><button class="btn dng sm2" data-a="repl" data-v="'+s.id+'">Sostituisci</button></div>';
+    });
+    B+='</div>';
+  }else if(c.phase==='ariseRes'){
+    B+='<div class="panel arise"><p class="big" style="color:'+(c.ok?'#b79cff':'var(--danger)')+'">'+(c.ok?'Ombra estratta':'Estrazione fallita')+'</p><p class="sm" style="margin-bottom:14px">'+c.msg+'</p><button class="btn pri full" data-a="next">'+((c.e.boss&&!c.tower)?'Concludi il Gate':'Avanti')+'</button></div>';
+  }else if(c.phase==='doors'){
+    B+='<div class="panel"><div class="lbl"><span>Scegli una porta</span>'+(c.tower?'<em>Piano '+(c.floor+1)+' dopo</em>':'')+'</div>';
+    B+='<div class="doors3">';c.doors.forEach(function(k){B+='<button class="door" data-a="door" data-v="'+k+'"><b>'+DOORS[k].n+'</b><span>'+DOORS[k].d+'</span></button>'});B+='</div>';
+    if(c.tower)B+='<div class="leaverow">'+(leaveArm?'<span>Scendere dalla Torre?</span><button class="mini dng" data-a="leave">S\u00ec, scendi</button><button class="mini" data-a="leavecancel">No</button>':'<button class="mini" data-a="leavearm">Scendi dalla Torre\u2026</button>')+'</div>';
+    B+='</div>';
+  }else if(c.phase==='cleared'){
+    B+='<div class="panel"><div class="lbl"><span>Gate completato</span></div><div class="sum"><span>EXP ottenuta</span><span>'+fmt(c.gx)+'</span><span>Oro ottenuto</span><span>'+fmt(c.gg)+'</span><span>Ombre estratte</span><span>'+c.got.length+'</span><span>Frammenti</span><span>'+c.fragGot+'</span></div>'+
+     '<div class="lbl"><span>Bottino</span></div><div class="loot">'+(c.loot&&c.loot.length?c.loot.map(function(o){return '<div'+(o.rare?' class="rare"':'')+'>'+o.t+'</div>'}).join(''):'<div style="color:var(--muted)">Nessun oggetto questa volta.</div>')+'</div><button class="btn pri full" data-a="leave">Torna al rifugio</button></div>';
+  }else if(c.phase==='lost'){
+    B+='<div class="panel"><div class="lbl"><span>Sconfitta</span></div><p class="sm" style="font-size:14px">'+(c.tower?'Sei caduto al piano '+c.floor+'. Tieni tutto ciò che hai guadagnato.':'Sei caduto nel Gate. Perdi '+fmt(c.lost)+' oro, l’EXP guadagnata resta tua.')+'</p><button class="btn full" data-a="leave">Torna al rifugio</button></div>';
+  }
+  actHtml=B;
+  return h;
+}
+
+var TABS=[['stato','Stato'],['gate','Gate'],['ombre','Ombre'],['quest','Quest'],['shop','Negozio']];
+function render(){
+  checkQuest();
+  document.body.classList.add('cp');document.body.classList.toggle('tomb',false);
+  document.body.classList.toggle('cb',!!c);
+  $('#top').innerHTML=vTop();
+  var v=$('#view'),nav=$('#nav'),ab=$('#actbar'),root=document.documentElement;
+  if(c){
+    nav.hidden=true;var top=vCombat();
+    if(c.phase==='fight'){
+      v.innerHTML=top;ab.innerHTML='<div>'+actHtml+'</div>';ab.hidden=false;
+      document.body.style.paddingBottom=(ab.offsetHeight+16)+'px';
+      root.style.setProperty('--bar-h',ab.offsetHeight+'px');
+    }else{
+      v.innerHTML=top+actHtml;ab.hidden=true;ab.innerHTML='';
+      document.body.style.paddingBottom='';root.style.removeProperty('--bar-h');
+    }
+    return;
+  }
+  ab.hidden=true;document.body.style.paddingBottom='';root.style.removeProperty('--bar-h');
+  nav.hidden=false;
+  v.innerHTML=({stato:vStato,gate:vGate,ombre:vOmbre,quest:vQuest,shop:vShop})[tab]();
+  nav.innerHTML=TABS.map(function(t){
+    var dot=(t[0]==='stato'&&(p.pts>0||(p.lv>=20&&!p.spec)))||(t[0]==='quest'&&((questDone()&&!p.quest.claimed)||(weeklyDone()&&!p.weekly.claimed)||(p.story<STORY.length&&stVal(p.story)>=STORY[p.story].n)||QD.some(function(d){var s=p.gq[d.id];return s&&s.s===2})));
+    return '<button data-a="tab" data-v="'+t[0]+'" class="'+(tab===t[0]?'on':'')+(dot?' dot':'')+'">'+t[1]+'</button>';
+  }).join('');
+  if(pendingMsg){var m=pendingMsg;pendingMsg=null;toast(m,'bad')}
+}
+
+function act(a,v){
+  switch(a){
+    case 'tab':tab=v;saveBox=null;openSh=null;relId=null;selSlot=null;resetArm=false;qConfirm=null;fuseId=null;specArm=null;awkArm=false;break;
+    case 'stat':if(p.pts>0){p.st[v]++;p.pts--;if(v==='vit')p.hp+=12;if(v==='int')p.mp+=6}break;
+    case 'reset':
+      if(!resetArm){resetArm=true;break}
+      p=migrate(fresh());p.hp=maxHp();p.mp=maxMp();resetArm=false;relId=null;selSlot=null;tab='stato';toast('Nuova partita iniziata.');break;
+    case 'resetno':resetArm=false;break;
+    case 'spec':
+      if(p.lv>=20&&!p.spec&&SPEC[v]){if(specArm===v){p.spec=v;specArm=null;toast('Specializzazione: '+SPEC[v].n,'up')}else specArm=v}
+      break;
+    case 'awake':
+      if(p.lv<100)break;
+      if(!awkArm){awkArm=true;break}
+      p.awk++;p.lv=1;p.exp=0;p.pts=0;p.st={str:5,agi:5,int:5,vit:5};fixTeam();awkArm=false;p.hp=maxHp();p.mp=maxMp();
+      toast('Risveglio completato! Bonus permanenti attivi.','up');break;
+    case 'awakeno':awkArm=false;break;
+    case 'enter':enterGate(+v);break;
+    case 'tower':enterTower(v);break;
+    case 'claim':claimQuest(false);break;
+    case 'wclaim':claimWeekly(false);break;
+    case 'stclaim':
+      if(p.story<STORY.length&&stVal(p.story)>=STORY[p.story].n){
+        var sr=stReward(p.story);p.gold+=sr.gold;p.pts+=sr.pts;p.frag+=sr.frag;p.story++;gainExp(sr.exp);
+        toast('Capitolo completato! +'+fmt(sr.gold)+' oro, +'+fmt(sr.exp)+' EXP','up');
+      }
+      break;
+    case 'qrank':qRank=+v;qConfirm=null;break;
+    case 'qcancel':
+      if(p.gq[v]&&p.gq[v].s===1){if(qConfirm===v){delete p.gq[v];qConfirm=null;toast('Quest annullata: puoi sceglierne un’altra.')}else qConfirm=v}
+      break;
+    case 'qact':qConfirm=null;var qa=QD.filter(function(x){return x.id===v})[0];if(qa&&gOpen(qa.g)&&qActive()<3&&!p.gq[v]){p.gq[v]={s:1,v:0}}break;
+    case 'qclaim':
+      var qd=QD.filter(function(x){return x.id===v})[0],qs=p.gq[v];
+      if(qd&&qs&&qs.s===2){var rw=qReward(qd);qs.s=3;p.gold+=rw.gold;p.pts+=rw.pts;gainExp(rw.exp);toast('+'+fmt(rw.gold)+' oro, +'+fmt(rw.exp)+' EXP'+(rw.pts?', +'+rw.pts+' punti':''),'up')}
+      break;
+    case 'buyH':if(p.gold>=priceP()){p.gold-=priceP();p.potH++}break;
+    case 'buyM':if(p.gold>=priceP()){p.gold-=priceP();p.potM++}break;
+    case 'buyA':var ap=Math.round(priceP()*.8);if(p.gold>=ap){p.gold-=ap;p.potA++}break;
+    case 'buyB':if(p.gold>=priceP()*3){p.gold-=priceP()*3;p.potB++}break;
+    case 'buyW':if(p.w<30&&!(p.w%5===0&&p.w>0&&p.w/5>p.wev)&&p.gold>=priceW()){p.gold-=priceW();p.w++;toast('Arma potenziata: +'+p.w,'up')}break;
+    case 'evolveW':
+      var ek=p.w/5,ec=2*ek+1;
+      if(p.w%5===0&&p.w>0&&p.w<30&&ek>p.wev&&rIdx()>=ek&&p.frag>=ec){p.frag-=ec;p.wev++;toast('Arma evoluta: '+wName(),'up')}
+      break;
+    case 'shopcls':shopCls=v;break;
+    case 'buyI':
+      var bi=v.split(':'),bt=+bi[2];
+      if(p.gold>=PRICE[bt]){p.gold-=PRICE[bt];p.inv.push({id:++p.iid,cls:bi[0],k:bi[1],t:bt});toast(iName(bi[0],bi[1],bt)+' aggiunto all’inventario','up')}
+      break;
+    case 'slot':
+      var sl=v.split(':');
+      selSlot=(selSlot&&String(selSlot.sid)===sl[0]&&selSlot.k===sl[1])?null:{sid:+sl[0],k:sl[1]};
+      break;
+    case 'eq':
+      var ep=v.split(':'),es=findShadow(ep[0]);
+      if(es){
+        var ix=-1;p.inv.forEach(function(it,i){if(String(it.id)===ep[2])ix=i});
+        if(ix>=0){
+          var it=p.inv.splice(ix,1)[0];
+          if(es.eq[ep[1]])p.inv.push(es.eq[ep[1]]);
+          es.eq[ep[1]]=it;es.hp=sMax(es);selSlot=null;
+        }
+      }
+      break;
+    case 'uneq':
+      var up2=v.split(':'),us=findShadow(up2[0]);
+      if(us&&us.eq[up2[1]]){p.inv.push(us.eq[up2[1]]);us.eq[up2[1]]=null;us.hp=sMax(us);selSlot=null}
+      break;
+    case 'up':
+      var s2=findShadow(v);
+      if(s2&&s2.up<UPMAX){var uc=upCost(s2);if(p.gold>=uc){p.gold-=uc;upgrade(s2)}}
+      break;
+    case 'rel':
+      if(relId===+v){var rs=findShadow(v);if(rs){dropShadow(rs);p.shadows=p.shadows.filter(function(s){return s!==rs})}relId=null;selSlot=null}
+      else relId=+v;
+      break;
+    case 'fuse':
+      var fs=findShadow(v),fp=fs&&partner(fs);
+      if(fs&&fp){
+        if(fuseId===fs.id){
+          ['w','a'].forEach(function(k){if(!fs.eq[k]&&fp.eq[k]){fs.eq[k]=fp.eq[k];fp.eq[k]=null}});
+          dropShadow(fp);
+          fs.r++;fs.atk=r1(Math.max(fs.atk,fp.atk)*1.05);fs.max=Math.round(Math.max(fs.max,fp.max)*1.05);fs.heal=r1(Math.max(fs.heal,fp.heal)*1.05);fs.up=Math.max(fs.up,fp.up);
+          addTrait(fs);
+          p.shadows=p.shadows.filter(function(s){return s!==fp});
+          fs.hp=sMax(fs);fuseId=null;toast(fs.name+' diventa '+RARITY[fs.r].n+'!','up');
+        }else fuseId=fs.id;
+      }
+      break;
+    case 'evo':
+      var vs=findShadow(v);
+      if(vs&&vs.r<2&&vs.up>=10&&p.frag>=evoCost(vs)){
+        p.frag-=evoCost(vs);vs.r++;vs.up=0;addTrait(vs);vs.hp=sMax(vs);
+        toast(vs.name+' evolve in '+RARITY[vs.r].n+'!','up');
+      }
+      break;
+    case 'bench':
+      var bs=findShadow(v);
+      if(bs){if(bs.a)bs.a=false;else if(team().length<cap())bs.a=true}
+      break;
+    case 'c':pAct(v);return;
+    case 'arise':doArise();break;
+    case 'repl':doReplace(v);break;
+    case 'door':chooseDoor(v);return;
+    case 'next':nextRoom();return;
+    case 'leavearm':leaveArm=true;break;
+    case 'leavecancel':leaveArm=false;break;
+    case 'stats':statsOpen=!statsOpen;break;
+    case 'exp':
+      saveBox=JSON.stringify(p);
+      try{navigator.clipboard.writeText(saveBox).catch(function(){})}catch(e){}
+      break;
+    case 'imp':saveBox='';break;
+    case 'impgo':
+      var tb=document.getElementById('savebox'),io=null;
+      try{io=JSON.parse(tb.value)}catch(e){}
+      if(io&&io.st&&io.lv){saveBox=null;adopt(io);return}
+      toast('Salvataggio non valido.','bad');
+      break;
+    case 'open':openSh=(openSh===+v)?null:+v;if(openSh===null||(selSlot&&selSlot.sid!==+v))selSlot=null;break;
+    case 'noarise':p.noArise=!p.noArise;break;
+    case 'leave':leaveArm=false;endGate();return;
+  }
+  save();render();
+}
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-a]');
+  if(!b||b.disabled)return;
+  act(b.getAttribute('data-a'),b.getAttribute('data-v'));
+});
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden){flushCloud()}
+  else if(!c)render();
+});
+window.addEventListener('pagehide',function(){flushCloud()});
+
+boot(load()||migrate(fresh()));
+render();
+cloudInit();
+})();
+</script>
+<script>if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){navigator.serviceWorker.register("sw.js").catch(function(){})}</script>
+</body>
+</html>
