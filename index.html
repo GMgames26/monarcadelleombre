@@ -313,7 +313,7 @@ var MOBS=[
  [{n:'Guardiano dell’abisso',c:'tank'},{n:'Demone stregone',c:'mago'},{n:'Cavaliere cremisi',c:'assassino'},{n:'Serafino caduto',c:'guaritore'}]];
 var BOSS=[{n:'Re dei Goblin',c:'tank',r:[1,1.25]},{n:'Capitano Orco',c:'tank',r:[1.15,.75]},{n:'Signore dei Non Morti',c:'mago',r:[.6,1.3]},{n:'Titano di pietra',c:'tank',r:[.7,1.2]},{n:'Cavaliere della Rovina',c:'assassino',r:[1,.7]},{n:'Sovrano del Vuoto',c:'mago',r:[1.1,.6]}];
 var RSC={tank:{p:.85,m:1.15},mago:{p:1.15,m:.85},assassino:{p:1,m:1},guaritore:{p:1,m:1}};
-function dmgTaken(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?.9:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
+function dmgTaken(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
 function rsTags(e){if(!e.rs)return'';var o='';[['p','fisico'],['m','magia']].forEach(function(t){var f=e.rs[t[0]];if(f>=1.1)o+='<span class="tag warn">Debole: '+t[1]+'</span>';else if(f<=.9)o+='<span class="tag vio">Resiste: '+t[1]+'</span>'});return o}
 
@@ -365,9 +365,9 @@ var PRICE=[120,300,650,2400,7500,20000,50000];
 
 /* specializzazioni (livello 20) */
 var SPEC={
- tank:{n:'Tank',d:'HP +20%, danno fisico +15%, danni subiti −25% fisici e −10% magici. Abilità Muro d’ombra: colpo fisico da 1,8× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[1.8],phys:true,wall:true},
+ tank:{n:'Tank',d:'HP +20%, danno fisico +15%, danni subiti −25% fisici. Abilità Muro d’ombra: colpo fisico da 1,8× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[1.8],phys:true,wall:true},
  mago:{n:'Mago',d:'MP +25%, danno magico +20%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana: 3 colpi magici da 1,0× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[1,1,1],ign:true},
- sin:{n:'Assassino',d:'Critico +15%, schivata +10%, danni subiti −20% fisici. Abilità Colpo fatale: 3,4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[3.4],force:true,pierce:true},
+ sin:{n:'Assassino',d:'Critico +15%, schivata +10%, danni subiti −20% fisici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale: 3,4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[3.4],force:true,pierce:true},
  necro:{n:'Evocatore',d:'Ombre +15% forza e HP e −10% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra: le ombre agiscono due volte.',s:'Comando',f:.45,m:[.8],cmd:true}};
 
 /* modificatori dei Gate */
@@ -422,11 +422,11 @@ var QL=[
   ['crit','Occhio da assassino','Metti a segno {n} colpi critici nei Gate E',10,2],
   ['elite','Caccia all’élite','Sconfiggi {n} nemici élite nei Gate E',2,2],
   ['clean','Cacciatore sobrio','Completa {n} Gate E senza usare pozioni',2,3],
-  ['intact','Nessuno resta indietro','Completa {n} Gate E senza perdere ombre (ne serve una)',2,3],
+  ['weak','Occhio per i difetti','Colpisci {n} volte un nemico nel suo punto debole nei Gate E',6,3],
   ['gate','Veterano dei Gate','Completa {n} Gate E',10,4]],
- [['kill','Mattanza','Sconfiggi {n} nemici nei Gate D',25,1],
+ [['pot','Scorte in uso','Usa {n} pozioni nei Gate D',3,1],
   ['fury','Furia scatenata','Usa Furia d’ombra {n} volte nei Gate D',6,1],
-  ['skill','Maestro delle abilit\u00e0','Usa {n} abilit\u00e0 nei Gate D',20,1],
+  ['skill','Maestro delle abilità','Usa {n} abilità nei Gate D',20,1],
   ['shield','Rompiscudi','Infrangi {n} scudi dei boss nei Gate D',2,2],
   ['arise','Genitore d’ombre','Estrai {n} ombre nei Gate D',4,2],
   ['modgate','Gate maledetti','Completa {n} Gate D con un modificatore attivo',2,2],
@@ -435,43 +435,43 @@ var QL=[
   ['lowhp','Sul filo del rasoio','Sconfiggi un boss D con meno del 25% di HP',1,3],
   ['gate','Maestro dei Gate','Completa {n} Gate D',12,4]],
  [['kill','Pulizia dei sotterranei','Sconfiggi {n} nemici nei Gate C',40,1],
-  ['mage','Magia al comando','Completa {n} Gate C con un Mago d\u2019ombra vivo a fine Gate',2,1],
-  ['boss','Cacciatore di boss','Sconfiggi {n} boss nei Gate C',2,1],
+  ['weak','Punto debole','Colpisci {n} volte un nemico nel suo punto debole nei Gate C',10,1],
+  ['spec','Arte della via','Usa l’abilità di specializzazione {n} volte nei Gate C',8,1],
+  ['pot','Alchimista da campo','Usa {n} pozioni nei Gate C',4,2],
   ['tele','Parata perfetta','Blocca {n} attacchi annunciati nei Gate C',8,2],
-  ['arise','Il reclutatore','Estrai {n} ombre nei Gate C',4,2],
-  ['elite','Cacciatore di \u00e9lite','Sconfiggi {n} nemici \u00e9lite nei Gate C',8,2],
-  ['squad','Squadra completa','Completa {n} Gate C con tutte e 4 le classi vive a fine Gate',2,3],
-  ['nodef','Senza guardia','Completa {n} Gate C senza mai usare Difendi',2,3],
-  ['clean','Mani pulite','Completa {n} Gate C senza usare pozioni',3,3],
+  ['elite','Cacciatore di élite','Sconfiggi {n} nemici élite nei Gate C',8,2],
+  ['mage','Magia al comando','Completa {n} Gate C con un Mago d’ombra vivo a fine Gate',2,3],
+  ['tierp','Sfida rinforzata','Completa {n} Gate C in difficoltà Rinforzato o Rosso',2,3],
+  ['lowhp','Sul baratro','Sconfiggi un boss C con meno del 25% di HP',1,3],
   ['gate','Specialista dei Gate','Completa {n} Gate C',15,4]],
- [['kill','Piazza pulita','Sconfiggi {n} nemici nei Gate B',60,1],
-  ['fury','Furia incessante','Usa Furia d\u2019ombra {n} volte nei Gate B',12,1],
-  ['tele','Guardia ferrea','Blocca {n} attacchi annunciati nei Gate B',4,1],
+ [['fury','Furia incessante','Usa Furia d’ombra {n} volte nei Gate B',12,1],
+  ['kill','Piazza pulita','Sconfiggi {n} nemici nei Gate B',60,1],
+  ['boss','Abbattitore di boss','Sconfiggi {n} boss nei Gate B',3,1],
+  ['shield','Frantumascudi','Infrangi {n} scudi dei boss nei Gate B',5,2],
   ['crit','Colpi chirurgici','Metti a segno {n} colpi critici nei Gate B',25,2],
-  ['boss','Abbattitore di boss','Sconfiggi {n} boss nei Gate B',3,2],
-  ['modgate','Sfida estrema','Completa {n} Gate B con un modificatore attivo',3,2],
-  ['nodef','Guardia bassa','Completa {n} Gate B senza mai usare Difendi',3,3],
-  ['elite','Re degli \u00e9lite','Sconfiggi {n} nemici \u00e9lite nei Gate B',10,3],
-  ['lowhp','Ultimo respiro','Sconfiggi un boss B con meno del 25% di HP',1,3],
+  ['aboss','Dominatore di boss','Estrai {n} ombre da un boss nei Gate B',1,2],
+  ['squad','Squadra completa','Completa {n} Gate B con tutte e 4 le classi vive a fine Gate',2,3],
+  ['red','Il portale rosso','Completa {n} Gate B Rossi',1,3],
+  ['intact','Nessuno resta indietro','Completa {n} Gate B senza perdere ombre (ne serve una)',3,3],
   ['gate','Veterano dei Gate B','Completa {n} Gate B',18,4]],
- [['kill','Marea d\u2019ombra','Sconfiggi {n} nemici nei Gate A',80,1],
-  ['skill','Maestro delle abilit\u00e0','Usa {n} abilit\u00e0 nei Gate A',25,1],
-  ['boss','Cacciatore di boss','Sconfiggi {n} boss nei Gate A',3,1],
+ [['skill','Maestro delle abilità','Usa {n} abilità nei Gate A',25,1],
+  ['weak','Cecchino dei punti deboli','Colpisci {n} volte un nemico nel suo punto debole nei Gate A',15,1],
+  ['spec','Maestria suprema','Usa l’abilità di specializzazione {n} volte nei Gate A',15,1],
   ['arise','Legione crescente','Estrai {n} ombre nei Gate A',6,2],
-  ['crit','Colpi decisivi','Metti a segno {n} colpi critici nei Gate A',20,2],
-  ['tele','Muro di ferro','Blocca {n} attacchi annunciati nei Gate A',8,2],
-  ['squad','Armata perfetta','Completa {n} Gate A con tutte e 4 le classi vive a fine Gate',3,3],
+  ['modgate','Sfida estrema','Completa {n} Gate A con un modificatore attivo',3,2],
+  ['elite','Re degli élite','Sconfiggi {n} nemici élite nei Gate A',10,2],
+  ['red','Sangue sul portale','Completa {n} Gate A Rossi',2,3],
+  ['nodef','Guardia bassa','Completa {n} Gate A senza mai usare Difendi',4,3],
   ['clean','Cacciatore puro','Completa {n} Gate A senza usare pozioni',4,3],
-  ['intact','Nessun caduto','Completa {n} Gate A senza perdere ombre (ne serve una)',4,3],
   ['gate','Signore dei Gate A','Completa {n} Gate A',20,4]],
  [['kill','Sterminio','Sconfiggi {n} nemici nei Gate S',100,1],
   ['boss','Regicida','Sconfiggi {n} boss nei Gate S',3,1],
   ['crit','Lama implacabile','Metti a segno {n} colpi critici nei Gate S',40,1],
-  ['elite','Sangue reale','Sconfiggi {n} nemici \u00e9lite nei Gate S',15,2],
-  ['modgate','Oltre ogni limite','Completa {n} Gate S con un modificatore attivo',4,2],
-  ['mage','Arcano supremo','Completa {n} Gate S con un Mago d\u2019ombra vivo a fine Gate',4,2],
+  ['weak','Anatomia del nemico','Colpisci {n} volte un nemico nel suo punto debole nei Gate S',20,2],
+  ['elite','Sangue reale','Sconfiggi {n} nemici élite nei Gate S',15,2],
+  ['aboss','Trono d’ombra','Estrai {n} ombre da un boss nei Gate S',2,2],
+  ['red','Il Monarca rosso','Completa {n} Gate S Rossi',3,3],
   ['lowhp','Al limite','Sconfiggi un boss S con meno del 25% di HP',2,3],
-  ['nodef','Nessuna paura','Completa {n} Gate S senza mai usare Difendi',4,3],
   ['squad','Sovrano delle ombre','Completa {n} Gate S con tutte e 4 le classi vive a fine Gate',4,3],
   ['gate','Monarca dei Gate','Completa {n} Gate S',25,4]]];
 var QD=[];
@@ -504,14 +504,14 @@ var p, c=null, tab='stato', relId=null, timer=null, tt=null, pendingMsg=null;
 var saveBox=null,openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gq:{},tv:2,qv:2,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gq:{},tv:2,qv:3,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
   if(o.spec==='bers')o.spec='tank';
   if(o.trv===undefined){var oc=[4,8,14,22,35],rf=0;if(o.tree){['o','c','f'].forEach(function(k){for(var i=0;i<(o.tree[k]|0)&&i<5;i++)rf+=oc[i]});o.frag=(o.frag||0)+rf;o.tree={r:0,o:0,c:0,f:0}}o.trv=2}
   if(o.stv===undefined&&o.story!==undefined){o.story=[0,1,2,3,4,5,6,7,9,14,19][Math.max(0,Math.min(o.story|0,10))];o.stv=2}
   var shift=(o.tv===undefined),hadCnt=!!o.cnt;
   if(o.wev===undefined)o.wev=Math.min(5,Math.floor((o.w||0)/5));
-  if(o.qv!==2){var oldDone=0;for(var qk in (o.gq||{})){if(o.gq[qk].s===2)oldDone++}o.gq={};o.qv=2;if(oldDone)o.gold=(o.gold||0)+oldDone*(150+20*(o.lv||1))}
+  if(o.qv!==3){var oldDone=0,nq={};for(var qk2 in (o.gq||{})){if(/^[ED]\./.test(qk2)&&qk2!=='E.8'&&qk2!=='D.0')nq[qk2]=o.gq[qk2];else if(o.gq[qk2].s===2)oldDone++}o.gq=nq;o.qv=3;if(oldDone)o.gold=(o.gold||0)+oldDone*(150+20*(o.lv||1))}
   var d=fresh();for(var k in d){if(o[k]===undefined)o[k]=d[k]}
   if(!hadCnt){o.cnt.kill=o.kills||0;o.cnt.gate=o.gates||0}
   var ic=o.st.int,cp0=(ic>=5?1:0)+(ic>=15?1:0)+(ic>=25?1:0)+(ic>=40?1:0),act0=0;
@@ -940,6 +940,7 @@ function hitCalc(m,force,magic){
 /* danni al nemico, con scudo del boss */
 function hurtE(d,pierce,magic,ign){
   var e=c.e,rf=(e.rs&&e.rs[magic?'m':'p'])||1;if(ign&&rf<1)rf=1;
+  if(rf>1)qev('weak',1);
   d=Math.max(1,Math.round(d*rf));
   p.sx.dmg+=d;
   if(sig()==='bastion'&&!magic)d=Math.max(1,Math.round(d*.6));
@@ -973,7 +974,7 @@ function pAct(k){
   var s=SK[k],sp=SPEC[p.spec];
   if(k==='spec'){
     if(!sp||p.mp<spCost())return;
-    p.mp-=spCost();quest('skills',1);qev('skill',1);
+    p.mp-=spCost();quest('skills',1);qev('skill',1);qev('spec',1);
     var tot=0,parts=[];
     sp.m.forEach(function(m){var h=hitCalc(m,sp.force,!sp.phys);tot+=h.d;parts.push(h.cr?h.d+'!':String(h.d));if(h.cr)qev('crit',1)});
     hurtE(tot,sp.pierce,!sp.phys,sp.ign);c.flash='e';
@@ -995,18 +996,18 @@ function pAct(k){
     log('Ti metti in guardia e recuperi MP.','sys');
   }else if(k==='ph'){
     if(p.potH<1||p.hp>=maxHp())return;
-    p.potH--;c.pot=true;p.sx.pot++;var h=healP(maxHp()*(tn('c')>=4?.65:.5));
+    p.potH--;c.pot=true;qev('pot',1);p.sx.pot++;var h=healP(maxHp()*(tn('c')>=4?.65:.5));
     team().forEach(function(sh){if(sh.hp>0)healS(sh,sMax(sh)*.25)});
     log('Pozione di cura: +'+h+' HP, le ombre recuperano il 25%.','good');
   }else if(k==='pm'){
     if(p.potM<1||p.mp>=maxMp())return;
-    p.potM--;c.pot=true;p.sx.pot++;var m=Math.round(maxMp()*.6);p.mp=Math.min(maxMp(),p.mp+m);log('Pozione di mana: +'+m+' MP','good');
+    p.potM--;c.pot=true;qev('pot',1);p.sx.pot++;var m=Math.round(maxMp()*.6);p.mp=Math.min(maxMp(),p.mp+m);log('Pozione di mana: +'+m+' MP','good');
   }else if(k==='pa'){
     if(p.potA<1||!(c.st.poison||c.st.curse>0||c.st.stun>0))return;
-    p.potA--;c.pot=true;p.sx.pot++;c.st={poison:null,stun:0,curse:0};log('Antidoto: ogni status è rimosso.','good');
+    p.potA--;c.pot=true;qev('pot',1);p.sx.pot++;c.st={poison:null,stun:0,curse:0};log('Antidoto: ogni status è rimosso.','good');
   }else if(k==='pb'){
     if(p.potB<1||c.buff>0)return;
-    p.potB--;c.pot=true;p.sx.pot++;c.buff=3;var eh=healP(maxHp()*.4);p.mp=Math.min(maxMp(),p.mp+Math.round(maxMp()*.4));c.st={poison:null,stun:0,curse:0};team().forEach(function(sh){if(sh.hp>0)healS(sh,sMax(sh)*.2)});log('Elisir del Monarca: +'+eh+' HP, +40% MP, status rimossi e +30% di danni per 3 turni!','good');
+    p.potB--;c.pot=true;qev('pot',1);p.sx.pot++;c.buff=3;var eh=healP(maxHp()*.4);p.mp=Math.min(maxMp(),p.mp+Math.round(maxMp()*.4));c.st={poison:null,stun:0,curse:0};team().forEach(function(sh){if(sh.hp>0)healS(sh,sMax(sh)*.2)});log('Elisir del Monarca: +'+eh+' HP, +40% MP, status rimossi e +30% di danni per 3 turni!','good');
   }else if(k==='flee'){endGate();return}
   else return;
   if(c.e.hp<=0){win();return}
@@ -1120,6 +1121,7 @@ function enemyTurn(){
       var txt=e.name+' travolge tutti: -'+pd+' a te';
       team().forEach(function(s){
         if(s.hp<=0)return;
+        if(p.spec==='sin'&&Math.random()<.1)return;
         var sd2=Math.max(1,Math.round(ar*CL[s.cls].dr*(1-sB(s).red)));
         s.hp=Math.max(0,s.hp-sd2);
         if(s.hp<=0)shFall(s);
@@ -1141,10 +1143,13 @@ function enemyTurn(){
       }
     }else{
       var s=x.s;d=d*CL[s.cls].dr*(1-sB(s).red);d=Math.max(1,Math.round(d));
+      if(p.spec==='sin'&&Math.random()<.1){log(s.name+' schiva il colpo di '+e.name+'!','good');d=0}
+      else{
       s.hp=Math.max(0,s.hp-d);
       log(e.name+' colpisce '+s.name+': -'+d,'bad');
       if(hasT(s,'spine')){var rf=Math.max(1,Math.round(d*.2));hurtE(rf);log(s.name+' riflette '+rf+' danni.','shadow')}
       if(s.cls==='tank'&&hasAb(s)&&s.hp>0&&Math.random()<.25){var cd=Math.max(1,Math.round(sAtk(s)*.8));hurtE(cd);log(s.name+' contrattacca: '+cd,'shadow')}
+      }
       if(s.hp<=0)shFall(s);
     }
   }
@@ -1202,14 +1207,14 @@ function doArise(){
     p.sx.ok++;
     var m=CL[e.cls],uid=e.boss?'b'+e.g:'';
     if(uid&&(p.shadows.some(function(s){return s.u===uid}))){
-      p.frag+=2;c.fragGot+=2;c.ok=true;c.msg=BN[e.g]+' è già nel tuo esercito: ottieni 2 frammenti d’ombra.';c.phase='ariseRes';p.cnt.arise++;qev('arise',1);return;
+      p.frag+=2;c.fragGot+=2;c.ok=true;c.msg=BN[e.g]+' è già nel tuo esercito: ottieni 2 frammenti d’ombra.';c.phase='ariseRes';p.cnt.arise++;qev('arise',1);qev('aboss',1);return;
     }
     var r=rollRarity(e);
     var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,u:uid,cls:e.cls,r:r,tr:[],atk:r1(e.atk*.33*m.atk),max:Math.round(e.max*.4*m.hp),heal:e.cls==='guaritore'?r1(e.atk*.28):0,up:0,eq:{w:null,a:null},hp:0};
     if(e.boss){var ft=BTR[e.g];if(ft==='devoto'&&e.cls!=='guaritore')ft='furia';sh.tr.push(ft);for(var i=0;i<r-1;i++)addTrait(sh)}
     else for(var j=0;j<r;j++)addTrait(sh);
     sh.hp=sMax(sh);
-    p.cnt.arise++;qev('arise',1);
+    p.cnt.arise++;qev('arise',1);if(e.boss)qev('aboss',1);
     if(p.shadows.length<maxTotal()){
       sh.a=team().length<cap()&&canField(sh);p.shadows.push(sh);c.ok=true;c.msg=sh.name+' ('+RARITY[r].n+') '+(sh.a?'si unisce alla tua squadra come ':'va in panchina come ')+CL[sh.cls].n+'.';c.got.push(sh.name);c.phase='ariseRes';
     }else{c.pend=sh;c.phase='replace'}
@@ -1292,6 +1297,8 @@ function nextRoom(){
     if(team().length>0&&!c.fell)qev('intact',1);
     if(!c.usedDef)qev('nodef',1);
     if(c.mod)qev('modgate',1);
+    if(c.tier>=1)qev('tierp',1);
+    if(c.tier===2)qev('red',1);
     if(team().some(function(s){return s.hp>0&&s.cls==='mago'}))qev('mage',1);
     if(CLK.every(function(k){return team().some(function(s){return s.hp>0&&s.cls===k})}))qev('squad',1);
     var b=Math.round((14+5*eLevel(c.g))*((modOf()&&modOf().gm)||1)*(c.rwT||1));p.gold+=b;c.gg+=b;
