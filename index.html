@@ -909,8 +909,9 @@ function startRoom(){
 function enterGate(g){
   if(!gOpen(g))return;
   p.hp=maxHp();p.mp=maxMp();healAll();
-  var t=selT(g),hi=hiT(g),n=thrN(g,t),m=t===2?'rosso':(p.mods[g]==='rosso'?'':(p.mods[g]||''));
-  c=newRun({g:g,mod:m,rooms:TIERS[t].rooms+((m&&MODS[m].rooms)?MODS[m].rooms-3:0),tier:t,low:t<hi,aff:t>=1?affOf(g):'',thrN:n,thrM:1+.04*n,rwT:TIERS[t].rw*(1+.03*n)*(t<hi?.15:1)});
+  var t=selT(g),hi=hiT(g),lw=(t<hi||g<rIdx()),m=t===2?'rosso':(p.mods[g]==='rosso'?'':(p.mods[g]||''));
+  c=newRun({g:g,mod:m,rooms:TIERS[t].rooms+((m&&MODS[m].rooms)?MODS[m].rooms-3:0),tier:t,low:lw,aff:t>=1?affOf(g):'',thrN:0,thrM:lw?.9:1,rwT:TIERS[t].rw*(lw?.4:1)});
+  c.snap=JSON.stringify(Object.assign({},p,{run:null}));
   log(GATES[g].n+': '+GATES[g].d,'sys');
   if(m)log(MODS[m].n+': '+MODS[m].d,'sys');
   startRoom();
@@ -1167,7 +1168,7 @@ function win(){
   var fr=0;
   if(e.boss)fr=c.tower?(c.floor%10===0?3+Math.floor(c.floor/10):1):1+(e.g>=3?1:0)+(c.mod==='rosso'?1:0);
   else if(e.el&&Math.random()<.15)fr=1;
-  if(c.low&&!c.tower)fr=0;
+  if(c.low&&!c.tower)fr=Math.min(fr,1);
   if(fr){if(tn('f')>=3)fr*=1.15;addFrag(fr);c.fragGot+=fr;log('+'+fq(fr)+' frammenti d’ombra','good')}
   var eg=Math.round(e.gold*(1+(tn('r')>=1?.05:0)+(tn('f')>=1?.1:0))),ex=Math.round(e.exp*(1+(tn('r')>=1?.05:0)+(tn('f')>=2?.1:0)));
   c.gx+=ex;c.gg+=eg;p.gold+=eg;p.sx.gold+=eg;p.sx.exp+=ex;gainExp(ex);
@@ -1189,6 +1190,7 @@ function pushHist(l){
 function lose(){
   p.sx.def++;pushHist('Sconfitto');
   if(c.tower){c.lost=0;if(c.floor>p.tower)p.tower=c.floor}
+  else if(c.snap){var hh=p.hist,dd=p.sx.def,cc=c;p=JSON.parse(c.snap);p.hist=hh;p.sx=p.sx||{};p.sx.def=dd;c=cc;c.lost=0;c.rest=true}
   else{c.lost=Math.floor(p.gold*.15);p.gold-=c.lost}
   c.phase='lost';healAll();save();render();
 }
@@ -1229,7 +1231,7 @@ function doReplace(id){
   c.ok=true;c.msg=c.pend.name+' prende il posto di '+old.name+'.'+(moved?' L\u2019equipaggiamento passa alla nuova ombra.':'');c.got.push(c.pend.name);c.pend=null;c.phase='ariseRes';
 }
 function rollLoot(){
-  var g=c.g,m=(g>rIdx()?1.5:1)*((modOf()&&modOf().lm)||1)*(tn('f')>=5?1.2:1)*(c.low?.15:1),out=[],b=Math.min(g,4),mm=modOf();
+  var g=c.g,m=(g>rIdx()?1.5:1)*((modOf()&&modOf().lm)||1)*(tn('f')>=5?1.2:1)*(c.low?.4:1),out=[],b=Math.min(g,4),mm=modOf();
   if(Math.random()<.20*m){var n=Math.random()<.15?2:1;p.potH+=n;out.push({t:n+'× Pozione di cura'})}
   if(Math.random()<.14*m){p.potM++;out.push({t:'1× Pozione di mana'})}
   if(Math.random()<.11*m*((mm&&mm.am)||1)){p.potA++;out.push({t:'1× Antidoto'})}
@@ -1302,8 +1304,7 @@ function nextRoom(){
     if(team().some(function(s){return s.hp>0&&s.cls==='mago'}))qev('mage',1);
     if(CLK.every(function(k){return team().some(function(s){return s.hp>0&&s.cls===k})}))qev('squad',1);
     var b=Math.round((14+5*eLevel(c.g))*((modOf()&&modOf().gm)||1)*(c.rwT||1));p.gold+=b;c.gg+=b;
-    if(!c.low){p.thr=p.thr||{};var tk=c.g+'.'+(c.tier|0);p.thr[tk]=Math.min(15,(p.thr[tk]|0)+1)}
-    p.mods[c.g]=rollMod();p.af=p.af||{};p.af[c.g]=Math.random()<.5?'ward':'plate';
+        p.mods[c.g]=rollMod();p.af=p.af||{};p.af[c.g]=Math.random()<.5?'ward':'plate';
     pushHist('Completato');c.phase='cleared';
     toast('Gate completato!','up');save();render();return;
   }
@@ -1371,9 +1372,9 @@ function vGate(){
   }else h+='<div class="panel"><div class="lbl"><span>La Torre</span></div><p class="sm">Si sblocca al livello 10.</p></div>';
   h+='<div class="lbl"><span>Gate disponibili</span><em>Rango '+RANKS[r]+'</em></div>';
   for(var g=0;g<6;g++){
-    var lock=!gOpen(g),L=eLevel(g),pen=eDanger(g),hi=hiT(g),sl=selT(g),low=sl<hi,tn2=thrN(g,sl);
+    var lock=!gOpen(g),L=eLevel(g),pen=eDanger(g),hi=hiT(g),sl=selT(g),low=(sl<hi||g<r),tn2=0;
     var mk=sl===2?'rosso':(p.mods[g]==='rosso'?'':p.mods[g]),M=mk?MODS[mk]:null;
-    var rw=(M?M.rw:1)*TIERS[sl].rw*(1+.03*tn2)*(low?.15:1),gm=(M?(M.gm||1):1)*TIERS[sl].rw*(1+.03*tn2)*(low?.15:1),nr=TIERS[sl].rooms+((M&&M.rooms)?M.rooms-3:0);
+    var rw=(M?M.rw:1)*TIERS[sl].rw*(low?.4:1),gm=(M?(M.gm||1):1)*TIERS[sl].rw*(low?.4:1),nr=TIERS[sl].rooms+((M&&M.rooms)?M.rooms-3:0);
     var ex=(nr+4)*needAt(L)/24.5*pen*rw,go=(nr+4)*(4+1.6*L)*pen*gm+(14+5*L)*gm;
     var lv=LO[g]+(g<5?'-'+HI[g]:'+'),tb='';
     for(var t=0;t<3;t++){var un=p.lv>=tierLv(g,t);tb+='<button class="chip'+(t===sl?' on':'')+'" style="--cc:'+(t===2?'#ff4d6d':RK_COL[g])+'" data-a="gtier" data-v="'+g+':'+t+'" '+((un&&!lock)?'':'disabled')+'>'+TIERS[t].n+(un?'':' · Liv. '+tierLv(g,t))+'</button>'}
@@ -1590,7 +1591,7 @@ function vCombat(){
     B+='<div class="panel"><div class="lbl"><span>Gate completato</span></div><div class="sum"><span>EXP ottenuta</span><span>'+fmt(c.gx)+'</span><span>Oro ottenuto</span><span>'+fmt(c.gg)+'</span><span>Ombre estratte</span><span>'+c.got.length+'</span><span>Frammenti</span><span>'+c.fragGot+'</span></div>'+
      '<div class="lbl"><span>Bottino</span></div><div class="loot">'+(c.loot&&c.loot.length?c.loot.map(function(o){return '<div'+(o.rare?' class="rare"':'')+'>'+o.t+'</div>'}).join(''):'<div style="color:var(--muted)">Nessun oggetto questa volta.</div>')+'</div><button class="btn pri full" data-a="leave">Torna al rifugio</button></div>';
   }else if(c.phase==='lost'){
-    B+='<div class="panel"><div class="lbl"><span>Sconfitta</span></div><p class="sm" style="font-size:14px">'+(c.tower?'Sei caduto al piano '+c.floor+'. Tieni tutto ciò che hai guadagnato.':'Sei caduto nel Gate. Perdi '+fmt(c.lost)+' oro, l’EXP guadagnata resta tua.')+'</p><button class="btn full" data-a="leave">Torna al rifugio</button></div>';
+    B+='<div class="panel"><div class="lbl"><span>Sconfitta</span></div><p class="sm" style="font-size:14px">'+(c.tower?'Sei caduto al piano '+c.floor+'. Tieni tutto ciò che hai guadagnato.':'Sei caduto nel Gate'+(c.rest?': tutto torna com’era prima di entrare (EXP, oro, ombre e oggetti).':'. Perdi '+fmt(c.lost)+' oro, l’EXP guadagnata resta tua.'))+'</p><button class="btn full" data-a="leave">Torna al rifugio</button></div>';
   }
   actHtml=B;
   return h;
