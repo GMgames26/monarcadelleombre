@@ -380,7 +380,7 @@ var MODS={
  tesoro:{n:'Tesoro nascosto',d:'Oro doppio, nemici +15% di forza.',pw:1.15,rw:1,gm:2},
  elite:{n:'Covo d’élite',d:'Tutti i nemici sono élite. EXP +40%.',pw:1,rw:1.4,allElite:true,lm:1.2}};
 var MODK=Object.keys(MODS).filter(function(k){return k!=='rosso'});
-function rollMod(){return Math.random()<.4?'':MODK[Math.floor(Math.random()*MODK.length)]}
+function rollMod(){return ''}
 
 /* porte tra una stanza e l'altra */
 var DOORS={
@@ -410,7 +410,7 @@ var TB=[
  {k:'titan',n:'Titani',d:'Nemici enormi e lenti che si rigenerano.'},
  {k:'abyss',n:'Abisso',d:'Furia crescente e cure dimezzate.'}];
 function band(f){return Math.floor((f-1)/10)%6}
-function sig(){return c?(c.tower?TB[band(c.floor)].k:GATES[c.g].sig):''}
+function sig(){return c?(c.tower?TB[band(c.floor)].k:''):''}
 
 /* quest dei Gate: 10 per rango, diverse tra loro (per ora E e D) */
 var QL=[
@@ -429,7 +429,7 @@ var QL=[
   ['skill','Maestro delle abilità','Usa {n} abilità nei Gate D',20,1],
   ['shield','Rompiscudi','Infrangi {n} scudi dei boss nei Gate D',2,2],
   ['arise','Genitore d’ombre','Estrai {n} ombre nei Gate D',4,2],
-  ['modgate','Gate maledetti','Completa {n} Gate D con un modificatore attivo',2,2],
+  ['tierp','Sfida rinforzata','Completa {n} Gate D in difficoltà Rinforzato o Rosso',2,2],
   ['nodef','Senza guardia','Completa {n} Gate D senza mai usare Difendi',2,3],
   ['elite','Predatore d’élite','Sconfiggi {n} nemici élite nei Gate D',5,3],
   ['lowhp','Sul filo del rasoio','Sconfiggi un boss D con meno del 25% di HP',1,3],
@@ -458,7 +458,7 @@ var QL=[
   ['weak','Cecchino dei punti deboli','Colpisci {n} volte un nemico nel suo punto debole nei Gate A',15,1],
   ['spec','Maestria suprema','Usa l’abilità di specializzazione {n} volte nei Gate A',15,1],
   ['arise','Legione crescente','Estrai {n} ombre nei Gate A',6,2],
-  ['modgate','Sfida estrema','Completa {n} Gate A con un modificatore attivo',3,2],
+  ['tierp','Sfida estrema','Completa {n} Gate A in difficoltà Rinforzato o Rosso',3,2],
   ['elite','Re degli élite','Sconfiggi {n} nemici élite nei Gate A',10,2],
   ['red','Sangue sul portale','Completa {n} Gate A Rossi',2,3],
   ['nodef','Guardia bassa','Completa {n} Gate A senza mai usare Difendi',4,3],
@@ -715,8 +715,8 @@ function wName(){return WN[p.wev]}
 function ariseCost(){return Math.max(10,Math.round(maxMp()*.08))}
 function mpRegen(){return Math.max(2,Math.round(maxMp()*.015))}
 var SK={atk:{f:0,m:[1],n:'Attacco'},dbl:{f:.15,m:[.75,.75],n:'Doppia lama'},fury:{f:.35,m:[2.6],n:'Furia d’ombra',lv:5},dom:{f:.6,m:[4.6],n:'Dominio del Monarca',lv:15}};
-function skCost(k){return Math.max(1,Math.round(maxMp()*SK[k].f*(p.spec==='mago'?.8:1)))}
-function spCost(){return p.spec?Math.max(1,Math.round(maxMp()*SPEC[p.spec].f*(p.spec==='mago'?.8:1))):0}
+function skCost(k){return Math.max(1,Math.round(50*SK[k].f*(p.spec==='mago'?.8:1)))}
+function spCost(){return p.spec?Math.max(1,Math.round(50*SPEC[p.spec].f*(p.spec==='mago'?.8:1))):0}
 function gOpen(g){return p.lv>=LO[g]-3}
 function eLevel(g){return clamp(p.lv,LO[g],HI[g])}
 function eDanger(g){return 1+.05*Math.max(0,LO[g]-p.lv)}
@@ -909,10 +909,10 @@ function startRoom(){
 function enterGate(g){
   if(!gOpen(g))return;
   p.hp=maxHp();p.mp=maxMp();healAll();
-  var t=selT(g),hi=hiT(g),lw=(t<hi||g<rIdx()),m=t===2?'rosso':(p.mods[g]==='rosso'?'':(p.mods[g]||''));
-  c=newRun({g:g,mod:m,rooms:TIERS[t].rooms+((m&&MODS[m].rooms)?MODS[m].rooms-3:0),tier:t,low:lw,aff:t>=1?affOf(g):'',thrN:0,thrM:lw?.9:1,rwT:TIERS[t].rw*(lw?.4:1)});
+  var t=selT(g),hi=hiT(g),lw=(t<hi||g<rIdx()),m=t===2?'rosso':'';
+  c=newRun({g:g,mod:m,rooms:TIERS[t].rooms+((m&&MODS[m].rooms)?MODS[m].rooms-3:0),tier:t,low:lw,aff:t>=1?affOf(g):'',thrN:0,thrM:lw?.9:1,rwT:TIERS[t].rw});
   c.snap=JSON.stringify(Object.assign({},p,{run:null}));
-  log(GATES[g].n+': '+GATES[g].d,'sys');
+  log(GATES[g].n+'.','sys');
   if(m)log(MODS[m].n+': '+MODS[m].d,'sys');
   startRoom();
 }
@@ -1168,7 +1168,7 @@ function win(){
   var fr=0;
   if(e.boss)fr=c.tower?(c.floor%10===0?3+Math.floor(c.floor/10):1):1+(e.g>=3?1:0)+(c.mod==='rosso'?1:0);
   else if(e.el&&Math.random()<.15)fr=1;
-  if(c.low&&!c.tower)fr=Math.min(fr,1);
+  
   if(fr){if(tn('f')>=3)fr*=1.15;addFrag(fr);c.fragGot+=fr;log('+'+fq(fr)+' frammenti d’ombra','good')}
   var eg=Math.round(e.gold*(1+(tn('r')>=1?.05:0)+(tn('f')>=1?.1:0))),ex=Math.round(e.exp*(1+(tn('r')>=1?.05:0)+(tn('f')>=2?.1:0)));
   c.gx+=ex;c.gg+=eg;p.gold+=eg;p.sx.gold+=eg;p.sx.exp+=ex;gainExp(ex);
@@ -1231,7 +1231,7 @@ function doReplace(id){
   c.ok=true;c.msg=c.pend.name+' prende il posto di '+old.name+'.'+(moved?' L\u2019equipaggiamento passa alla nuova ombra.':'');c.got.push(c.pend.name);c.pend=null;c.phase='ariseRes';
 }
 function rollLoot(){
-  var g=c.g,m=(g>rIdx()?1.5:1)*((modOf()&&modOf().lm)||1)*(tn('f')>=5?1.2:1)*(c.low?.4:1),out=[],b=Math.min(g,4),mm=modOf();
+  var g=c.g,m=(g>rIdx()?1.5:1)*((modOf()&&modOf().lm)||1)*(tn('f')>=5?1.2:1),out=[],b=Math.min(g,4),mm=modOf();
   if(Math.random()<.20*m){var n=Math.random()<.15?2:1;p.potH+=n;out.push({t:n+'× Pozione di cura'})}
   if(Math.random()<.14*m){p.potM++;out.push({t:'1× Pozione di mana'})}
   if(Math.random()<.11*m*((mm&&mm.am)||1)){p.potA++;out.push({t:'1× Antidoto'})}
@@ -1373,14 +1373,14 @@ function vGate(){
   h+='<div class="lbl"><span>Gate disponibili</span><em>Rango '+RANKS[r]+'</em></div>';
   for(var g=0;g<6;g++){
     var lock=!gOpen(g),L=eLevel(g),pen=eDanger(g),hi=hiT(g),sl=selT(g),low=(sl<hi||g<r),tn2=0;
-    var mk=sl===2?'rosso':(p.mods[g]==='rosso'?'':p.mods[g]),M=mk?MODS[mk]:null;
-    var rw=(M?M.rw:1)*TIERS[sl].rw*(low?.4:1),gm=(M?(M.gm||1):1)*TIERS[sl].rw*(low?.4:1),nr=TIERS[sl].rooms+((M&&M.rooms)?M.rooms-3:0);
+    var mk=sl===2?'rosso':'',M=mk?MODS[mk]:null;
+    var rw=(M?M.rw:1)*TIERS[sl].rw*1,gm=(M?(M.gm||1):1)*TIERS[sl].rw*1,nr=TIERS[sl].rooms+((M&&M.rooms)?M.rooms-3:0);
     var ex=(nr+4)*needAt(L)/24.5*pen*rw,go=(nr+4)*(4+1.6*L)*pen*gm+(14+5*L)*gm;
     var lv=LO[g]+(g<5?'-'+HI[g]:'+'),tb='';
     for(var t=0;t<3;t++){var un=p.lv>=tierLv(g,t);tb+='<button class="chip'+(t===sl?' on':'')+'" style="--cc:'+(t===2?'#ff4d6d':RK_COL[g])+'" data-a="gtier" data-v="'+g+':'+t+'" '+((un&&!lock)?'':'disabled')+'>'+TIERS[t].n+(un?'':' · Liv. '+tierLv(g,t))+'</button>'}
-    h+='<div class="gate'+(lock?' lock':'')+'" style="--rk:'+RK_COL[g]+'"><div class="g">'+RANKS[g]+'</div><div><div class="gt">'+GATES[g].n+' <span class="tag" style="color:'+RK_COL[g]+'">'+RANKS[g]+'</span>'+(g>r?' <span class="tag warn">Pericoloso</span>':'')+(M?' <span class="tag vio">'+M.n+'</span>':'')+(low?' <span class="tag warn">Ricompense ridotte</span>':'')+'</div>'+
+    h+='<div class="gate'+(lock?' lock':'')+'" style="--rk:'+RK_COL[g]+'"><div class="g">'+RANKS[g]+'</div><div><div class="gt">'+GATES[g].n+' <span class="tag" style="color:'+RK_COL[g]+'">'+RANKS[g]+'</span>'+(g>r?' <span class="tag warn">Pericoloso</span>':'')+(M?' <span class="tag vio">'+M.n+'</span>':'')+''+'</div>'+
      '<div class="chips" style="margin:4px 0">'+tb+'</div>'+
-     '<div class="sm">Livelli '+lv+' · nemici livello '+L+(pen>1?' (+'+Math.round((pen-1)*100)+'% forza)':'')+(tn2?' · Minaccia +'+(tn2*4)+'%':'')+'</div>'+'<div class="sm" style="color:var(--gold)">'+GATES[g].d+'</div>'+(M?'<div class="sm" style="color:#b79cff">'+M.d+'</div>':'')+(sl>=1?'<div class="sm" style="color:#7fe0ff">Affinità: '+AFF[affOf(g)].n+' ('+AFF[affOf(g)].d+')</div>':'')+'<div class="sm">'+nr+' stanze + boss · circa '+fmt(ex)+' EXP, '+fmt(go)+' oro'+(sl===2&&!low?' · equipaggiamento in premio':'')+'</div></div>'+
+     '<div class="sm">Livelli '+lv+' · nemici livello '+L+(pen>1?' (+'+Math.round((pen-1)*100)+'% forza)':'')+(tn2?' · Minaccia +'+(tn2*4)+'%':'')+'</div>'+(M?'<div class="sm" style="color:#b79cff">'+M.d+'</div>':'')+(sl>=1?'<div class="sm" style="color:#7fe0ff">Affinità: '+AFF[affOf(g)].n+' ('+AFF[affOf(g)].d+')</div>':'')+'<div class="sm">'+nr+' stanze + boss · circa '+fmt(ex)+' EXP, '+fmt(go)+' oro'+(sl===2&&!low?' · equipaggiamento in premio':'')+'</div></div>'+
      '<button class="btn '+(lock?'':'pri')+'" data-a="enter" data-v="'+g+'" '+(lock?'disabled':'')+'>'+(lock?'Bloccato · serve livello '+(LO[g]-3):'Entra nel Gate')+'</button></div>';
   }
   return h;
