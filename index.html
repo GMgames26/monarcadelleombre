@@ -313,6 +313,7 @@ var MOBS=[
  [{n:'Guardiano dell’abisso',c:'tank'},{n:'Demone stregone',c:'mago'},{n:'Cavaliere cremisi',c:'assassino'},{n:'Serafino caduto',c:'guaritore'}]];
 var BOSS=[{n:'Re dei Goblin',c:'tank',r:[1,1.25]},{n:'Capitano Orco',c:'tank',r:[1.15,.75]},{n:'Signore dei Non Morti',c:'mago',r:[.6,1.3]},{n:'Titano di pietra',c:'tank',r:[.7,1.2]},{n:'Cavaliere della Rovina',c:'assassino',r:[1,.7]},{n:'Sovrano del Vuoto',c:'mago',r:[1.1,.6]}];
 var RSC={tank:{p:.85,m:1.15},mago:{p:1.15,m:.85},assassino:{p:1,m:1},guaritore:{p:1,m:1}};
+function dmgTaken(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?.9:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
 function rsTags(e){if(!e.rs)return'';var o='';[['p','fisico'],['m','magia']].forEach(function(t){var f=e.rs[t[0]];if(f>=1.1)o+='<span class="tag warn">Debole: '+t[1]+'</span>';else if(f<=.9)o+='<span class="tag vio">Resiste: '+t[1]+'</span>'});return o}
 
@@ -364,9 +365,10 @@ var PRICE=[120,300,650,2400,7500,20000,50000];
 
 /* specializzazioni (livello 20) */
 var SPEC={
- necro:{n:'Evocatore',d:'Ombre +15% di forza e HP, ARISE +10%. Abilità Comando d’ombra: le ombre agiscono due volte.',s:'Comando',f:.45,m:[.8],cmd:true},
- bers:{n:'Berserker',d:'+20% attacco. Abilità Frenesia: 4 colpi da 0,9×.',s:'Frenesia',f:.4,m:[.9,.9,.9,.9]},
- sin:{n:'Assassino d’ombra',d:'+15% critico, +10% schivata. Abilità Colpo fatale: 3,4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[3.4],force:true,pierce:true}};
+ tank:{n:'Tank',d:'HP +20%, danno fisico +15%, danni subiti −25% fisici e −10% magici. Abilità Muro d’ombra: colpo fisico da 1,8× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[1.8],phys:true,wall:true},
+ mago:{n:'Mago',d:'MP +25%, danno magico +20%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana: 3 colpi magici da 1,0× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[1,1,1],ign:true},
+ sin:{n:'Assassino',d:'Critico +15%, schivata +10%, danni subiti −20% fisici. Abilità Colpo fatale: 3,4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[3.4],force:true,pierce:true},
+ necro:{n:'Evocatore',d:'Ombre +15% forza e HP e −10% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra: le ombre agiscono due volte.',s:'Comando',f:.45,m:[.8],cmd:true}};
 
 /* modificatori dei Gate */
 var MODS={
@@ -504,6 +506,7 @@ var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su 
 
 function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gq:{},tv:2,qv:2,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
+  if(o.spec==='bers')o.spec='tank';
   if(o.trv===undefined){var oc=[4,8,14,22,35],rf=0;if(o.tree){['o','c','f'].forEach(function(k){for(var i=0;i<(o.tree[k]|0)&&i<5;i++)rf+=oc[i]});o.frag=(o.frag||0)+rf;o.tree={r:0,o:0,c:0,f:0}}o.trv=2}
   if(o.stv===undefined&&o.story!==undefined){o.story=[0,1,2,3,4,5,6,7,9,14,19][Math.max(0,Math.min(o.story|0,10))];o.stv=2}
   var shift=(o.tv===undefined),hadCnt=!!o.cnt;
@@ -615,11 +618,11 @@ function cloudInit(){
 
 /* ---------- formule ---------- */
 function awkM(){return 1+.08*p.awk}
-function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0)))}
-function maxMp(){return 20+p.st.int*6}
-function pw(v){return Math.round((4+v*2)*(1+.05*p.w)*(1+.1*p.wev)*awkM()*(p.spec==='bers'?1.2:1)*(1+(tn('c')>=3?.06:0)))}
-function atk(){return pw(p.st.str)}
-function matk(){return pw(p.st.int)}
+function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:1))}
+function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1))}
+function pw(v){return Math.round((4+v*2)*(1+.05*p.w)*(1+.1*p.wev)*awkM()*(1+(tn('c')>=3?.06:0)))}
+function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.15:1))}
+function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.2:1))}
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0))}
 function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0))}
 function cap(){var i=p.st.int;return(i>=5?1:0)+(i>=15?1:0)+(i>=25?1:0)+(i>=40?1:0)}
@@ -665,7 +668,7 @@ var tsel=null,respecArm=false;
 function tn(k){return(p&&p.tree&&p.tree[k])|0}
 function fq(n){return String(Math.round(n*100)/100).replace('.',',')}
 function addFrag(n){p.frag=Math.round((p.frag+n)*100)/100}
-function respecCost(){return Math.round((40+20*p.lv)*(tn('f')>=4?.6:1))}
+function respecCost(){return Math.round(80*p.lv*(tn('f')>=4?.6:1))}
 function specCost(){return Math.round(8*(tn('f')>=4?.6:1))}
 var AFF={ward:{n:'Barriera arcana',d:'magia −35%, fisico +10%',p:1.1,m:.65},plate:{n:'Corazza pesante',d:'fisico −35%, magia +10%',p:.65,m:1.1}};
 function affOf(g){return(p.af&&p.af[g])||(g%2?'ward':'plate')}
@@ -712,8 +715,8 @@ function wName(){return WN[p.wev]}
 function ariseCost(){return Math.max(10,Math.round(maxMp()*.08))}
 function mpRegen(){return Math.max(2,Math.round(maxMp()*.015))}
 var SK={atk:{f:0,m:[1],n:'Attacco'},dbl:{f:.15,m:[.75,.75],n:'Doppia lama'},fury:{f:.35,m:[2.6],n:'Furia d’ombra',lv:5},dom:{f:.6,m:[4.6],n:'Dominio del Monarca',lv:15}};
-function skCost(k){return Math.max(1,Math.round(maxMp()*SK[k].f))}
-function spCost(){return p.spec?Math.max(1,Math.round(maxMp()*SPEC[p.spec].f)):0}
+function skCost(k){return Math.max(1,Math.round(maxMp()*SK[k].f*(p.spec==='mago'?.8:1)))}
+function spCost(){return p.spec?Math.max(1,Math.round(maxMp()*SPEC[p.spec].f*(p.spec==='mago'?.8:1))):0}
 function gOpen(g){return p.lv>=LO[g]-3}
 function eLevel(g){return clamp(p.lv,LO[g],HI[g])}
 function eDanger(g){return 1+.05*Math.max(0,LO[g]-p.lv)}
@@ -748,7 +751,7 @@ function sB(s){
   if(hasT(s,'furia'))b.atk+=.2;
   if(hasT(s,'corazza')){b.hp+=.25;b.red+=.1}
   if(hasT(s,'cecchino'))b.crit+=.15;
-  if(p.spec==='necro'){b.atk+=.15;b.hp+=.15}
+  if(p.spec==='necro'){b.atk+=.15;b.hp+=.15;b.red+=.1}
   if(tn('o')>=1){b.atk+=.05;b.hp+=.05}
   if(tn('o')>=6){b.atk+=.08;b.hp+=.08}
   b.red=Math.min(.55,b.red);
@@ -873,7 +876,7 @@ function mkEnemy(o){
     atk:Math.round((5+1.8*b)*rm*am*rnd(.95,1.05)),
     exp:Math.max(1,Math.round(needAt(L)/24.5*(boss?4:(el?2.2:1))*pen*rw*(o.tower?1.3:1)*((c&&!c.tower&&c.rwT)||1))),
     gold:Math.round((4+1.6*L)*(boss?4:(el?2.2:1))*pen*gm*((c&&!c.tower&&c.rwT)||1)),
-    pas:[],tl:[],ev:4,sh:0,shMax:0,shDone:false,turns:0,tele:null,rs:d.r?{p:d.r[0],m:d.r[1]}:{p:RSC[d.c].p,m:RSC[d.c].m}};
+    pas:[],tl:[],ev:4,sh:0,shMax:0,shDone:false,turns:0,tele:null,rs:d.r?{p:d.r[0],m:d.r[1]}:{p:RSC[d.c].p,m:RSC[d.c].m},dt:(d.c==='mago'||d.c==='guaritore')?'m':'p'};
   if(c&&!c.tower&&c.aff){var af=AFF[c.aff];e.rs.p*=af.p;e.rs.m*=af.m}
   if(o.tower){var tk2=sig();if(tk2==='titan')e.rs.p*=.8;else if(tk2==='abyss'){e.rs.m*=.75;e.rs.p*=1.1}}
   if(boss){var t=BT[g];e.pas=t.pas.slice();e.tl=t.tl.slice();e.ev=t.ev}
@@ -935,9 +938,9 @@ function hitCalc(m,force,magic){
   if(cr){d*=(tn('c')>=6?1.9:1.7);p.sx.crit++}d=Math.max(1,Math.round(d));if(d>p.sx.max)p.sx.max=d;return{d:d,cr:cr};
 }
 /* danni al nemico, con scudo del boss */
-function hurtE(d,pierce,magic){
-  var e=c.e;
-  d=Math.max(1,Math.round(d*((e.rs&&e.rs[magic?'m':'p'])||1)));
+function hurtE(d,pierce,magic,ign){
+  var e=c.e,rf=(e.rs&&e.rs[magic?'m':'p'])||1;if(ign&&rf<1)rf=1;
+  d=Math.max(1,Math.round(d*rf));
   p.sx.dmg+=d;
   if(sig()==='bastion'&&!magic)d=Math.max(1,Math.round(d*.6));
   if(sig()==='armor')d=Math.max(1,Math.round(d*.85));
@@ -972,10 +975,11 @@ function pAct(k){
     if(!sp||p.mp<spCost())return;
     p.mp-=spCost();quest('skills',1);qev('skill',1);
     var tot=0,parts=[];
-    sp.m.forEach(function(m){var h=hitCalc(m,sp.force,true);tot+=h.d;parts.push(h.cr?h.d+'!':String(h.d));if(h.cr)qev('crit',1)});
-    hurtE(tot,sp.pierce,true);c.flash='e';
-    if(sp.cmd){c.cmd=true;log('Comando d’ombra: '+parts.join(' + ')+' danni'+rsNote(true)+'. Le ombre agiranno due volte!','hit')}
-    else log(sp.s+': '+parts.join(' + ')+' danni'+rsNote(true),'hit');
+    sp.m.forEach(function(m){var h=hitCalc(m,sp.force,!sp.phys);tot+=h.d;parts.push(h.cr?h.d+'!':String(h.d));if(h.cr)qev('crit',1)});
+    hurtE(tot,sp.pierce,!sp.phys,sp.ign);c.flash='e';
+    if(sp.wall){c.wall=true;log('Muro d’ombra: i danni subiti nel prossimo turno sono dimezzati.','good')}
+    if(sp.cmd){c.cmd=true;log('Comando d’ombra: '+parts.join(' + ')+' danni'+rsNote(!sp.phys)+'. Le ombre agiranno due volte!','hit')}
+    else log(sp.s+': '+parts.join(' + ')+' danni'+(sp.ign?' · ignora le resistenze':rsNote(!sp.phys)),'hit');
   }else if(s){
     var cost=k==='atk'?0:skCost(k);
     if(p.mp<cost||(s.lv&&p.lv<s.lv))return;
@@ -1093,13 +1097,14 @@ function enemyTurn(){
   if(sig()==='hunt'){var bw=1.01;tg.forEach(function(t){var r2=t.t==='p'?p.hp/maxHp():t.s.hp/sMax(t.s);if(r2<bw){bw=r2;x=t}})}
   var en=1+(e.pas.indexOf('enrage')>=0?Math.min(1,.07*e.turns):0)+((sig()==='void'||sig()==='abyss')&&!e.boss?Math.min(.5,.05*e.turns):0);
   var d=e.atk*rnd(.85,1.15)*en;
+  if(c.wall){d*=.5;c.wall=false}
   e.turns++;
   if(tele){
     var T=TELE[tele];
     if(Math.random()<dodge()){log('Schivi '+e.name+' che '+T.l.replace(/^[^ ]+ /,''),'good');qev('dodge',1)}
     else if(c.def&&tele!=='charge'){log('Ti pari: '+STN[tele]+' è bloccato!','good');qev('tele',1)}
     else{
-      var K=50+2*p.lv,dd=d*(tele==='charge'?2.4:1.2)*K/(K+p.st.vit);
+      var K=50+2*p.lv,dd=d*dmgTaken(e)*(tele==='charge'?2.4:1.2)*K/(K+p.st.vit);
       if(c.def){dd*=.5;qev('tele',1);log('Pari parzialmente il colpo!','good')}
       dd=Math.max(1,Math.round(dd));p.hp=Math.max(0,p.hp-dd);c.flash='p';
       log(e.name+' ti colpisce con forza: -'+dd+' HP','bad');
@@ -1109,7 +1114,7 @@ function enemyTurn(){
   }else{
     if(!e.boss&&(sig()==='swarm'||(p.lv>=10&&Math.random()<.25))){
       /* attacco ad area */
-      var ar=d*.55,K0=50+2*p.lv,pd=Math.max(1,Math.round(ar*K0/(K0+p.st.vit)*(c.def?.5:1)));
+      var ar=d*.55,K0=50+2*p.lv,pd=Math.max(1,Math.round(ar*dmgTaken(e)*K0/(K0+p.st.vit)*(c.def?.5:1)));
       if(Math.random()<dodge()){log('Schivi l’attacco ad area!','good');qev('dodge',1)}
       else{p.hp=Math.max(0,p.hp-pd);c.flash='p'}
       var txt=e.name+' travolge tutti: -'+pd+' a te';
@@ -1123,7 +1128,7 @@ function enemyTurn(){
     }else if(x.t==='p'){
       if(Math.random()<dodge()){log('Schivi l’attacco!','good');qev('dodge',1)}
       else{
-        var K2=50+2*p.lv,dm=d*K2/(K2+p.st.vit);if(c.def)dm*=.5;dm=Math.max(1,Math.round(dm));
+        var K2=50+2*p.lv,dm=d*dmgTaken(e)*K2/(K2+p.st.vit);if(c.def)dm*=.5;dm=Math.max(1,Math.round(dm));
         p.hp=Math.max(0,p.hp-dm);c.flash='p';log(e.name+' ti colpisce: -'+dm+' HP','bad');
         if(!c.def&&p.hp>0){
           var pc=0;
@@ -1531,7 +1536,7 @@ function vCombat(){
   h+='<div class="panel"><div class="lbl"><span>'+hdr+'</span><span>'+rm+'</span></div>';
   if(c.phase!=='cleared'&&c.phase!=='lost'){
     h+='<div class="enemy'+(c.flash==='e'?' hit':'')+(e.hp<=0?' dead':'')+'"><div class="en">'+(e.boss?'<span class="tag boss">Boss</span>':'')+e.name+'</div>'+bar(e.hp,e.max,'hp',true)+
-     '<div class="sm">'+fmt(e.hp)+' / '+fmt(e.max)+' HP · ATT '+e.atk+(e.sh>0?' · Scudo '+fmt(e.sh):'')+'</div>'+(rsTags(e)?'<div class="sm" style="margin-top:3px">'+rsTags(e)+'</div>':'')+
+     '<div class="sm">'+fmt(e.hp)+' / '+fmt(e.max)+' HP · ATT '+e.atk+(e.dt==='m'?' magico':' fisico')+(e.sh>0?' · Scudo '+fmt(e.sh):'')+'</div>'+(rsTags(e)?'<div class="sm" style="margin-top:3px">'+rsTags(e)+'</div>':'')+
      '<div class="telebox">'+(e.tele&&c.phase==='fight'?'<b>ATTENZIONE</b> '+TELE[e.tele].t:(e.pas.length?'<span class="sm">'+e.pas.map(function(k){return PASN[k]}).join(' · ')+'</span>':''))+'</div></div>';
   }
   h+='</div>';
