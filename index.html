@@ -503,7 +503,7 @@ var STORY=[
  {t:'Verso il Monarca',x:'Solo i Monarchi superano il livello 100. Raggiungilo.',n:100,ref:100,f:function(){return p.lv}},
  {t:'Il Risveglio',x:'Il Sistema ti offre di rinascere più forte. Compi il primo Risveglio.',n:1,ref:100,f:function(){return p.awk}}];
 
-var p, c=null, tab='stato', relId=null, timer=null, tt=null, pendingMsg=null;
+var p, c=null, tab='stato', relId=null, sellId=null, timer=null, tt=null, pendingMsg=null;
 var saveBox=null,openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
@@ -774,6 +774,7 @@ function iName(cls,k,t){var d=IT[cls][k];return d[0]+' '+(d[1]?ADJF:ADJM)[t]}
 function iSlot(cls,k){return IT[cls][k][0]}
 function healAll(){p.shadows.forEach(function(s){s.hp=sMax(s)})}
 function dropShadow(s){['w','a'].forEach(function(k){if(s.eq[k]){p.inv.push(s.eq[k]);s.eq[k]=null}})}
+function sellVal(s){return Math.round((s.boss?150:s.el?50:20)*(1+.25*(s.up||0))*RAR(s))}
 function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s))}
 function findShadow(id){return p.shadows.filter(function(s){return String(s.id)===String(id)})[0]}
 function addTrait(s){
@@ -1419,6 +1420,7 @@ function shDetail(s){
   }
   h+='<div class="btns"><button class="btn gld sm2" data-a="up" data-v="'+s.id+'" '+((maxed||p.gold<uc)?'disabled':'')+'>Potenzia<small>'+(maxed?(upMax()<UPMAX?'Max del rango +'+upMax():'Massimo +'+UPMAX):fmt(uc)+' oro')+'</small></button>'+
    '<button class="btn dng sm2" data-a="rel" data-v="'+s.id+'">'+(relId===s.id?'Conferma':'Rilascia')+'</button></div>';
+  if(!s.a)h+='<div class="btns"><button class="btn gld sm2" data-a="sell" data-v="'+s.id+'">'+(sellId===s.id?'Conferma vendita':'Vendi')+'<small>'+fmt(sellVal(s))+' oro'+(s.boss&&sellId!==s.id?' · ombra di boss':'')+'</small></button></div>';
   if(pt||s.r<2){
     h+='<div class="btns">';
     if(pt)h+='<button class="btn '+(fuseId===s.id?'dng':'pri')+' sm2" data-a="fuse" data-v="'+s.id+'">'+(fuseId===s.id?'Conferma fusione':'Fondi con la copia')+'<small>diventa '+RARITY[s.r+1].n+'</small></button>';
@@ -1632,7 +1634,7 @@ function render(){
 
 function act(a,v){
   switch(a){
-    case 'tab':tab=v;respecArm=false;saveBox=null;openSh=null;relId=null;selSlot=null;resetArm=false;qConfirm=null;fuseId=null;specArm=null;awkArm=false;break;
+    case 'tab':tab=v;sellId=null;respecArm=false;saveBox=null;openSh=null;relId=null;selSlot=null;resetArm=false;qConfirm=null;fuseId=null;specArm=null;awkArm=false;break;
     case 'stat':if(p.pts>0){p.st[v]++;p.pts--;if(v==='vit')p.hp+=12;if(v==='int')p.mp+=6}break;
     case 'reset':
       if(!resetArm){resetArm=true;break}
@@ -1702,6 +1704,13 @@ function act(a,v){
     case 'up':
       var s2=findShadow(v);
       if(s2&&s2.up<upMax()){var uc=upCost(s2);if(p.gold>=uc){p.gold-=uc;upgrade(s2)}}
+      break;
+    case 'sell':
+      var sh9=findShadow(v);
+      if(sh9&&!sh9.a){
+        if(sh9.boss&&sellId!==sh9.id){sellId=sh9.id;break}
+        var gv=sellVal(sh9);dropShadow(sh9);p.shadows=p.shadows.filter(function(x){return x!==sh9});p.gold+=gv;sellId=null;openSh=null;selSlot=null;toast(sh9.name+' venduta: +'+fmt(gv)+' oro','up');
+      }
       break;
     case 'rel':
       if(relId===+v){var rs=findShadow(v);if(rs){dropShadow(rs);p.shadows=p.shadows.filter(function(s){return s!==rs})}relId=null;selSlot=null}
