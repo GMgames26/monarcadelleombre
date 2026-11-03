@@ -301,8 +301,8 @@ var $=function(s){return document.querySelector(s)};
 var KEY='monarca-ombre-v1';
 var RANKS=['E','D','C','B','A','S'];
 var RK_COL=['#8fa3c9','#3ddc97','#4aa8ff','#9266ff','#ff5fa8','#f2c14e'];
-var LO=[1,15,30,45,70,100];          /* livello a cui inizia il rango */
-var HI=[14,29,44,69,99,150];          /* livello massimo dei nemici del Gate */
+var LO=[1,20,35,50,75,100];          /* livello a cui inizia il rango */
+var HI=[19,34,49,74,99,150];          /* livello massimo dei nemici del Gate */
 var REPL=[5,17,35,57,85,115];        /* livello di riferimento per le ricompense delle quest */
 var MOBS=[
  [{n:'Cinghiale corazzato',c:'tank'},{n:'Goblin sciamano',c:'mago'},{n:'Lupo grigio',c:'assassino'},{n:'Goblin guaritore',c:'guaritore'}],
@@ -482,20 +482,20 @@ var STORY=[
  {t:'Il primo Gate',x:'Un Gate si è aperto sotto casa tua. Entra e chiudilo.',n:1,ref:2,f:function(){return p.cnt.gate}},
  {t:'Il risveglio',x:'Una voce nella testa ti propone di sfruttare i caduti. Estrai la tua prima ombra.',n:1,ref:3,f:function(){return p.cnt.arise}},
  {t:'L’esercito',x:'Un’ombra sola non basta. Raccogline tre.',n:3,ref:6,f:function(){return p.shadows.length}},
- {t:'Rango D',x:'Il Sistema ti riconosce come cacciatore di rango D.',n:15,ref:15,f:function(){return p.lv}},
+ {t:'Rango D',x:'Il Sistema ti riconosce come cacciatore di rango D.',n:20,ref:20,f:function(){return p.lv}},
  {t:'Sangue nobile',x:'I mostri d’élite sorvegliano i Gate più profondi. Dai loro la caccia.',n:5,ref:12,f:function(){return p.cnt.elite}},
  {t:'Il Capitano',x:'Un Capitano Orco guarda dall’alto il rango D. Abbattilo.',n:1,ref:14,f:function(){return p.cnt.bossR[1]}},
  {t:'La via del Monarca',x:'Al livello 20 il Sistema ti chiede di scegliere la tua strada.',n:1,ref:20,f:function(){return p.spec?1:0}},
  {t:'La Torre',x:'Una Torre senza fine si apre all’orizzonte. Sconfiggi il boss del piano 5.',n:5,ref:21,f:function(){return p.tower}},
  {t:'Il Guardiano',x:'Il boss del piano 10 custodisce il primo checkpoint. Abbattilo.',n:10,ref:24,f:function(){return p.tcp}},
- {t:'Rango C',x:'I Gate di rango C ti aspettano. Raggiungi il livello 30.',n:30,ref:30,f:function(){return p.lv}},
+ {t:'Rango C',x:'I Gate di rango C ti aspettano. Raggiungi il livello 35.',n:35,ref:35,f:function(){return p.lv}},
  {t:'Cacciatore di boss',x:'I boss temprano il Monarca. Sconfiggine dieci, nei Gate o nella Torre.',n:10,ref:30,f:function(){return p.cnt.boss}},
  {t:'Oltre le nuvole',x:'Il boss del piano 20 non è mai stato battuto. Fallo cadere.',n:20,ref:38,f:function(){return p.tcp}},
- {t:'Rango B',x:'Solo i migliori arrivano al rango B. Raggiungi il livello 45.',n:45,ref:45,f:function(){return p.lv}},
+ {t:'Rango B',x:'Solo i migliori arrivano al rango B. Raggiungi il livello 50.',n:50,ref:50,f:function(){return p.lv}},
  {t:'Il Titano',x:'Nel rango B un Titano di pietra blocca la strada. Spezzalo.',n:1,ref:50,f:function(){return p.cnt.bossR[3]}},
  {t:'Mietitore',x:'Un esercito si forgia sul campo. Abbatti 300 nemici.',n:300,ref:55,f:function(){return p.cnt.kill}},
  {t:'Il Re dei piani',x:'Il boss del piano 30 siede su un trono d’ombra. Detronizzalo.',n:30,ref:60,f:function(){return p.tcp}},
- {t:'Rango A',x:'Le leggende del rango A ti riconoscono. Raggiungi il livello 70.',n:70,ref:70,f:function(){return p.lv}},
+ {t:'Rango A',x:'Le leggende del rango A ti riconoscono. Raggiungi il livello 75.',n:75,ref:75,f:function(){return p.lv}},
  {t:'La vetta della Torre',x:'Il boss del piano 40 è il guardiano dell’abisso. Sconfiggilo.',n:40,ref:80,f:function(){return p.tcp}},
  {t:'Verso il Monarca',x:'Solo i Monarchi superano il livello 100. Raggiungilo.',n:100,ref:100,f:function(){return p.lv}},
  {t:'Il Risveglio',x:'Il Sistema ti offre di rinascere più forte. Compi il primo Risveglio.',n:1,ref:100,f:function(){return p.awk}}];
