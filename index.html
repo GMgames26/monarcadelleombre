@@ -375,7 +375,7 @@ var SPEC={
 
 /* modificatori dei Gate */
 var MODS={
- rosso:{n:'Portale rosso',d:'Nemici +40% di forza, boss +30% di vita, EXP e oro doppi, veleno frequente. Qui cade l’equipaggiamento.',pw:1.4,rw:2,gm:2,lm:1.6},
+ rosso:{n:'Portale rosso',d:'Nemici +40% di forza, boss +30% di vita, veleno frequente. Qui cade l’equipaggiamento.',pw:1.4,rw:1,gm:1,lm:1.6},
  nebbia:{n:'Nebbia fitta',d:'Nessun colpo critico per nessuno. EXP +20%.',pw:1,rw:1.2,nocrit:true},
  maledetto:{n:'Gate maledetto',d:'Le cure valgono la metà. EXP +25%.',pw:1,rw:1.25,heal:.5},
  veleno:{n:'Palude velenosa',d:'Quasi ogni colpo avvelena. Oro +25%, più antidoti.',pw:1.05,rw:1,gm:1.25,poison:true,am:2.5},
@@ -634,7 +634,7 @@ var UPMAX=20;
 var TIERS=[
  {n:'Normale',pw:1,rooms:3,el:.14,rw:1,poi:0},
  {n:'Rinforzato',pw:1.2,rooms:4,el:.28,rw:1.5,poi:.2},
- {n:'Rosso',pw:1,rooms:5,el:.35,rw:1,poi:.3}];
+ {n:'Rosso',pw:1,rooms:5,el:.35,rw:2,poi:.3}];
 function tierLv(g,t){return LO[g]+5*t}
 function hiT(g){var t=0;if(p.lv>=tierLv(g,1))t=1;if(p.lv>=tierLv(g,2))t=2;return t}
 function selT(g){var h=hiT(g),s=p.gt&&p.gt[g];return s===undefined?h:Math.min(+s,h)}
@@ -910,7 +910,7 @@ function enterGate(g){
   if(!gOpen(g))return;
   p.hp=maxHp();p.mp=maxMp();healAll();
   var t=selT(g),hi=hiT(g),lw=(t<hi||g<rIdx()),m=t===2?'rosso':'';
-  c=newRun({g:g,mod:m,rooms:TIERS[t].rooms+((m&&MODS[m].rooms)?MODS[m].rooms-3:0),tier:t,low:lw,aff:t>=1?affOf(g):'',thrN:0,thrM:lw?.9:1,rwT:TIERS[t].rw});
+  c=newRun({g:g,mod:m,rooms:TIERS[t].rooms+((m&&MODS[m].rooms)?MODS[m].rooms-3:0),tier:t,low:lw,old:g<rIdx(),aff:t>=1?affOf(g):'',thrN:0,thrM:lw?.9:1,rwT:TIERS[t].rw});
   c.snap=JSON.stringify(Object.assign({},p,{run:null}));
   log(GATES[g].n+'.','sys');
   if(m)log(MODS[m].n+': '+MODS[m].d,'sys');
@@ -1171,6 +1171,7 @@ function win(){
   
   if(fr){if(tn('f')>=3)fr*=1.15;addFrag(fr);c.fragGot+=fr;log('+'+fq(fr)+' frammenti d’ombra','good')}
   var eg=Math.round(e.gold*(1+(tn('r')>=1?.05:0)+(tn('f')>=1?.1:0))),ex=Math.round(e.exp*(1+(tn('r')>=1?.05:0)+(tn('f')>=2?.1:0)));
+  if(c.old&&!c.tower){ex=0;eg=Math.round(eg*.4)}
   c.gx+=ex;c.gg+=eg;p.gold+=eg;p.sx.gold+=eg;p.sx.exp+=ex;gainExp(ex);
   log(e.name+' sconfitto. +'+fmt(ex)+' EXP, +'+fmt(eg)+' oro','good');
   if(c.tower&&c.floor>p.tower)p.tower=c.floor;
@@ -1281,7 +1282,7 @@ function chooseDoor(k){
     var gb=Math.max(20,Math.round((10+3*L)*2));
     if(Math.random()<.5){p.gold+=gb;c.gg+=gb;log('Scommessa vinta: +'+gb+' oro!','good')}
     else{var gl=Math.min(p.gold,Math.round(gb*.6));p.gold-=gl;log('Scommessa persa: -'+gl+' oro.','bad')}
-  }else if(k==='training'){var tx=Math.round(needAt(L)/24.5*2);c.gx+=tx;gainExp(tx);log('Ti alleni duramente: +'+fmt(tx)+' EXP.','good')}
+  }else if(k==='training'){if(c.old&&!c.tower)log('Ti alleni, ma questo Gate non ti insegna più nulla.','sys');else{var tx=Math.round(needAt(L)/24.5*2);c.gx+=tx;gainExp(tx);log('Ti alleni duramente: +'+fmt(tx)+' EXP.','good')}}
   else if(k==='ambush'){c.forceElite=true;c.rwX=Math.max(c.rwX,1.3);log('Imboscata! La prossima stanza ospita un’élite.','bad')}
   else if(k==='blood'){
     var bl=Math.max(1,Math.round(maxHp()*.15));p.hp=Math.max(1,p.hp-bl);p.frag+=2;c.fragGot+=2;log('Altare del sangue: -'+bl+' HP, +2 frammenti d’ombra.','good');
@@ -1303,7 +1304,7 @@ function nextRoom(){
     if(c.tier===2)qev('red',1);
     if(team().some(function(s){return s.hp>0&&s.cls==='mago'}))qev('mage',1);
     if(CLK.every(function(k){return team().some(function(s){return s.hp>0&&s.cls===k})}))qev('squad',1);
-    var b=Math.round((14+5*eLevel(c.g))*((modOf()&&modOf().gm)||1)*(c.rwT||1));p.gold+=b;c.gg+=b;
+    var b=Math.round((14+5*eLevel(c.g))*((modOf()&&modOf().gm)||1)*(c.rwT||1)*(c.old?.4:1));p.gold+=b;c.gg+=b;
         p.mods[c.g]=rollMod();p.af=p.af||{};p.af[c.g]=Math.random()<.5?'ward':'plate';
     pushHist('Completato');c.phase='cleared';
     toast('Gate completato!','up');save();render();return;
@@ -1375,10 +1376,10 @@ function vGate(){
     var lock=!gOpen(g),L=eLevel(g),pen=eDanger(g),hi=hiT(g),sl=selT(g),low=(sl<hi||g<r),tn2=0;
     var mk=sl===2?'rosso':'',M=mk?MODS[mk]:null;
     var rw=(M?M.rw:1)*TIERS[sl].rw*1,gm=(M?(M.gm||1):1)*TIERS[sl].rw*1,nr=TIERS[sl].rooms+((M&&M.rooms)?M.rooms-3:0);
-    var ex=(nr+4)*needAt(L)/24.5*pen*rw,go=(nr+4)*(4+1.6*L)*pen*gm+(14+5*L)*gm;
+    var ex=(nr+4)*needAt(L)/24.5*pen*rw,go=((nr+4)*(4+1.6*L)*pen*gm+(14+5*L)*gm)*(g<r?.4:1);if(g<r)ex=0;
     var lv=LO[g]+(g<5?'-'+HI[g]:'+'),tb='';
     for(var t=0;t<3;t++){var un=p.lv>=tierLv(g,t);tb+='<button class="chip'+(t===sl?' on':'')+'" style="--cc:'+(t===2?'#ff4d6d':RK_COL[g])+'" data-a="gtier" data-v="'+g+':'+t+'" '+((un&&!lock)?'':'disabled')+'>'+TIERS[t].n+(un?'':' · Liv. '+tierLv(g,t))+'</button>'}
-    h+='<div class="gate'+(lock?' lock':'')+'" style="--rk:'+RK_COL[g]+'"><div class="g">'+RANKS[g]+'</div><div><div class="gt">'+GATES[g].n+' <span class="tag" style="color:'+RK_COL[g]+'">'+RANKS[g]+'</span>'+(g>r?' <span class="tag warn">Pericoloso</span>':'')+(M?' <span class="tag vio">'+M.n+'</span>':'')+''+'</div>'+
+    h+='<div class="gate'+(lock?' lock':'')+'" style="--rk:'+RK_COL[g]+'"><div class="g">'+RANKS[g]+'</div><div><div class="gt">'+GATES[g].n+' <span class="tag" style="color:'+RK_COL[g]+'">'+RANKS[g]+'</span>'+(g>r?' <span class="tag warn">Pericoloso</span>':'')+(g<r?' <span class="tag warn">EXP bloccata · oro ×0,4</span>':'')+(M?' <span class="tag vio">'+M.n+'</span>':'')+''+'</div>'+
      '<div class="chips" style="margin:4px 0">'+tb+'</div>'+
      '<div class="sm">Livelli '+lv+' · nemici livello '+L+(pen>1?' (+'+Math.round((pen-1)*100)+'% forza)':'')+(tn2?' · Minaccia +'+(tn2*4)+'%':'')+'</div>'+(M?'<div class="sm" style="color:#b79cff">'+M.d+'</div>':'')+(sl>=1?'<div class="sm" style="color:#7fe0ff">Affinità: '+AFF[affOf(g)].n+' ('+AFF[affOf(g)].d+')</div>':'')+'<div class="sm">'+nr+' stanze + boss · circa '+fmt(ex)+' EXP, '+fmt(go)+' oro'+(sl===2&&!low?' · equipaggiamento in premio':'')+'</div></div>'+
      '<button class="btn '+(lock?'':'pri')+'" data-a="enter" data-v="'+g+'" '+(lock?'disabled':'')+'>'+(lock?'Bloccato · serve livello '+LO[g]:'Entra nel Gate')+'</button></div>';
