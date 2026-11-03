@@ -301,8 +301,8 @@ var $=function(s){return document.querySelector(s)};
 var KEY='monarca-ombre-v1';
 var RANKS=['E','D','C','B','A','S'];
 var RK_COL=['#8fa3c9','#3ddc97','#4aa8ff','#9266ff','#ff5fa8','#f2c14e'];
-var LO=[1,10,25,45,70,100];          /* livello a cui inizia il rango */
-var HI=[9,24,44,69,99,150];          /* livello massimo dei nemici del Gate */
+var LO=[1,15,30,45,70,100];          /* livello a cui inizia il rango */
+var HI=[14,29,44,69,99,150];          /* livello massimo dei nemici del Gate */
 var REPL=[5,17,35,57,85,115];        /* livello di riferimento per le ricompense delle quest */
 var MOBS=[
  [{n:'Cinghiale corazzato',c:'tank'},{n:'Goblin sciamano',c:'mago'},{n:'Lupo grigio',c:'assassino'},{n:'Goblin guaritore',c:'guaritore'}],
@@ -482,13 +482,13 @@ var STORY=[
  {t:'Il primo Gate',x:'Un Gate si è aperto sotto casa tua. Entra e chiudilo.',n:1,ref:2,f:function(){return p.cnt.gate}},
  {t:'Il risveglio',x:'Una voce nella testa ti propone di sfruttare i caduti. Estrai la tua prima ombra.',n:1,ref:3,f:function(){return p.cnt.arise}},
  {t:'L’esercito',x:'Un’ombra sola non basta. Raccogline tre.',n:3,ref:6,f:function(){return p.shadows.length}},
- {t:'Rango D',x:'Il Sistema ti riconosce come cacciatore di rango D.',n:10,ref:10,f:function(){return p.lv}},
+ {t:'Rango D',x:'Il Sistema ti riconosce come cacciatore di rango D.',n:15,ref:15,f:function(){return p.lv}},
  {t:'Sangue nobile',x:'I mostri d’élite sorvegliano i Gate più profondi. Dai loro la caccia.',n:5,ref:12,f:function(){return p.cnt.elite}},
  {t:'Il Capitano',x:'Un Capitano Orco guarda dall’alto il rango D. Abbattilo.',n:1,ref:14,f:function(){return p.cnt.bossR[1]}},
  {t:'La via del Monarca',x:'Al livello 20 il Sistema ti chiede di scegliere la tua strada.',n:1,ref:20,f:function(){return p.spec?1:0}},
  {t:'La Torre',x:'Una Torre senza fine si apre all’orizzonte. Sconfiggi il boss del piano 5.',n:5,ref:21,f:function(){return p.tower}},
  {t:'Il Guardiano',x:'Il boss del piano 10 custodisce il primo checkpoint. Abbattilo.',n:10,ref:24,f:function(){return p.tcp}},
- {t:'Rango C',x:'I Gate di rango C ti aspettano. Raggiungi il livello 25.',n:25,ref:25,f:function(){return p.lv}},
+ {t:'Rango C',x:'I Gate di rango C ti aspettano. Raggiungi il livello 30.',n:30,ref:30,f:function(){return p.lv}},
  {t:'Cacciatore di boss',x:'I boss temprano il Monarca. Sconfiggine dieci, nei Gate o nella Torre.',n:10,ref:30,f:function(){return p.cnt.boss}},
  {t:'Oltre le nuvole',x:'Il boss del piano 20 non è mai stato battuto. Fallo cadere.',n:20,ref:38,f:function(){return p.tcp}},
  {t:'Rango B',x:'Solo i migliori arrivano al rango B. Raggiungi il livello 45.',n:45,ref:45,f:function(){return p.lv}},
@@ -632,11 +632,7 @@ var TIERS=[
  {n:'Normale',pw:1,rooms:3,el:.14,rw:1,poi:0},
  {n:'Rinforzato',pw:1.2,rooms:4,el:.28,rw:1.5,poi:.2},
  {n:'Rosso',pw:1,rooms:5,el:.35,rw:1,poi:.3}];
-function tierLv(g,t){
-  if(t===0)return Math.max(1,LO[g]-3);
-  if(g===5)return t===1?100:105;
-  var sp=HI[g]-LO[g]+1;return LO[g]+Math.round(sp*(t===1?.35:.7));
-}
+function tierLv(g,t){return LO[g]+5*t}
 function hiT(g){var t=0;if(p.lv>=tierLv(g,1))t=1;if(p.lv>=tierLv(g,2))t=2;return t}
 function selT(g){var h=hiT(g),s=p.gt&&p.gt[g];return s===undefined?h:Math.min(+s,h)}
 function thrN(g,t){return Math.min(15,(p.thr&&p.thr[g+'.'+t])|0)}
@@ -717,7 +713,7 @@ function mpRegen(){return Math.max(2,Math.round(maxMp()*.015))}
 var SK={atk:{f:0,m:[1],n:'Attacco'},dbl:{f:.15,m:[.75,.75],n:'Doppia lama'},fury:{f:.35,m:[2.6],n:'Furia d’ombra',lv:5},dom:{f:.6,m:[4.6],n:'Dominio del Monarca',lv:15}};
 function skCost(k){return Math.max(1,Math.round(50*SK[k].f*(p.spec==='mago'?.8:1)))}
 function spCost(){return p.spec?Math.max(1,Math.round(50*SPEC[p.spec].f*(p.spec==='mago'?.8:1))):0}
-function gOpen(g){return p.lv>=LO[g]-3}
+function gOpen(g){return p.lv>=LO[g]}
 function eLevel(g){return clamp(p.lv,LO[g],HI[g])}
 function eDanger(g){return 1+.05*Math.max(0,LO[g]-p.lv)}
 function modOf(){return c&&c.mod?MODS[c.mod]:null}
@@ -1381,7 +1377,7 @@ function vGate(){
     h+='<div class="gate'+(lock?' lock':'')+'" style="--rk:'+RK_COL[g]+'"><div class="g">'+RANKS[g]+'</div><div><div class="gt">'+GATES[g].n+' <span class="tag" style="color:'+RK_COL[g]+'">'+RANKS[g]+'</span>'+(g>r?' <span class="tag warn">Pericoloso</span>':'')+(M?' <span class="tag vio">'+M.n+'</span>':'')+''+'</div>'+
      '<div class="chips" style="margin:4px 0">'+tb+'</div>'+
      '<div class="sm">Livelli '+lv+' · nemici livello '+L+(pen>1?' (+'+Math.round((pen-1)*100)+'% forza)':'')+(tn2?' · Minaccia +'+(tn2*4)+'%':'')+'</div>'+(M?'<div class="sm" style="color:#b79cff">'+M.d+'</div>':'')+(sl>=1?'<div class="sm" style="color:#7fe0ff">Affinità: '+AFF[affOf(g)].n+' ('+AFF[affOf(g)].d+')</div>':'')+'<div class="sm">'+nr+' stanze + boss · circa '+fmt(ex)+' EXP, '+fmt(go)+' oro'+(sl===2&&!low?' · equipaggiamento in premio':'')+'</div></div>'+
-     '<button class="btn '+(lock?'':'pri')+'" data-a="enter" data-v="'+g+'" '+(lock?'disabled':'')+'>'+(lock?'Bloccato · serve livello '+(LO[g]-3):'Entra nel Gate')+'</button></div>';
+     '<button class="btn '+(lock?'':'pri')+'" data-a="enter" data-v="'+g+'" '+(lock?'disabled':'')+'>'+(lock?'Bloccato · serve livello '+LO[g]:'Entra nel Gate')+'</button></div>';
   }
   return h;
 }
