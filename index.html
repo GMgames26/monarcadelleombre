@@ -316,6 +316,7 @@ var MOBS=[
  [{n:'Guardiano dell’abisso',c:'tank'},{n:'Demone stregone',c:'mago'},{n:'Cavaliere cremisi',c:'assassino'},{n:'Serafino caduto',c:'guaritore'}]];
 var BOSS=[{n:'Re dei Goblin',c:'tank',r:[1,1.25]},{n:'Capitano Orco',c:'tank',r:[1.15,.75]},{n:'Signore dei Non Morti',c:'mago',r:[.6,1.3]},{n:'Titano di pietra',c:'tank',r:[.7,1.2]},{n:'Cavaliere della Rovina',c:'assassino',r:[1,.7]},{n:'Sovrano del Vuoto',c:'mago',r:[1.1,.6]}];
 var RSC={tank:{p:.85,m:1.15},mago:{p:1.15,m:.85},assassino:{p:1,m:1},guaritore:{p:1,m:1}};
+function dfR(t){var K=50+2*p.lv;return Math.round((1-K/(K+p.st.vit)*dmgTaken({dt:t}))*100)}
 function dmgTaken(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
 function rsTags(e){if(!e.rs)return'';var o='';[['p','fisico'],['m','magia']].forEach(function(t){var f=e.rs[t[0]];if(f>=1.1)o+='<span class="tag warn">Debole: '+t[1]+'</span>';else if(f<=.9)o+='<span class="tag vio">Resiste: '+t[1]+'</span>'});return o}
@@ -774,7 +775,7 @@ function iName(cls,k,t){var d=IT[cls][k];return d[0]+' '+(d[1]?ADJF:ADJM)[t]}
 function iSlot(cls,k){return IT[cls][k][0]}
 function healAll(){p.shadows.forEach(function(s){s.hp=sMax(s)})}
 function dropShadow(s){['w','a'].forEach(function(k){if(s.eq[k]){p.inv.push(s.eq[k]);s.eq[k]=null}})}
-function sellVal(s){return Math.round((s.boss?150:s.el?50:20)*(1+.25*(s.up||0))*RAR(s))}
+function sellVal(s){return Math.round((s.boss?300:s.el?120:50)*(1+.25*(s.up||0))*RAR(s))}
 function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s))}
 function findShadow(id){return p.shadows.filter(function(s){return String(s.id)===String(id)})[0]}
 function addTrait(s){
@@ -1333,6 +1334,7 @@ function vStato(){
   if(p.kills===0&&p.gates===0)h+='<div class="panel hint"><p><b>Hai il diritto di salire di livello.</b></p><p class="sm">Entra in un Gate di rango E, sconfiggi i mostri e usa ARISE per trasformarli in ombre.</p><button class="btn pri full" style="margin-top:6px" data-a="tab" data-v="gate">Vai ai Gate</button></div>';
   h+='<div class="panel"><div class="pair"><div><div class="sm" style="margin:0">HP '+fmt(p.hp)+' / '+fmt(maxHp())+'</div>'+bar(p.hp,maxHp(),'hp')+'</div><div><div class="sm" style="margin:0">MP '+fmt(p.mp)+' / '+fmt(maxMp())+'</div>'+bar(p.mp,maxMp(),'mp')+'</div></div>'+
    '<div class="stats4 stats5" style="margin-top:8px"><div class="cell"><b>'+atk()+'</b><span>Fisico</span></div><div class="cell"><b>'+matk()+'</b><span>Magico</span></div><div class="cell"><b>'+Math.round(crit()*100)+'%</b><span>Critico</span></div><div class="cell"><b>'+Math.round(dodge()*100)+'%</b><span>Schivata</span></div><div class="cell"><b>'+team().length+'/'+cap()+'</b><span>Squadra</span></div></div>'+
+   '<div class="stats4 stats5" style="margin-top:6px"><div class="cell"><b>'+dfR('p')+'%</b><span>Dif. fisico</span></div><div class="cell"><b>'+dfR('m')+'%</b><span>Dif. magico</span></div></div>'+
    '<p class="sm" style="margin-top:6px">'+wName()+' +'+p.w+' · Gate '+fmt(p.gates)+' · Frammenti '+fq(p.frag)+' · Torre '+p.tower+'</p></div>';
   h+='<div class="panel"><div class="lbl"><span>Attributi</span><em>Punti: '+p.pts+'</em></div><div class="attrs">';
   h+=S.map(function(s){return '<div class="at"><div class="grow"><div class="rn">'+s[1]+'</div><div class="sm">'+s[2]+'</div></div><div class="val">'+p.st[s[0]]+'</div><button class="btn sq" data-a="stat" data-v="'+s[0]+'" '+(p.pts?'':'disabled')+' aria-label="Aumenta '+s[1]+'">+</button></div>'}).join('');
