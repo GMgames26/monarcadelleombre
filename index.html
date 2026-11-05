@@ -320,7 +320,7 @@ function dfR(t){var K=50+2*p.lv;return Math.round((1-K/(K+p.st.vit)*dmgTaken({dt
 function dmgTaken(e){var g9=gI(),m0=e.dt==='m';return dmgT0(e)*(1-(m0?g9.rm:g9.rp))}
 /* equipaggiamento del cacciatore */
 var GN={sw:['Spada di ferro','Spada d’acciaio','Spada runica','Lama del Cavaliere','Lama del Re','Lama del Monarca'],sc:['Scettro di legno','Scettro d’argento','Scettro arcano','Scettro del Mago','Scettro del Re','Scettro del Monarca'],sh:['Scudo di legno','Scudo di ferro','Scudo rinforzato','Scudo del Guardiano','Scudo del Re','Scudo del Monarca'],cl:['Mantello logoro','Mantello di pelle','Mantello incantato','Mantello d’ombra','Mantello del Re','Mantello del Monarca']};
-var GD=[0.08,0.12,0.18,0.25,0.33,0.42],GC=[.01,.02,.03,.04,.05,.06],GH=[80,170,300,480,750,1150],GR=[0.04,0.06,0.09,0.12,0.15,0.18],GP=[60,140,300,600,1200,2400];
+var GD=[0.24,0.33,0.44,0.56,0.69,0.82],GC=[0.03,0.05,0.07,0.09,0.11,0.13],GH=[240,440,700,1050,1500,2100],GR=[0.14,0.2,0.25,0.3,0.34,0.38],GP=[60,140,300,600,1200,2400];
 var GSL={sw:'w',sc:'w',sh:'s',cl:'m'},GSLN={w:'Arma',s:'Scudo',m:'Mantello'},GK=['sw','sc','sh','cl'];
 function gI(){
   var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0};
@@ -359,7 +359,7 @@ function vGear(){
   }else h+='<p class="sm" style="margin:8px 0 0">Equipaggiamenti rari cadono dai Gate Rossi.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.15,1.25,1.2,1.15,0.95];
+var ATKF=[1,1.42,1.55,1.5,1.42,1.2];
 function atkF(L){return ATKF[rkL(L)]}
 function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
