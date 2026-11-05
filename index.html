@@ -128,7 +128,9 @@ button{font-family:inherit}
 .loot div.rare{color:var(--gold);font-weight:600}
 .tb{padding:8px 0;border-top:1px solid #1a2552}.tbh{font:600 12px var(--display);letter-spacing:.12em;text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:3px}.tn{font-size:12px;color:var(--muted);margin:2px 0}.tn.on{color:var(--good)}.tn.nx{color:var(--fg)}.tn b{color:var(--gold);font-weight:600}
 .tree{padding:10px 8px}.trow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:0}.thead div{text-align:center;font:700 10px var(--display);letter-spacing:.14em;text-transform:uppercase;padding-bottom:6px}.tcell{position:relative;padding-top:10px}.tcell .tl{position:absolute;left:50%;top:0;width:2px;height:10px;background:#1d2a5c;transform:translateX(-1px)}.tcell .tl.on{background:var(--bc)}.tn2{width:100%;min-height:42px;border:1px solid #1d2a5c;border-radius:6px;background:#0a0f22;color:#4a5584;font:600 10.5px/1.25 var(--display);padding:4px 3px;cursor:pointer}.tn2.nxt{border-color:var(--bc);color:var(--fg);box-shadow:0 0 0 1px var(--bc) inset}.tn2.own{background:#151c44;border-color:var(--bc);color:var(--bc)}.tn2.sel{outline:2px solid var(--fg);outline-offset:1px}.tcell.root{grid-column:2}.tn2.rootn{min-height:46px}.tjoin{height:10px;margin:10px 18% 0;border:2px solid #1d2a5c;border-bottom:0;border-radius:6px 6px 0 0}.tjoin.on{border-color:#e8ecff}
-#nav{grid-template-columns:repeat(6,1fr)!important}#nav button{font-size:10px;letter-spacing:.03em}
+#nav{grid-template-columns:repeat(7,1fr)!important}#nav button{font-size:8.5px;letter-spacing:0;padding:0 1px;min-width:0}
+.sl{display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:13px;border-top:1px solid #1a2552}.sl:first-of-type{border-top:0}.sl b{font-variant-numeric:tabular-nums}.sl span{color:var(--muted)}
+.sg{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:4px;padding:6px 0;font-size:13px;border-top:1px solid #1a2552;text-align:right}.sg>:first-child{text-align:left}.sg.h{font:600 10px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-top:0}.sg b{font-variant-numeric:tabular-nums}
 .warnbox{font-size:12px;color:var(--muted);margin:6px 0 0}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .chip{font:600 13px var(--display);letter-spacing:.06em;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:3px;min-height:40px;min-width:44px;padding:6px 12px;cursor:pointer}
@@ -564,7 +566,7 @@ var p, c=null, tab='stato', relId=null, sellId=null, timer=null, tt=null, pendin
 var saveBox=null,qSec='main',openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,tbc:{},stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,gtc:{},tbc:{},stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
   if(o.spec==='bers')o.spec='tank';
   if(o.trv===undefined){var oc=[4,8,14,22,35],rf=0;if(o.tree){['o','c','f'].forEach(function(k){for(var i=0;i<(o.tree[k]|0)&&i<5;i++)rf+=oc[i]});o.frag=(o.frag||0)+rf;o.tree={r:0,o:0,c:0,f:0}}o.trv=2}
@@ -1367,7 +1369,7 @@ function chooseDoor(k){
 }
 function nextRoom(){
   if(c.e.boss&&!c.tower){
-    p.gates++;p.cnt.gate++;quest('gates',1);weekly('gates',1);qev('gate',1);rollLoot();
+    p.gates++;p.cnt.gate++;(p.gtc[c.g]=p.gtc[c.g]||[0,0,0])[c.tier|0]++;quest('gates',1);weekly('gates',1);qev('gate',1);rollLoot();
     if(!c.pot)qev('clean',1);
     if(team().length>0&&!c.fell)qev('intact',1);
     if(!c.usedDef)qev('nodef',1);
@@ -1427,17 +1429,23 @@ function vStato(){
     h+='<div class="panel"><p class="sm" style="margin:0">Risvegli: '+p.awk+' · HP e attacco +'+(8*p.awk)+'%, EXP +'+(15*p.awk)+'%.</p></div>';
   }
   h+='<div class="panel"><div class="lbl"><span>Backup salvataggio</span></div><div class="btns" style="margin-top:0"><button class="btn sm2" data-a="exp">Esporta</button><button class="btn sm2" data-a="imp">Importa</button></div>'+(saveBox!==null?'<textarea id="savebox" rows="4" style="width:100%;margin-top:8px;background:#0a0f22;color:var(--fg);border:1px solid var(--line);border-radius:3px;padding:6px;font-size:11px" placeholder="Incolla qui il salvataggio da importare">'+saveBox+'</textarea>'+(saveBox===''?'<button class="btn pri full sm2" style="margin-top:6px" data-a="impgo">Carica questo salvataggio</button>':'<p class="sm">Salvataggio copiato. Incollalo nell\u2019altro dispositivo con Importa.</p>')+'':'')+'</div>';
-  h+='<button class="btn full sm2" style="margin-bottom:8px" data-a="stats">Statistiche '+(statsOpen?'\u25b2':'\u25bc')+'</button>';
-  if(statsOpen){
-    var X=p.sx,C=[[fmt(p.cnt.kill),'Nemici'],[fmt(p.cnt.boss),'Boss'],[fmt(p.cnt.elite),'\u00c9lite'],[fmt(p.gates),'Gate vinti'],[fmt(X.def),'Sconfitte'],['Piano '+p.tower,'Torre'],[fmt(X.ok),'Ombre estratte'],[fmt(X.fail),'ARISE falliti'],[fmt(X.fall),'Ombre cadute'],[fmt(X.crit),'Critici'],[fmt(X.max),'Colpo max'],[fmt(X.pot),'Pozioni usate'],[fmt(X.dmg),'Danni totali'],[fmt(X.gold),'Oro guadagnato'],[fmt(X.exp),'EXP da nemici'],[p.frag,'Frammenti']];
-    h+='<div class="panel"><div class="lbl"><span>Statistiche</span><em>alcune contano da questa versione</em></div><div class="stats3">'+C.map(function(x){return '<div class="cell"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join('')+'</div>';
-    h+='<div class="lbl" style="margin-top:10px"><span>Ultime partite</span></div>';
-    if(!p.hist.length)h+='<p class="sm" style="margin:0">Ancora nessuna partita registrata.</p>';
-    p.hist.forEach(function(x){h+='<div class="hrow"><span class="hr" style="color:'+(x.l==='Completato'?'var(--good)':(x.l==='Sconfitto'?'var(--danger)':'var(--muted)'))+'">'+x.l+'</span><span class="hn">'+x.n+(x.r==='T'?' \u00b7 piano '+x.f:' \u00b7 '+x.r)+(x.m?' \u00b7 '+MODS[x.m].n:'')+'</span><span class="hs">'+fmt(x.x)+' EXP \u00b7 '+fmt(x.g)+' oro'+(x.a?' \u00b7 '+x.a+' ombre':'')+'</span></div>'});
-    h+='</div>';
-  }
   h+='<button class="btn dng full sm2" data-a="reset">'+(resetArm?'Conferma: cancella tutti i progressi':'Ricomincia da zero')+'</button>'+(resetArm?'<button class="btn full sm2" style="margin-top:6px" data-a="resetno">Annulla</button>':'');
   return h;
+}
+function vStat(){
+  var X=p.sx,L=function(a,b){return '<div class="sl"><span>'+a+'</span><b>'+b+'</b></div>'};
+  var h='<div class="lbl"><span>Statistiche</span><em>dati dal 6 nov</em></div>';
+  h+='<div class="panel"><div class="lbl"><span>Generali</span></div>'+L('Livello',p.lv+(p.awk?' · Risveglio '+p.awk:''))+L('Nemici sconfitti',fmt(p.cnt.kill))+L('Boss sconfitti',fmt(p.cnt.boss))+L('Élite sconfitti',fmt(p.cnt.elite))+L('Colpi critici',fmt(X.crit))+L('Colpo massimo',fmt(X.max))+L('Danni totali',fmt(X.dmg))+L('Pozioni usate',fmt(X.pot))+L('Oro guadagnato',fmt(X.gold))+L('EXP da nemici',fmt(X.exp))+'</div>';
+  var tot=[0,0,0];
+  h+='<div class="panel"><div class="lbl"><span>Gate completati</span><em>'+fmt(p.gates)+' totali</em></div><div class="sg h"><span>Rango</span><span>Base</span><span>Rinf.</span><span>Rosso</span></div>';
+  for(var g=0;g<6;g++){var a=p.gtc[g]||[0,0,0];for(var t=0;t<3;t++)tot[t]+=a[t];h+='<div class="sg"><span>'+RANKS[g]+'</span><b>'+a[0]+'</b><b>'+a[1]+'</b><b>'+a[2]+'</b></div>'}
+  h+='<div class="sg"><span>Totale</span><b>'+tot[0]+'</b><b>'+tot[1]+'</b><b>'+tot[2]+'</b></div>'+L('Sconfitte',fmt(X.def))+'</div>';
+  h+='<div class="panel"><div class="lbl"><span>Ombre</span></div>'+L('Ombre estratte',fmt(X.ok))+L('ARISE falliti',fmt(X.fail))+L('Ombre cadute',fmt(X.fall))+L('Nell’esercito',p.shadows.length)+L('Frammenti',fq(p.frag))+'</div>';
+  h+='<div class="panel"><div class="lbl"><span>Torre</span></div>'+L('Record',p.tower?'Piano '+p.tower:'—')+L('Checkpoint',p.tcp?'Piano '+p.tcp:'—')+'</div>';
+  h+='<div class="panel"><div class="lbl"><span>Ultime partite</span></div>';
+  if(!p.hist.length)h+='<p class="sm" style="margin:0">Ancora nessuna partita registrata.</p>';
+  p.hist.forEach(function(x){h+='<div class="hrow"><span class="hr" style="color:'+(x.l==='Completato'?'var(--good)':(x.l==='Sconfitto'?'var(--danger)':'var(--muted)'))+'">'+x.l+'</span><span class="hn">'+x.n+(x.r==='T'?' · piano '+x.f:' · '+x.r)+(x.m?' · '+MODS[x.m].n:'')+'</span><span class="hs">'+fmt(x.x)+' EXP · '+fmt(x.g)+' oro'+(x.a?' · '+x.a+' ombre':'')+'</span></div>'});
+  return h+'</div>';
 }
 function vGate(){
   var r=rIdx(),h='';
@@ -1674,7 +1682,7 @@ function vCombat(){
   return h;
 }
 
-var TABS=[['stato','Stato'],['gate','Gate'],['ombre','Ombre'],['albero','Albero'],['quest','Quest'],['shop','Negozio']];
+var TABS=[['stato','Stato'],['gate','Gate'],['ombre','Ombre'],['albero','Albero'],['quest','Quest'],['shop','Negozio'],['stat','Stat.']];
 function render(){
   checkQuest();
   document.body.classList.add('cp');document.body.classList.toggle('tomb',false);
@@ -1695,7 +1703,7 @@ function render(){
   }
   ab.hidden=true;document.body.style.paddingBottom='';root.style.removeProperty('--bar-h');
   nav.hidden=false;
-  v.innerHTML=({stato:vStato,gate:vGate,ombre:vOmbre,albero:vAlbero,quest:vQuest,shop:vShop})[tab]();
+  v.innerHTML=({stato:vStato,gate:vGate,ombre:vOmbre,albero:vAlbero,quest:vQuest,shop:vShop,stat:vStat})[tab]();
   nav.innerHTML=TABS.map(function(t){
     var dot=(t[0]==='albero'&&treeBuy())||(t[0]==='stato'&&(p.pts>0||(p.lv>=20&&!p.spec)))||(t[0]==='quest'&&((questDone()&&!p.quest.claimed)||(weeklyDone()&&!p.weekly.claimed)||(p.story<STORY.length&&stVal(p.story)>=STORY[p.story].n)||QD.some(function(d){var s=p.gq[d.id];return s&&s.s===2})));
     return '<button data-a="tab" data-v="'+t[0]+'" class="'+(tab===t[0]?'on':'')+(dot?' dot':'')+'">'+t[1]+'</button>';
