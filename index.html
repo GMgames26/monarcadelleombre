@@ -322,52 +322,57 @@ function dmgTaken(e){var g9=gI(),m0=e.dt==='m';return dmgT0(e)*(1-(m0?g9.rm:g9.r
 /* equipaggiamento del cacciatore */
 var GN={sw:['Spada di ferro','Spada d’acciaio','Spada runica','Lama del Cavaliere','Lama del Re','Lama del Monarca'],sc:['Scettro di legno','Scettro d’argento','Scettro arcano','Scettro del Mago','Scettro del Re','Scettro del Monarca'],sh:['Scudo di legno','Scudo di ferro','Scudo rinforzato','Scudo del Guardiano','Scudo del Re','Scudo del Monarca'],sm:['Egida di cristallo','Egida d’argento','Egida runica','Egida dell’Arcimago','Egida del Re','Egida del Monarca'],co:['Corazza di cuoio','Corazza di ferro','Corazza rinforzata','Corazza del Guardiano','Corazza del Re','Corazza del Monarca'],cl:['Mantello logoro','Mantello di pelle','Mantello incantato','Mantello d’ombra','Mantello del Re','Mantello del Monarca']};
 var GD=[0.28,0.38,0.5,0.64,0.79,0.94],GC=[0.035,0.058,0.08,0.1,0.125,0.15],GH=[275,500,800,1200,1725,2400],GR=[0.16,0.23,0.29,0.34,0.39,0.43],GP=[60,140,300,600,1200,2400];
-var MPG=[.04,.07,.10,.13,.16,.20];
+var MPG=[.04,.07,.10,.13,.16,.20],GU=[.08,.055,.04,.035,.025,.04],GUC=[3,5,8,12,18];
+function gUp(it){return 1+GU[it.t]*(it.u|0)}
+function gUCost(it){return Math.round(GP[it.t]*GUC[it.u|0])}
 var GSL={sw:'w',sc:'w',sh:'s',sm:'s',co:'m',cl:'m'},GSLN={w:'Arma',s:'Scudo',m:'Armatura'},GK=['sw','sc','sh','sm','co','cl'];
-function gI(){
-  var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0};
-  ['w','s','m'].forEach(function(sl){var it=p.gear&&p.gear[sl];if(!it)return;var t=it.t;
-    if(it.k==='sw'){a.dm+=GD[t];a.cr+=GC[t]}
-    else if(it.k==='sc'){a.mm+=GD[t];a.dd+=GC[t]}
-    else if(it.k==='sh'){a.hp+=Math.round(GH[t]*.35);a.rp+=GR[t]*.7}
-    else if(it.k==='co'){a.hp+=Math.round(GH[t]*.75);a.rp+=GR[t]*.3}
-    else if(it.k==='sm'){a.rm+=GR[t]*.7;a.mp+=MPG[t]*.6}
-    else if(it.k==='cl'){a.hp+=Math.round(GH[t]*.35);a.rm+=GR[t]*.3;a.mp+=MPG[t]*.4}});
+function gStat(it){
+  var t=it.t,U=gUp(it),a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0},k=it.k;
+  if(k==='sw'){a.dm=GD[t]*U;a.cr=GC[t]*U}
+  else if(k==='sc'){a.mm=GD[t]*U;a.dd=GC[t]*U}
+  else if(k==='sh'){a.hp=Math.round(GH[t]*.35*U);a.rp=GR[t]*.7*U}
+  else if(k==='co'){a.hp=Math.round(GH[t]*.75*U);a.rp=GR[t]*.3*U}
+  else if(k==='sm'){a.rm=GR[t]*.7*U;a.mp=MPG[t]*.6*U}
+  else{a.hp=Math.round(GH[t]*.35*U);a.rm=GR[t]*.3*U;a.mp=MPG[t]*.4*U}
   return a;
 }
-function gName(k,t){return GN[k][t]+' · '+RANKS[t]}
-function gDesc(k,t){
-  var P=function(x){return Math.round(x*100)+'%'};
-  if(k==='sw')return '+'+P(GD[t])+' danno fisico, +'+P(GC[t])+' critico';
-  if(k==='sc')return '+'+P(GD[t])+' danno magico, +'+P(GC[t])+' schivata';
-  if(k==='sh')return '+'+Math.round(GH[t]*.35)+' HP, −'+P(GR[t]*.7)+' danni fisici';
-  if(k==='co')return '+'+Math.round(GH[t]*.75)+' HP, −'+P(GR[t]*.3)+' danni fisici';
-  if(k==='sm')return '−'+P(GR[t]*.7)+' danni magici, +'+P(MPG[t]*.6)+' MP';
-  return '+'+Math.round(GH[t]*.35)+' HP, −'+P(GR[t]*.3)+' danni magici, +'+P(MPG[t]*.4)+' MP';
+function gI(){
+  var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0};
+  ['w','s','m'].forEach(function(sl){var it=p.gear&&p.gear[sl];if(!it)return;var b=gStat(it);for(var x in b)a[x]+=b[x]});
+  return a;
 }
-function bagAdd(k,t){
-  var b=p.bag.filter(function(x){return x.k===k&&x.t===t})[0];
-  if(b)b.n++;else p.bag.push({k:k,t:t,n:1});
-  p.bag.sort(function(a,b){return b.t-a.t||GK.indexOf(a.k)-GK.indexOf(b.k)});
+function gName(k,t,u){return GN[k][t]+' · '+RANKS[t]+(u?' +'+u:'')}
+function gDesc(k,t,u){
+  var P=function(x){return Math.round(x*100)+'%'},a=gStat({k:k,t:t,u:u|0});
+  if(k==='sw')return '+'+P(a.dm)+' danno fisico, +'+P(a.cr)+' critico';
+  if(k==='sc')return '+'+P(a.mm)+' danno magico, +'+P(a.dd)+' schivata';
+  if(k==='sh'||k==='co')return '+'+a.hp+' HP, −'+P(a.rp)+' danni fisici';
+  if(k==='sm')return '−'+P(a.rm)+' danni magici, +'+P(a.mp)+' MP';
+  return '+'+a.hp+' HP, −'+P(a.rm)+' danni magici, +'+P(a.mp)+' MP';
+}
+function bagAdd(k,t,u){
+  u=u|0;var b=p.bag.filter(function(x){return x.k===k&&x.t===t&&(x.u|0)===u})[0];
+  if(b)b.n++;else p.bag.push({k:k,t:t,u:u,n:1});
+  p.bag.sort(function(a,b){return b.t-a.t||(b.u|0)-(a.u|0)||GK.indexOf(a.k)-GK.indexOf(b.k)});
 }
 function bagTake(b){b.n--;if(b.n<=0)p.bag.splice(p.bag.indexOf(b),1)}
 function vGear(){
   var h='<div class="panel"><div class="lbl"><span>Equipaggiamento</span><em>Zaino: '+p.bag.reduce(function(a,b){return a+b.n},0)+'</em></div>';
   ['w','s','m'].forEach(function(sl){
     var it=p.gear[sl];
-    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t):(sl==='w'?'Spada o scettro':(sl==='s'?'Scudo (tank) o egida (mago)':'Corazza (tank) o mantello (mago)')))+'</div></div>'+(it?'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
+    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t,it.u):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t,it.u):(sl==='w'?'Spada o scettro':(sl==='s'?'Scudo (tank) o egida (mago)':'Corazza (tank) o mantello (mago)')))+'</div></div>'+(it?((it.u|0)<5?'<button class="btn gld sm2" data-a="gup" data-v="'+sl+'" '+((c||p.gold<gUCost(it))?'disabled':'')+'>+'+((it.u|0)+1)+'<small>'+fmt(gUCost(it))+' oro</small></button>':'<span class="tag" style="color:var(--gold)">MAX</span>')+'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
   });
   if(p.bag.length){
     h+='<div class="sm" style="margin:8px 0 2px">Zaino</div>';
     p.bag.forEach(function(b){
-      h+='<div class="row"><div class="grow"><div class="rn">'+gName(b.k,b.t)+(b.n>1?' ×'+b.n:'')+'</div><div class="sm">'+gDesc(b.k,b.t)+'</div></div><button class="btn pri sm2" data-a="geq" data-v="'+b.k+':'+b.t+'" '+(c?'disabled':'')+'>Equipa</button><button class="btn gld sm2" data-a="gsell" data-v="'+b.k+':'+b.t+'">Vendi<small>'+fmt(GP[b.t])+' oro</small></button></div>';
+      h+='<div class="row"><div class="grow"><div class="rn">'+gName(b.k,b.t,b.u)+(b.n>1?' ×'+b.n:'')+'</div><div class="sm">'+gDesc(b.k,b.t,b.u)+'</div></div><button class="btn pri sm2" data-a="geq" data-v="'+b.k+':'+b.t+':'+(b.u|0)+'" '+(c?'disabled':'')+'>Equipa</button><button class="btn gld sm2" data-a="gsell" data-v="'+b.k+':'+b.t+':'+(b.u|0)+'">Vendi<small>'+fmt(GP[b.t])+' oro</small></button></div>';
     });
-  }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (35% a ogni vittoria). Puoi cambiarli prima di ogni Gate.</p>';
+  }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (35% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con l’oro.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.33,1.48,1.45,1.38,1.18];
+var ATKF=[1,1.42,1.54,1.48,1.4,1.2];
 function atkF(L){return ATKF[rkL(L)]}
-function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
+function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .75;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
 function rsTags(e){if(!e.rs)return'';var o='';[['p','fisico'],['m','magia']].forEach(function(t){var f=e.rs[t[0]];if(f>=1.1)o+='<span class="tag warn">Debole: '+t[1]+'</span>';else if(f<=.9)o+='<span class="tag vio">Resiste: '+t[1]+'</span>'});return o}
 
@@ -421,7 +426,7 @@ var PRICE=[120,300,650,2400,7500,20000,50000];
 var SPEC={
  tank:{n:'Tank',d:'HP +20%, danno fisico +25%, danni subiti −25% fisici. Abilità Muro d’ombra (50 MP, ogni 3 turni): colpo fisico da 6,5× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[6.5],phys:true,wall:true},
  mago:{n:'Mago',d:'MP +25%, danno magico +10%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana (40 MP, ogni 3 turni): 3 colpi magici da 2,2× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[2.2,2.2,2.2],ign:true},
- sin:{n:'Assassino',d:'HP +10%, critico +15%, schivata +10%, danni subiti −20% fisici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale (50 MP, ogni 3 turni): colpo fisico 5,2×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[5.2],force:true,pierce:true,phys:true},
+ sin:{n:'Assassino',d:'HP +20%, danno fisico +12%, critico +15%, schivata +10%, danni subiti −25% fisici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale (50 MP, ogni 3 turni): colpo fisico 5,2×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[5.2],force:true,pierce:true,phys:true},
  necro:{n:'Evocatore',d:'Ombre +15% forza e HP e −10% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra (50 MP, ogni 3 turni): colpo magico 3,5× e le ombre agiscono due volte.',s:'Comando',f:.45,m:[3.5],cmd:true}};
 
 /* modificatori dei Gate */
@@ -675,10 +680,10 @@ function cloudInit(){
 
 /* ---------- formule ---------- */
 function awkM(){return 1+.08*p.awk}
-function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:(p.spec==='sin'?1.1:1)))+gI().hp}
+function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:(p.spec==='sin'?1.2:1)))+gI().hp}
 function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1)*(1+gI().mp))}
 function pw(v){return Math.round((4+v*2)*(1+.022*p.lv)*awkM()*(1+(tn('c')>=3?.06:0)))}
-function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.25:1)*(1+gI().dm))}
+function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.25:(p.spec==='sin'?1.12:1))*(1+gI().dm))}
 function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.1:1)*(1+gI().mm))}
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
 function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0)+gI().dd)}
@@ -1306,7 +1311,7 @@ function rollLoot(){
     out.push({t:iName(cls,k,tier)+' ('+CL[cls].n+', '+(tier===b+2?'raro':'pregiato')+')',rare:true});
     if(tier===b+2)setTimeout(function(){toast('Drop raro: '+iName(cls,k,tier),'up')},900);
   }
-  if(c.tier===2&&Math.random()<.35+(tn('f')>=5?.05:0)){var gk2=GK[Math.floor(Math.random()*GK.length)];bagAdd(gk2,c.g);out.push({t:gName(gk2,c.g),rare:true});setTimeout(function(){toast('Drop raro: '+gName(gk2,c.g),'up')},900)}
+  if(c.tier===2&&Math.random()<.35+(tn('f')>=5?.05:0)){var gk2=GK[Math.floor(Math.random()*GK.length)];bagAdd(gk2,c.g,0);out.push({t:gName(gk2,c.g),rare:true});setTimeout(function(){toast('Drop raro: '+gName(gk2,c.g),'up')},900)}
   if(c.tier===2&&!c.low&&Math.random()<.05){p.potF=(p.potF|0)+1;out.push({t:'1× Piuma di Fenice',rare:true})}
   c.loot=out;
 }
@@ -1766,16 +1771,20 @@ function act(a,v){
       break;
     case 'geq':
       if(c)break;
-      var gp=v.split(':'),gk=gp[0],gt=+gp[1],gb=p.bag.filter(function(x){return x.k===gk&&x.t===gt})[0];
+      var gp=v.split(':'),gk=gp[0],gt=+gp[1],gu=+(gp[2]||0),gb=p.bag.filter(function(x){return x.k===gk&&x.t===gt&&(x.u|0)===gu})[0];
       if(!gb)break;
-      bagTake(gb);var gsl=GSL[gk],gold9=p.gear[gsl];p.gear[gsl]={k:gk,t:gt};if(gold9)bagAdd(gold9.k,gold9.t);p.hp=Math.min(p.hp,maxHp());
+      bagTake(gb);var gsl=GSL[gk],gold9=p.gear[gsl];p.gear[gsl]={k:gk,t:gt,u:gu};if(gold9)bagAdd(gold9.k,gold9.t,gold9.u);p.hp=Math.min(p.hp,maxHp());
+      break;
+    case 'gup':
+      if(c)break;
+      var gz=p.gear[v];if(gz&&(gz.u|0)<5){var gcz=gUCost(gz);if(p.gold>=gcz){p.gold-=gcz;gz.u=(gz.u|0)+1;toast(gName(gz.k,gz.t,gz.u),'up')}}
       break;
     case 'gun':
       if(c)break;
-      var gu=p.gear[v];if(gu){bagAdd(gu.k,gu.t);p.gear[v]=null;p.hp=Math.max(1,Math.min(p.hp,maxHp()))}
+      var gu=p.gear[v];if(gu){bagAdd(gu.k,gu.t,gu.u);p.gear[v]=null;p.hp=Math.max(1,Math.min(p.hp,maxHp()))}
       break;
     case 'gsell':
-      var gq=v.split(':'),gb2=p.bag.filter(function(x){return x.k===gq[0]&&x.t===+gq[1]})[0];
+      var gq=v.split(':'),gb2=p.bag.filter(function(x){return x.k===gq[0]&&x.t===+gq[1]&&(x.u|0)===+(gq[2]||0)})[0];
       if(gb2){var gv=GP[gb2.t];bagTake(gb2);p.gold+=gv;toast('Venduto: +'+fmt(gv)+' oro','up')}
       break;
     case 'sell':
