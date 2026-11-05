@@ -320,7 +320,7 @@ function dfR(t){var K=50+2*p.lv;return Math.round((1-K/(K+p.st.vit)*dmgTaken({dt
 function dmgTaken(e){var g9=gI(),m0=e.dt==='m';return dmgT0(e)*(1-(m0?g9.rm:g9.rp))}
 /* equipaggiamento del cacciatore */
 var GN={sw:['Spada di ferro','Spada d’acciaio','Spada runica','Lama del Cavaliere','Lama del Re','Lama del Monarca'],sc:['Scettro di legno','Scettro d’argento','Scettro arcano','Scettro del Mago','Scettro del Re','Scettro del Monarca'],sh:['Scudo di legno','Scudo di ferro','Scudo rinforzato','Scudo del Guardiano','Scudo del Re','Scudo del Monarca'],cl:['Mantello logoro','Mantello di pelle','Mantello incantato','Mantello d’ombra','Mantello del Re','Mantello del Monarca']};
-var GD=[.06,.10,.15,.21,.28,.36],GC=[.01,.02,.03,.04,.05,.06],GH=[60,130,230,370,580,900],GR=[.03,.05,.07,.10,.13,.16],GP=[60,140,300,600,1200,2400];
+var GD=[0.08,0.12,0.18,0.25,0.33,0.42],GC=[.01,.02,.03,.04,.05,.06],GH=[80,170,300,480,750,1150],GR=[0.04,0.06,0.09,0.12,0.15,0.18],GP=[60,140,300,600,1200,2400];
 var GSL={sw:'w',sc:'w',sh:'s',cl:'m'},GSLN={w:'Arma',s:'Scudo',m:'Mantello'},GK=['sw','sc','sh','cl'];
 function gI(){
   var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0};
@@ -359,7 +359,8 @@ function vGear(){
   }else h+='<p class="sm" style="margin:8px 0 0">Equipaggiamenti rari cadono dai Gate Rossi.</p>';
   return h+'</div>';
 }
-function atkF(L){return L<=40?1:(L<=60?1-.4*(L-40)/20:.6*Math.pow(60/L,.5))}
+var ATKF=[1,1.15,1.25,1.2,1.15,0.95];
+function atkF(L){return ATKF[rkL(L)]}
 function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
 function rsTags(e){if(!e.rs)return'';var o='';[['p','fisico'],['m','magia']].forEach(function(t){var f=e.rs[t[0]];if(f>=1.1)o+='<span class="tag warn">Debole: '+t[1]+'</span>';else if(f<=.9)o+='<span class="tag vio">Resiste: '+t[1]+'</span>'});return o}
@@ -412,9 +413,9 @@ var PRICE=[120,300,650,2400,7500,20000,50000];
 
 /* specializzazioni (livello 20) */
 var SPEC={
- tank:{n:'Tank',d:'HP +20%, danno fisico +15%, danni subiti −25% fisici. Abilità Muro d’ombra: colpo fisico da 1,8× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[1.8],phys:true,wall:true},
- mago:{n:'Mago',d:'MP +25%, danno magico +20%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana: 3 colpi magici da 1,0× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[1,1,1],ign:true},
- sin:{n:'Assassino',d:'Critico +15%, schivata +10%, danni subiti −20% fisici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale: colpo fisico 3,4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[3.4],force:true,pierce:true,phys:true},
+ tank:{n:'Tank',d:'HP +20%, danno fisico +25%, danni subiti −25% fisici. Abilità Muro d’ombra: colpo fisico da 1,8× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[1.8],phys:true,wall:true},
+ mago:{n:'Mago',d:'MP +25%, danno magico +10%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana: 3 colpi magici da 1,0× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[1,1,1],ign:true},
+ sin:{n:'Assassino',d:'HP +10%, critico +15%, schivata +10%, danni subiti −20% fisici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale: colpo fisico 4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[4],force:true,pierce:true,phys:true},
  necro:{n:'Evocatore',d:'Ombre +15% forza e HP e −10% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra: le ombre agiscono due volte.',s:'Comando',f:.45,m:[.8],cmd:true}};
 
 /* modificatori dei Gate */
@@ -666,11 +667,11 @@ function cloudInit(){
 
 /* ---------- formule ---------- */
 function awkM(){return 1+.08*p.awk}
-function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:1))+gI().hp}
+function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:(p.spec==='sin'?1.1:1)))+gI().hp}
 function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1))}
 function pw(v){return Math.round((4+v*2)*(1+.05*p.w)*(1+.1*p.wev)*awkM()*(1+(tn('c')>=3?.06:0)))}
-function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.15:1)*(1+gI().dm))}
-function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.2:1)*(1+gI().mm))}
+function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.25:1)*(1+gI().dm))}
+function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.1:1)*(1+gI().mm))}
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
 function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0)+gI().dd)}
 function cap(){var i=p.st.int;return(i>=5?1:0)+(i>=15?1:0)+(i>=25?1:0)+(i>=40?1:0)}
@@ -914,7 +915,7 @@ function mkEnemy(o){
   var b=Math.pow(L,1.2),ex=Math.max(0,L-8);
   var boss=!!o.boss,el=!boss&&!!o.elite;
   var d=boss?BOSS[g]:pickMob(g);
-  var hm=(boss?4:(el?1.7:1))*(1+.012*ex)*(boss&&c&&!c.tower&&c.tier===2?1.3:1),am=(boss?1.4:(el?1.25:1))*(1+.018*ex);
+  var hm=(boss?4:(el?1.7:1))*(1+.012*ex)*(boss&&c&&!c.tower&&c.tier===2?1.3:1),am=(boss?1.1:(el?1.25:1))*(1+.018*ex);
   if(o.tower&&!boss){var tk=sig();if(tk==='titan'){hm*=2.2;am*=.6}if(tk==='swarm')am*=.85}
   var hp=Math.round((40+9*b)*rm*hm*rnd(.95,1.05));
   var rw=((m&&m.rw)||1)*(sig()==='armor'?1.15:(sig()==='void'?1.2:1)),gm=((m&&m.gm)||1)*(sig()==='fire'?1.3:1);
