@@ -552,7 +552,7 @@ var p, c=null, tab='stato', relId=null, sellId=null, timer=null, tt=null, pendin
 var saveBox=null,openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,gq:{},tv:2,qv:3,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:3,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
   if(o.spec==='bers')o.spec='tank';
   if(o.trv===undefined){var oc=[4,8,14,22,35],rf=0;if(o.tree){['o','c','f'].forEach(function(k){for(var i=0;i<(o.tree[k]|0)&&i<5;i++)rf+=oc[i]});o.frag=(o.frag||0)+rf;o.tree={r:0,o:0,c:0,f:0}}o.trv=2}
@@ -560,6 +560,7 @@ function migrate(o){
   var shift=(o.tv===undefined),hadCnt=!!o.cnt;
   if(o.wev===undefined)o.wev=Math.min(5,Math.floor((o.w||0)/5));
   if(o.qv!==3){var oldDone=0,nq={};for(var qk2 in (o.gq||{})){if(/^[ED]\./.test(qk2)&&qk2!=='E.8'&&qk2!=='D.0')nq[qk2]=o.gq[qk2];else if(o.gq[qk2].s===2)oldDone++}o.gq=nq;o.qv=3;if(oldDone)o.gold=(o.gold||0)+oldDone*(150+20*(o.lv||1))}
+  if(o.wv!==1){var rg=0,rf=0;for(var wi=1;wi<=(o.w||0);wi++)rg+=Math.round(60*Math.pow(wi,1.5));for(var wk=1;wk<=(o.wev||0);wk++)rf+=2*wk+1;o.gold=(o.gold||0)+rg;o.frag=(o.frag||0)+rf;o.w=0;o.wev=0;o.wv=1}
   if(o.shv!==1&&o.shadows){o.shadows.forEach(function(s){var f=Math.pow(1.08/1.14,s.up||0);if(s.boss)f*=.4;else if(s.el)f*=.735;s.max=Math.max(5,Math.round(s.max*f))});o.shv=1}
   var d=fresh();for(var k in d){if(o[k]===undefined)o[k]=d[k]}
   if(!hadCnt){o.cnt.kill=o.kills||0;o.cnt.gate=o.gates||0}
@@ -669,7 +670,7 @@ function cloudInit(){
 function awkM(){return 1+.08*p.awk}
 function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:(p.spec==='sin'?1.1:1)))+gI().hp}
 function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1))}
-function pw(v){return Math.round((4+v*2)*(1+.05*p.w)*(1+.1*p.wev)*awkM()*(1+(tn('c')>=3?.06:0)))}
+function pw(v){return Math.round((4+v*2)*(1+.022*p.lv)*awkM()*(1+(tn('c')>=3?.06:0)))}
 function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.25:1)*(1+gI().dm))}
 function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.1:1)*(1+gI().mm))}
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
@@ -1388,7 +1389,7 @@ function vStato(){
   h+='<div class="panel"><div class="pair"><div><div class="sm" style="margin:0">HP '+fmt(p.hp)+' / '+fmt(maxHp())+'</div>'+bar(p.hp,maxHp(),'hp')+'</div><div><div class="sm" style="margin:0">MP '+fmt(p.mp)+' / '+fmt(maxMp())+'</div>'+bar(p.mp,maxMp(),'mp')+'</div></div>'+
    '<div class="stats4 stats5" style="margin-top:8px"><div class="cell"><b>'+atk()+'</b><span>Fisico</span></div><div class="cell"><b>'+matk()+'</b><span>Magico</span></div><div class="cell"><b>'+Math.round(crit()*100)+'%</b><span>Critico</span></div><div class="cell"><b>'+Math.round(dodge()*100)+'%</b><span>Schivata</span></div><div class="cell"><b>'+team().length+'/'+cap()+'</b><span>Squadra</span></div></div>'+
    '<div class="stats4 stats5" style="margin-top:6px"><div class="cell"><b>'+dfR('p')+'%</b><span>Dif. fisico</span></div><div class="cell"><b>'+dfR('m')+'%</b><span>Dif. magico</span></div></div>'+
-   '<p class="sm" style="margin-top:6px">'+wName()+' +'+p.w+' · Gate '+fmt(p.gates)+' · Frammenti '+fq(p.frag)+' · Torre '+p.tower+'</p></div>';
+   '<p class="sm" style="margin-top:6px">Gate '+fmt(p.gates)+' · Frammenti '+fq(p.frag)+' · Torre '+p.tower+'</p></div>';
   h+='<div class="panel"><div class="lbl"><span>Attributi</span><em>Punti: '+p.pts+'</em></div><div class="attrs">';
   h+=S.map(function(s){return '<div class="at"><div class="grow"><div class="rn">'+s[1]+'</div><div class="sm">'+s[2]+'</div></div><div class="val">'+p.st[s[0]]+'</div><button class="btn sq" data-a="stat" data-v="'+s[0]+'" '+(p.pts?'':'disabled')+' aria-label="Aumenta '+s[1]+'">+</button></div>'}).join('');
   var spN=p.st.str+p.st.agi+p.st.int+p.st.vit-20;
@@ -1566,13 +1567,6 @@ function vShop(){
   h+='<div class="row"><div class="grow"><div class="rn">Pozione di mana</div><div class="sm">Recupera il 60% degli MP · ne hai '+p.potM+'</div></div><button class="btn gld" data-a="buyM" '+(p.gold<pp?'disabled':'')+'>'+pp+' oro</button></div>';
   h+='<div class="row"><div class="grow"><div class="rn">Antidoto</div><div class="sm">Rimuove veleno, stordimento e maledizione · ne hai '+p.potA+'</div></div><button class="btn gld" data-a="buyA" '+(p.gold<Math.round(pp*.8)?'disabled':'')+'>'+Math.round(pp*.8)+' oro</button></div>';
   h+='<div class="row"><div class="grow"><div class="rn">Elisir del Monarca</div><div class="sm">cura 40% HP e MP, toglie ogni status, +30% di danni per 3 turni · ne hai '+p.potB+'</div></div><button class="btn gld" data-a="buyB" '+(p.gold<pp*3?'disabled':'')+'>'+(pp*3)+' oro</button></div>'+'<div class="row"><div class="grow"><div class="rn">Piuma di Fenice</div><div class="sm">Rarissima, non in vendita: se muori ti riporta in vita con il 50% degli HP, da sola · ne hai '+(p.potF|0)+'</div></div></div></div>';
-  h+='<div class="panel"><div class="lbl"><span>Arma</span><em>Livello '+p.w+' / 30</em></div><div class="row"><div class="grow"><div class="rn">'+wName()+'</div><div class="sm">+5% danni per livello e +10% per ogni evoluzione · fisico '+atk()+' · magico '+matk()+'</div></div>';
-  if(blocked){
-    var k=p.w/5,need2=2*k+1,okr=rIdx()>=k;
-    h+='<button class="btn pri" data-a="evolveW" '+((okr&&p.frag>=need2)?'':'disabled')+'>Evolvi<small>'+(okr?need2+' frammenti':'rango '+RANKS[k])+'</small></button></div>';
-    h+='<p class="sm">L’arma ha raggiunto il suo limite: per evolverla servono rango '+RANKS[k]+' e '+need2+' frammenti d’ombra (li lasciano boss, élite e porte speciali). Ne hai '+fq(p.frag)+'.</p>';
-  }else h+='<button class="btn gld" data-a="buyW" '+((maxW||p.gold<wc)?'disabled':'')+'>'+(maxW?'Massimo':fmt(wc)+' oro')+'</button></div>';
-  h+='</div>';
   h+='<div class="panel" style="--cc:'+CL[shopCls].col+'"><div class="lbl"><span>Equipaggiamento ombre</span></div><div class="chips">';
   CLK.forEach(function(k){h+='<button class="chip'+(k===shopCls?' on':'')+'" style="--cc:'+CL[k].col+'" data-a="shopcls" data-v="'+k+'">'+CL[k].n+'</button>'});
   h+='</div>';
@@ -1728,11 +1722,6 @@ function act(a,v){
     case 'buyM':if(p.gold>=priceP()){p.gold-=priceP();p.potM++}break;
     case 'buyA':var ap=Math.round(priceP()*.8);if(p.gold>=ap){p.gold-=ap;p.potA++}break;
     case 'buyB':if(p.gold>=priceP()*3){p.gold-=priceP()*3;p.potB++}break;
-    case 'buyW':if(p.w<30&&!(p.w%5===0&&p.w>0&&p.w/5>p.wev)&&p.gold>=priceW()){p.gold-=priceW();p.w++;toast('Arma potenziata: +'+p.w,'up')}break;
-    case 'evolveW':
-      var ek=p.w/5,ec=2*ek+1;
-      if(p.w%5===0&&p.w>0&&p.w<30&&ek>p.wev&&rIdx()>=ek&&p.frag>=ec){p.frag-=ec;p.wev++;toast('Arma evoluta: '+wName(),'up')}
-      break;
     case 'shopcls':shopCls=v;break;
     case 'buyI':
       var bi=v.split(':'),bt=+bi[2];
