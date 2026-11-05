@@ -105,7 +105,8 @@ button{font-family:inherit}
 .cap{display:flex;gap:6px;margin:2px 0 4px}
 .cap i{flex:1;height:8px;border-radius:2px;background:#0a0f22;border:1px solid #1d2a5c}
 .cap i.f{background:var(--violet);border-color:var(--violet)}
-.qrow{padding:4px 0}
+.qrow{padding:3px 0}
+.qv .panel{padding:10px 12px;margin-bottom:8px}.qv .lbl{margin-bottom:4px}.qv .sm{font-size:12px}.qv .qrow .t{font-size:12.5px}.qv .btn.full{min-height:38px;padding-block:6px}.qv .bar{height:5px}
 .qrow+.qrow{border-top:1px solid #1a2552}
 .qrow .t{display:flex;justify-content:space-between;gap:8px;font:600 13px var(--display)}
 .qrow .t.ok{color:var(--good)}
@@ -319,16 +320,19 @@ var RSC={tank:{p:.85,m:1.15},mago:{p:1.15,m:.85},assassino:{p:1,m:1},guaritore:{
 function dfR(t){var K=50+2*p.lv;return Math.round((1-K/(K+p.st.vit)*dmgTaken({dt:t}))*100)}
 function dmgTaken(e){var g9=gI(),m0=e.dt==='m';return dmgT0(e)*(1-(m0?g9.rm:g9.rp))}
 /* equipaggiamento del cacciatore */
-var GN={sw:['Spada di ferro','Spada d’acciaio','Spada runica','Lama del Cavaliere','Lama del Re','Lama del Monarca'],sc:['Scettro di legno','Scettro d’argento','Scettro arcano','Scettro del Mago','Scettro del Re','Scettro del Monarca'],sh:['Scudo di legno','Scudo di ferro','Scudo rinforzato','Scudo del Guardiano','Scudo del Re','Scudo del Monarca'],cl:['Mantello logoro','Mantello di pelle','Mantello incantato','Mantello d’ombra','Mantello del Re','Mantello del Monarca']};
-var GD=[0.24,0.33,0.44,0.56,0.69,0.82],GC=[0.03,0.05,0.07,0.09,0.11,0.13],GH=[240,440,700,1050,1500,2100],GR=[0.14,0.2,0.25,0.3,0.34,0.38],GP=[60,140,300,600,1200,2400];
-var GSL={sw:'w',sc:'w',sh:'s',cl:'m'},GSLN={w:'Arma',s:'Scudo',m:'Mantello'},GK=['sw','sc','sh','cl'];
+var GN={sw:['Spada di ferro','Spada d’acciaio','Spada runica','Lama del Cavaliere','Lama del Re','Lama del Monarca'],sc:['Scettro di legno','Scettro d’argento','Scettro arcano','Scettro del Mago','Scettro del Re','Scettro del Monarca'],sh:['Scudo di legno','Scudo di ferro','Scudo rinforzato','Scudo del Guardiano','Scudo del Re','Scudo del Monarca'],sm:['Egida di cristallo','Egida d’argento','Egida runica','Egida dell’Arcimago','Egida del Re','Egida del Monarca'],co:['Corazza di cuoio','Corazza di ferro','Corazza rinforzata','Corazza del Guardiano','Corazza del Re','Corazza del Monarca'],cl:['Mantello logoro','Mantello di pelle','Mantello incantato','Mantello d’ombra','Mantello del Re','Mantello del Monarca']};
+var GD=[0.28,0.38,0.5,0.64,0.79,0.94],GC=[0.035,0.058,0.08,0.1,0.125,0.15],GH=[275,500,800,1200,1725,2400],GR=[0.16,0.23,0.29,0.34,0.39,0.43],GP=[60,140,300,600,1200,2400];
+var MPG=[.04,.07,.10,.13,.16,.20];
+var GSL={sw:'w',sc:'w',sh:'s',sm:'s',co:'m',cl:'m'},GSLN={w:'Arma',s:'Scudo',m:'Armatura'},GK=['sw','sc','sh','sm','co','cl'];
 function gI(){
-  var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0};
+  var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0};
   ['w','s','m'].forEach(function(sl){var it=p.gear&&p.gear[sl];if(!it)return;var t=it.t;
     if(it.k==='sw'){a.dm+=GD[t];a.cr+=GC[t]}
     else if(it.k==='sc'){a.mm+=GD[t];a.dd+=GC[t]}
-    else if(it.k==='sh'){a.hp+=GH[t];a.rp+=GR[t]}
-    else if(it.k==='cl'){a.hp+=GH[t];a.rm+=GR[t]}});
+    else if(it.k==='sh'){a.hp+=Math.round(GH[t]*.35);a.rp+=GR[t]*.7}
+    else if(it.k==='co'){a.hp+=Math.round(GH[t]*.75);a.rp+=GR[t]*.3}
+    else if(it.k==='sm'){a.rm+=GR[t]*.7;a.mp+=MPG[t]*.6}
+    else if(it.k==='cl'){a.hp+=Math.round(GH[t]*.35);a.rm+=GR[t]*.3;a.mp+=MPG[t]*.4}});
   return a;
 }
 function gName(k,t){return GN[k][t]+' · '+RANKS[t]}
@@ -336,8 +340,10 @@ function gDesc(k,t){
   var P=function(x){return Math.round(x*100)+'%'};
   if(k==='sw')return '+'+P(GD[t])+' danno fisico, +'+P(GC[t])+' critico';
   if(k==='sc')return '+'+P(GD[t])+' danno magico, +'+P(GC[t])+' schivata';
-  if(k==='sh')return '+'+GH[t]+' HP, −'+P(GR[t])+' danni fisici';
-  return '+'+GH[t]+' HP, −'+P(GR[t])+' danni magici';
+  if(k==='sh')return '+'+Math.round(GH[t]*.35)+' HP, −'+P(GR[t]*.7)+' danni fisici';
+  if(k==='co')return '+'+Math.round(GH[t]*.75)+' HP, −'+P(GR[t]*.3)+' danni fisici';
+  if(k==='sm')return '−'+P(GR[t]*.7)+' danni magici, +'+P(MPG[t]*.6)+' MP';
+  return '+'+Math.round(GH[t]*.35)+' HP, −'+P(GR[t]*.3)+' danni magici, +'+P(MPG[t]*.4)+' MP';
 }
 function bagAdd(k,t){
   var b=p.bag.filter(function(x){return x.k===k&&x.t===t})[0];
@@ -349,17 +355,17 @@ function vGear(){
   var h='<div class="panel"><div class="lbl"><span>Equipaggiamento</span><em>Zaino: '+p.bag.reduce(function(a,b){return a+b.n},0)+'</em></div>';
   ['w','s','m'].forEach(function(sl){
     var it=p.gear[sl];
-    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t):(sl==='w'?'Spada o scettro':(sl==='s'?'Più HP e meno danni fisici':'Più HP e meno danni magici')))+'</div></div>'+(it?'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
+    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t):(sl==='w'?'Spada o scettro':(sl==='s'?'Scudo (tank) o egida (mago)':'Corazza (tank) o mantello (mago)')))+'</div></div>'+(it?'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
   });
   if(p.bag.length){
     h+='<div class="sm" style="margin:8px 0 2px">Zaino</div>';
     p.bag.forEach(function(b){
       h+='<div class="row"><div class="grow"><div class="rn">'+gName(b.k,b.t)+(b.n>1?' ×'+b.n:'')+'</div><div class="sm">'+gDesc(b.k,b.t)+'</div></div><button class="btn pri sm2" data-a="geq" data-v="'+b.k+':'+b.t+'" '+(c?'disabled':'')+'>Equipa</button><button class="btn gld sm2" data-a="gsell" data-v="'+b.k+':'+b.t+'">Vendi<small>'+fmt(GP[b.t])+' oro</small></button></div>';
     });
-  }else h+='<p class="sm" style="margin:8px 0 0">Equipaggiamenti rari cadono dai Gate Rossi.</p>';
+  }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (35% a ogni vittoria). Puoi cambiarli prima di ogni Gate.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.42,1.55,1.5,1.42,1.2];
+var ATKF=[1,1.33,1.48,1.45,1.38,1.18];
 function atkF(L){return ATKF[rkL(L)]}
 function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
@@ -413,10 +419,10 @@ var PRICE=[120,300,650,2400,7500,20000,50000];
 
 /* specializzazioni (livello 20) */
 var SPEC={
- tank:{n:'Tank',d:'HP +20%, danno fisico +25%, danni subiti −25% fisici. Abilità Muro d’ombra: colpo fisico da 1,8× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[1.8],phys:true,wall:true},
- mago:{n:'Mago',d:'MP +25%, danno magico +10%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana: 3 colpi magici da 1,0× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[1,1,1],ign:true},
- sin:{n:'Assassino',d:'HP +10%, critico +15%, schivata +10%, danni subiti −20% fisici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale: colpo fisico 4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[4],force:true,pierce:true,phys:true},
- necro:{n:'Evocatore',d:'Ombre +15% forza e HP e −10% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra: le ombre agiscono due volte.',s:'Comando',f:.45,m:[.8],cmd:true}};
+ tank:{n:'Tank',d:'HP +20%, danno fisico +25%, danni subiti −25% fisici. Abilità Muro d’ombra (50 MP, ogni 3 turni): colpo fisico da 6,5× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[6.5],phys:true,wall:true},
+ mago:{n:'Mago',d:'MP +25%, danno magico +10%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana (40 MP, ogni 3 turni): 3 colpi magici da 2,2× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[2.2,2.2,2.2],ign:true},
+ sin:{n:'Assassino',d:'HP +10%, critico +15%, schivata +10%, danni subiti −20% fisici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale (50 MP, ogni 3 turni): colpo fisico 5,2×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[5.2],force:true,pierce:true,phys:true},
+ necro:{n:'Evocatore',d:'Ombre +15% forza e HP e −10% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra (50 MP, ogni 3 turni): colpo magico 3,5× e le ombre agiscono due volte.',s:'Comando',f:.45,m:[3.5],cmd:true}};
 
 /* modificatori dei Gate */
 var MODS={
@@ -480,7 +486,7 @@ var QL=[
   ['tierp','Sfida rinforzata','Completa {n} Gate D in difficoltà Rinforzato o Rosso',2,2],
   ['nodef','Senza guardia','Completa {n} Gate D senza mai usare Difendi',2,3],
   ['elite','Predatore d’élite','Sconfiggi {n} nemici élite nei Gate D',5,3],
-  ['lowhp','Sul filo del rasoio','Sconfiggi un boss D con meno del 25% di HP',1,3],
+  ['boss','Cacciatore di capitani','Sconfiggi {n} boss nei Gate D',3,3],
   ['gate','Maestro dei Gate','Completa {n} Gate D',12,4]],
  [['kill','Pulizia dei sotterranei','Sconfiggi {n} nemici nei Gate C',40,1],
   ['weak','Punto debole','Colpisci {n} volte un nemico nel suo punto debole nei Gate C',10,1],
@@ -490,7 +496,7 @@ var QL=[
   ['elite','Cacciatore di élite','Sconfiggi {n} nemici élite nei Gate C',8,2],
   ['mage','Magia al comando','Completa {n} Gate C con un Mago d’ombra vivo a fine Gate',2,3],
   ['tierp','Sfida rinforzata','Completa {n} Gate C in difficoltà Rinforzato o Rosso',2,3],
-  ['lowhp','Sul baratro','Sconfiggi un boss C con meno del 25% di HP',1,3],
+  ['boss','Spezzaboss','Sconfiggi {n} boss nei Gate C',4,3],
   ['gate','Specialista dei Gate','Completa {n} Gate C',15,4]],
  [['fury','Furia incessante','Usa Furia d’ombra {n} volte nei Gate B',12,1],
   ['kill','Piazza pulita','Sconfiggi {n} nemici nei Gate B',60,1],
@@ -519,7 +525,7 @@ var QL=[
   ['elite','Sangue reale','Sconfiggi {n} nemici élite nei Gate S',15,2],
   ['aboss','Trono d’ombra','Estrai {n} ombre da un boss nei Gate S',2,2],
   ['red','Il Monarca rosso','Completa {n} Gate S Rossi',3,3],
-  ['lowhp','Al limite','Sconfiggi un boss S con meno del 25% di HP',2,3],
+  ['shield','Spezzascudi supremo','Infrangi {n} scudi dei boss nei Gate S',6,3],
   ['squad','Sovrano delle ombre','Completa {n} Gate S con tutte e 4 le classi vive a fine Gate',4,3],
   ['gate','Monarca dei Gate','Completa {n} Gate S',25,4]]];
 var QD=[];
@@ -527,39 +533,40 @@ QL.forEach(function(list,g){list.forEach(function(t,i){QD.push({id:RANKS[g]+'.'+
 
 /* storia: un capitolo alla volta */
 var STORY=[
- {t:'Il primo Gate',x:'Un Gate si è aperto sotto casa tua. Entra e chiudilo.',n:1,ref:2,f:function(){return p.cnt.gate}},
- {t:'Il risveglio',x:'Una voce nella testa ti propone di sfruttare i caduti. Estrai la tua prima ombra.',n:1,ref:3,f:function(){return p.cnt.arise}},
- {t:'L’esercito',x:'Un’ombra sola non basta. Raccogline tre.',n:3,ref:6,f:function(){return p.shadows.length}},
+ {t:'Il primo Gate',x:'Un Gate si è aperto sotto casa tua. Entra e chiudilo.',n:1,ref:2,rel:1,f:function(){return p.cnt.gate}},
+ {t:'Il risveglio',x:'Una voce nella testa ti propone di sfruttare i caduti. Estrai la tua prima ombra.',n:1,ref:3,rel:1,f:function(){return p.cnt.arise}},
+ {t:'L’esercito',x:'Un’ombra sola non basta. Raccogline tre.',n:3,ref:6,rel:1,f:function(){return p.cnt.arise}},
  {t:'Rango D',x:'Il Sistema ti riconosce come cacciatore di rango D.',n:20,ref:20,f:function(){return p.lv}},
- {t:'Sangue nobile',x:'I mostri d’élite sorvegliano i Gate più profondi. Dai loro la caccia.',n:5,ref:12,f:function(){return p.cnt.elite}},
- {t:'Il Capitano',x:'Un Capitano Orco guarda dall’alto il rango D. Abbattilo.',n:1,ref:14,f:function(){return p.cnt.bossR[1]}},
+ {t:'Sangue nobile',x:'I mostri d’élite sorvegliano i Gate più profondi. Dai loro la caccia.',n:5,ref:12,rel:1,f:function(){return p.cnt.elite}},
+ {t:'Il Capitano',x:'Un Capitano Orco guarda dall’alto il rango D. Abbattilo.',n:1,ref:14,rel:1,f:function(){return p.cnt.bossR[1]}},
  {t:'La via del Monarca',x:'Al livello 20 il Sistema ti chiede di scegliere la tua strada.',n:1,ref:20,f:function(){return p.spec?1:0}},
- {t:'La Torre',x:'Una Torre senza fine si apre all’orizzonte. Sconfiggi il boss del piano 5.',n:5,ref:21,f:function(){return p.tower}},
- {t:'Il Guardiano',x:'Il boss del piano 10 custodisce il primo checkpoint. Abbattilo.',n:10,ref:24,f:function(){return p.tcp}},
+ {t:'La Torre',x:'Una Torre senza fine si apre all’orizzonte. Sconfiggi il boss del piano 5.',n:5,ref:21,f:function(){return p.stm|0}},
+ {t:'Il Guardiano',x:'Il boss del piano 10 custodisce il primo checkpoint. Abbattilo.',n:10,ref:24,f:function(){return p.stm|0}},
  {t:'Rango C',x:'I Gate di rango C ti aspettano. Raggiungi il livello 35.',n:35,ref:35,f:function(){return p.lv}},
- {t:'Cacciatore di boss',x:'I boss temprano il Monarca. Sconfiggine dieci, nei Gate o nella Torre.',n:10,ref:30,f:function(){return p.cnt.boss}},
- {t:'Oltre le nuvole',x:'Il boss del piano 20 non è mai stato battuto. Fallo cadere.',n:20,ref:38,f:function(){return p.tcp}},
+ {t:'Cacciatore di boss',x:'I boss temprano il Monarca. Sconfiggine dieci, nei Gate o nella Torre.',n:10,ref:30,rel:1,f:function(){return p.cnt.boss}},
+ {t:'Oltre le nuvole',x:'Il boss del piano 20 non è mai stato battuto. Fallo cadere.',n:20,ref:38,f:function(){return p.stm|0}},
  {t:'Rango B',x:'Solo i migliori arrivano al rango B. Raggiungi il livello 50.',n:50,ref:50,f:function(){return p.lv}},
- {t:'Il Titano',x:'Nel rango B un Titano di pietra blocca la strada. Spezzalo.',n:1,ref:50,f:function(){return p.cnt.bossR[3]}},
- {t:'Mietitore',x:'Un esercito si forgia sul campo. Abbatti 300 nemici.',n:300,ref:55,f:function(){return p.cnt.kill}},
- {t:'Il Re dei piani',x:'Il boss del piano 30 siede su un trono d’ombra. Detronizzalo.',n:30,ref:60,f:function(){return p.tcp}},
+ {t:'Il Titano',x:'Nel rango B un Titano di pietra blocca la strada. Spezzalo.',n:1,ref:50,rel:1,f:function(){return p.cnt.bossR[3]}},
+ {t:'Mietitore',x:'Un esercito si forgia sul campo. Abbatti 300 nemici.',n:300,ref:55,rel:1,f:function(){return p.cnt.kill}},
+ {t:'Il Re dei piani',x:'Il boss del piano 30 siede su un trono d’ombra. Detronizzalo.',n:30,ref:60,f:function(){return p.stm|0}},
  {t:'Rango A',x:'Le leggende del rango A ti riconoscono. Raggiungi il livello 75.',n:75,ref:75,f:function(){return p.lv}},
- {t:'La vetta della Torre',x:'Il boss del piano 40 è il guardiano dell’abisso. Sconfiggilo.',n:40,ref:80,f:function(){return p.tcp}},
+ {t:'La vetta della Torre',x:'Il boss del piano 40 è il guardiano dell’abisso. Sconfiggilo.',n:40,ref:80,f:function(){return p.stm|0}},
  {t:'Verso il Monarca',x:'Solo i Monarchi superano il livello 100. Raggiungilo.',n:100,ref:100,f:function(){return p.lv}},
  {t:'Il Risveglio',x:'Il Sistema ti offre di rinascere più forte. Compi il primo Risveglio.',n:1,ref:100,f:function(){return p.awk}}];
 
 var p, c=null, tab='stato', relId=null, sellId=null, timer=null, tt=null, pendingMsg=null;
-var saveBox=null,openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
+var saveBox=null,qSec='main',openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:3,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
   if(o.spec==='bers')o.spec='tank';
   if(o.trv===undefined){var oc=[4,8,14,22,35],rf=0;if(o.tree){['o','c','f'].forEach(function(k){for(var i=0;i<(o.tree[k]|0)&&i<5;i++)rf+=oc[i]});o.frag=(o.frag||0)+rf;o.tree={r:0,o:0,c:0,f:0}}o.trv=2}
   if(o.stv===undefined&&o.story!==undefined){o.story=[0,1,2,3,4,5,6,7,9,14,19][Math.max(0,Math.min(o.story|0,10))];o.stv=2}
   var shift=(o.tv===undefined),hadCnt=!!o.cnt;
   if(o.wev===undefined)o.wev=Math.min(5,Math.floor((o.w||0)/5));
-  if(o.qv!==3){var oldDone=0,nq={};for(var qk2 in (o.gq||{})){if(/^[ED]\./.test(qk2)&&qk2!=='E.8'&&qk2!=='D.0')nq[qk2]=o.gq[qk2];else if(o.gq[qk2].s===2)oldDone++}o.gq=nq;o.qv=3;if(oldDone)o.gold=(o.gold||0)+oldDone*(150+20*(o.lv||1))}
+  if(o.qv!==3&&o.qv!==4){var oldDone=0,nq={};for(var qk2 in (o.gq||{})){if(/^[ED]\./.test(qk2)&&qk2!=='E.8'&&qk2!=='D.0')nq[qk2]=o.gq[qk2];else if(o.gq[qk2].s===2)oldDone++}o.gq=nq;o.qv=3;if(oldDone)o.gold=(o.gold||0)+oldDone*(150+20*(o.lv||1))}
+  if(o.qv!==4){['D.8','C.8','S.7'].forEach(function(k){var q=o.gq&&o.gq[k];if(q){if(q.s===2)o.gold=(o.gold||0)+150+20*(o.lv||1);delete o.gq[k]}});o.qv=4}
   if(o.wv!==1){var rg=0,rf=0;for(var wi=1;wi<=(o.w||0);wi++)rg+=Math.round(60*Math.pow(wi,1.5));for(var wk=1;wk<=(o.wev||0);wk++)rf+=2*wk+1;o.gold=(o.gold||0)+rg;o.frag=(o.frag||0)+rf;o.w=0;o.wev=0;o.wv=1}
   if(o.shv!==1&&o.shadows){o.shadows.forEach(function(s){var f=Math.pow(1.08/1.14,s.up||0);if(s.boss)f*=.4;else if(s.el)f*=.735;s.max=Math.max(5,Math.round(s.max*f))});o.shv=1}
   var d=fresh();for(var k in d){if(o[k]===undefined)o[k]=d[k]}
@@ -669,7 +676,7 @@ function cloudInit(){
 /* ---------- formule ---------- */
 function awkM(){return 1+.08*p.awk}
 function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:(p.spec==='sin'?1.1:1)))+gI().hp}
-function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1))}
+function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1)*(1+gI().mp))}
 function pw(v){return Math.round((4+v*2)*(1+.022*p.lv)*awkM()*(1+(tn('c')>=3?.06:0)))}
 function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.25:1)*(1+gI().dm))}
 function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.1:1)*(1+gI().mm))}
@@ -693,10 +700,10 @@ var BR={o:{n:'Ombra',col:'#b27cff'},c:{n:'Cacciatore',col:'#4aa8ff'},f:{n:'Fortu
 var NODES={
  r:[{s:'Sigillo<br>EXP e oro +5%',d:'Sigillo del Monarca: +5% EXP e +5% oro da ogni nemico. Va sbloccato per primo.',c:5}],
  o:[{s:'Ombre<br>+5%',d:'Tutte le ombre ottengono +5% di forza e HP.',c:8},
-    {s:'Prima ombra<br>si rialza',d:'La prima ombra che cade in un Gate si rialza con il 50% dei suoi HP.',c:12},
+    {s:'Recupero<br>ombre',d:'Le ombre recuperano il 15% degli HP a ogni stanza.',c:12},
     {s:'+1 posto<br>panchina',d:'Un posto in più in panchina per le ombre.',c:18},
     {s:'ARISE<br>+6%',d:'+6% di probabilità di ARISE su nemici normali ed élite.',c:26},
-    {s:'Recupero<br>ombre',d:'Le ombre recuperano il 15% degli HP a ogni stanza.',c:38},
+    {s:'Prima ombra<br>si rialza',d:'La prima ombra che cade in un Gate si rialza con il 50% dei suoi HP.',c:38},
     {s:'Legione<br>+8%',d:'Le ombre ottengono altri +8% di forza e HP.',c:55}],
  c:[{s:'Critico<br>+4%',d:'+4% di probabilità di colpo critico.',c:8},
     {s:'HP<br>+6%',d:'+6% di HP massimi.',c:12},
@@ -708,7 +715,7 @@ var NODES={
     {s:'EXP<br>+10%',d:'+10% EXP da ogni nemico.',c:12},
     {s:'Frammenti<br>+15%',d:'+15% di frammenti d’ombra dai drop. Anche le frazioni si accumulano.',c:18},
     {s:'Sconto<br>−40%',d:'Ridistribuire gli attributi e cambiare specializzazione costano il 40% in meno.',c:26},
-    {s:'Pozioni<br>+20%',d:'+20% di drop di pozioni.',c:38},
+    {s:'Fortuna<br>+5%',d:'+5% di drop dell’equipaggiamento dai Gate Rossi (dal 35% al 40%) e +20% di drop di pozioni.',c:38},
     {s:'Checkpoint<br>ogni 5 piani',d:'Nella Torre il checkpoint scatta ogni 5 piani invece che ogni 10.',c:55}]};
 var tsel=null,respecArm=false;
 function tn(k){return(p&&p.tree&&p.tree[k])|0}
@@ -718,7 +725,7 @@ function respecCost(){return Math.round(80*p.lv*(tn('f')>=4?.6:1))}
 function specCost(){return Math.round(8*(tn('f')>=4?.6:1))}
 var AFF={ward:{n:'Barriera arcana',d:'magia −25%, fisico +15%',p:1.15,m:.75},plate:{n:'Corazza pesante',d:'fisico −25%, magia +15%',p:.75,m:1.15}};
 function affOf(g){return(p.af&&p.af[g])||(g%2?'ward':'plate')}
-function shFall(s){if(tn('o')>=2&&!c.rs){c.rs=true;s.hp=Math.max(1,Math.round(sMax(s)*.5));log(s.name+' si rialza con metà degli HP!','shadow');return}log(s.name+' cade.','bad');c.fell=true;p.sx.fall++}
+function shFall(s){if(tn('o')>=5&&!c.rs){c.rs=true;s.hp=Math.max(1,Math.round(sMax(s)*.5));log(s.name+' si rialza con metà degli HP!','shadow');return}log(s.name+' cade.','bad');c.fell=true;p.sx.fall++}
 function treeBuy(){if(tn('r')<1)return p.frag>=NODES.r[0].c;return['o','c','f'].some(function(k){var nd=NODES[k][tn(k)];return nd&&p.frag>=nd.c})}
 function vAlbero(){
   var own=tn('r')>=1,br=['o','c','f'];
@@ -763,7 +770,7 @@ function mpRegen(){return Math.max(2,Math.round(maxMp()*.015))}
 var SK={atk:{f:0,m:[1],n:'Attacco',phys:true},dbl:{f:.15,m:[.75,.75],n:'Doppia lama',phys:true},fen:{f:.35,m:[2.6],n:'Fendente',phys:true,lv:5},cmo:{f:.6,m:[4.6],n:'Colpo del Monarca',phys:true,lv:15},dar:{f:.15,m:[.75,.75],n:'Dardo arcano'},fury:{f:.35,m:[2.6],n:'Furia d’ombra',lv:5},dom:{f:.6,m:[4.6],n:'Dominio del Monarca',lv:15}};
 function pv(k){var s=k==='spec'?SPEC[p.spec]:SK[k];if(!s)return 0;var ph=!!s.phys,f=(c&&c.e&&c.e.rs&&c.e.rs[ph?'p':'m'])||1;if(s.ign&&f<1)f=1;var t=0;s.m.forEach(function(m){t+=m});return Math.round((ph?atk():matk())*t*pm()*f)}
 function skCost(k){return Math.max(1,Math.round(50*SK[k].f*(p.spec==='mago'?.8:1)))}
-function spCost(){return p.spec?Math.max(1,Math.round(50*SPEC[p.spec].f*(p.spec==='mago'?.8:1))):0}
+function spCost(){return p.spec?Math.round(50*(p.spec==='mago'?.8:1)):0}
 function gOpen(g){return p.lv>=LO[g]}
 function eLevel(g){return clamp(p.lv,LO[g],HI[g])}
 function eDanger(g){return 1+.05*Math.max(0,LO[g]-p.lv)}
@@ -886,7 +893,7 @@ function qev(key,n){
     if(st.v>=d.n){st.s=2;toast('Quest completata: '+d.t,'up')}
   });
 }
-function stVal(i){var s=STORY[i];return Math.min(s.n,s.f())}
+function stVal(i){var s=STORY[i],v=s.f();if(s.rel)v-=(p.stb|0);return Math.max(0,Math.min(s.n,v))}
 function stReward(i){var s=STORY[i];return{exp:Math.round(needAt(s.ref)*.3),gold:30+10*s.ref,pts:i%2?2:1,frag:i>=4?2:0}}
 
 function toast(m,k){var t=$('#toast');t.textContent=m;t.className='show '+(k||'');clearTimeout(tt);tt=setTimeout(function(){t.className=''},2800)}
@@ -1023,8 +1030,8 @@ function pAct(k){
   if(!c||c.busy||c.phase!=='fight')return;
   var s=SK[k],sp=SPEC[p.spec];
   if(k==='spec'){
-    if(!sp||p.mp<spCost())return;
-    p.mp-=spCost();quest('skills',1);qev('skill',1);qev('spec',1);
+    if(!sp||p.mp<spCost()||(c.scd|0)>0)return;
+    p.mp-=spCost();c.scd=3;quest('skills',1);qev('skill',1);qev('spec',1);
     var tot=0,parts=[];
     sp.m.forEach(function(m){var h=hitCalc(m,sp.force,!sp.phys);tot+=h.d;parts.push(h.cr?h.d+'!':String(h.d));if(h.cr)qev('crit',1)});
     hurtE(tot,sp.pierce,!sp.phys,sp.ign);c.flash='e';
@@ -1090,6 +1097,7 @@ function endRound(){
   if(st.curse>0)st.curse--;
   if(c.buff>0)c.buff--;
   if(c.stunCd>0)c.stunCd--;
+  if(c.scd>0)c.scd--;
   var e=c.e;
   if(e.hp>0&&e.pas.indexOf('regen')>=0){var h=Math.round(e.max*.03);e.hp=Math.min(e.max,e.hp+h);log(e.name+' si rigenera: +'+fmt(h),'bad')}
   p.mp=Math.min(maxMp(),p.mp+mpRegen());
@@ -1230,7 +1238,7 @@ function win(){
   c.gx+=ex;c.gg+=eg;p.gold+=eg;p.sx.gold+=eg;p.sx.exp+=ex;gainExp(ex);
   log(e.name+' sconfitto. +'+fmt(ex)+' EXP, +'+fmt(eg)+' oro','good');
   if(c.tower&&c.floor>p.tower)p.tower=c.floor;
-  if(c.tower){
+  if(c.tower){if(c.floor>(p.stm|0))p.stm=c.floor;
     if(e.boss&&c.floor%10===0&&Math.random()<.06){p.potF=(p.potF|0)+1;log('Hai trovato una Piuma di Fenice!','good');toast('Piuma di Fenice!','up')}
     if(e.boss&&c.floor%(tn('f')>=6?5:10)===0&&c.floor>p.tcp){p.tcp=c.floor;toast('Checkpoint: piano '+(c.floor+1),'up')}
     c.busy=false;c.flash='';nextRoom();return;
@@ -1279,7 +1287,7 @@ function doArise(){
   }else{p.sx.fail++;c.ok=false;c.msg='Estrazione fallita. L’ombra si dissolve.';c.phase='ariseRes'}
 }
 function doReplace(id){
-  var old=findShadow(id);if(!old||!c.pend)return;
+  var old=findShadow(id);if(!old||!c.pend||old.a)return;
   var same=old.cls===c.pend.cls&&(old.eq.w||old.eq.a),moved=false;
   if(same){['w','a'].forEach(function(k){if(old.eq[k]){c.pend.eq[k]=old.eq[k];old.eq[k]=null;moved=true}})}
   dropShadow(old);
@@ -1291,19 +1299,19 @@ function rollLoot(){
   if(Math.random()<.20*m){var n=Math.random()<.15?2:1;p.potH+=n;out.push({t:n+'× Pozione di cura'})}
   if(Math.random()<.14*m){p.potM++;out.push({t:'1× Pozione di mana'})}
   if(Math.random()<.11*m*((mm&&mm.am)||1)){p.potA++;out.push({t:'1× Antidoto'})}
-  if(Math.random()<.05*m){p.potB++;out.push({t:'1× Elisir del Monarca',rare:true})}
+  if(c.tier>=1&&Math.random()<(c.tier===2?.35:.25)){p.potB++;out.push({t:'1× Elisir del Monarca',rare:true})}
   if(c.tier===2&&!c.low&&Math.random()<.2){
     var tier=Math.random()<.15?b+2:b+1,cls=CLK[Math.floor(Math.random()*4)],k=Math.random()<.5?'w':'a';
     p.inv.push({id:++p.iid,cls:cls,k:k,t:tier});
     out.push({t:iName(cls,k,tier)+' ('+CL[cls].n+', '+(tier===b+2?'raro':'pregiato')+')',rare:true});
     if(tier===b+2)setTimeout(function(){toast('Drop raro: '+iName(cls,k,tier),'up')},900);
   }
-  if(c.tier===2&&Math.random()<.2){var gk2=GK[Math.floor(Math.random()*4)];bagAdd(gk2,c.g);out.push({t:gName(gk2,c.g),rare:true});setTimeout(function(){toast('Drop raro: '+gName(gk2,c.g),'up')},900)}
+  if(c.tier===2&&Math.random()<.35+(tn('f')>=5?.05:0)){var gk2=GK[Math.floor(Math.random()*GK.length)];bagAdd(gk2,c.g);out.push({t:gName(gk2,c.g),rare:true});setTimeout(function(){toast('Drop raro: '+gName(gk2,c.g),'up')},900)}
   if(c.tier===2&&!c.low&&Math.random()<.05){p.potF=(p.potF|0)+1;out.push({t:'1× Piuma di Fenice',rare:true})}
   c.loot=out;
 }
 function pickDoors(){
-  var keys=(c.tower?Object.keys(DOORS):GATES[c.g].doors),out=[];
+  var keys=(c.tower?Object.keys(DOORS).filter(function(k){return k!=='oracle'}):GATES[c.g].doors),out=[];
   while(out.length<3){var k=keys[Math.floor(Math.random()*keys.length)];if(out.indexOf(k)<0)out.push(k)}
   return out;
 }
@@ -1365,7 +1373,7 @@ function nextRoom(){
     pushHist('Completato');c.phase='cleared';
     toast('Gate completato!','up');save();render();return;
   }
-  if(tn('o')>=5)team().forEach(function(s){if(s.hp>0)s.hp=Math.min(sMax(s),s.hp+Math.round(sMax(s)*.15))});
+  if(tn('o')>=2)team().forEach(function(s){if(s.hp>0)s.hp=Math.min(sMax(s),s.hp+Math.round(sMax(s)*.15))});
   c.doors=pickDoors();c.phase='doors';
   log('Davanti a te si aprono tre porte.','sys');
   save();render();
@@ -1383,7 +1391,7 @@ function vTop(){
   '<div class="gold">'+fmt(p.gold)+'<small>oro</small><small class="syn" id="sync">'+syncTxt+'</small></div></div>';
 }
 function vStato(){
-  var S=[['str','Forza','danno fisico e abilità fisiche'],['agi','Agilità','critico, schivata'],['int','Intelletto','MP (anche per le abilità fisiche), ombre, magia'],['vit','Vitalità','HP, difesa']];
+  var S=[['str','Forza','danno fisico'],['agi','Agilità','critico, schivata'],['int','Intelligenza','MP, ombre, magia'],['vit','Vitalità','HP, difesa']];
   var h='';
   if(p.kills===0&&p.gates===0)h+='<div class="panel hint"><p><b>Hai il diritto di salire di livello.</b></p><p class="sm">Entra in un Gate di rango E, sconfiggi i mostri e usa ARISE per trasformarli in ombre.</p><button class="btn pri full" style="margin-top:6px" data-a="tab" data-v="gate">Vai ai Gate</button></div>';
   h+='<div class="panel"><div class="pair"><div><div class="sm" style="margin:0">HP '+fmt(p.hp)+' / '+fmt(maxHp())+'</div>'+bar(p.hp,maxHp(),'hp')+'</div><div><div class="sm" style="margin:0">MP '+fmt(p.mp)+' / '+fmt(maxMp())+'</div>'+bar(p.mp,maxMp(),'mp')+'</div></div>'+
@@ -1497,7 +1505,7 @@ function shRow(s){
 }
 function vOmbre(){
   var tm=team(),bn=p.shadows.filter(function(x){return !x.a});
-  var h='<div class="panel"><div class="lbl"><span>Esercito d’ombra</span><em>Frammenti: '+fq(p.frag)+'</em></div><div class="sm" style="margin:0">Slot squadra con Intelletto 5, 15, 25 e 40. In squadra al massimo 1 ombra di boss e 1 di élite. Potenziamento massimo +'+upMax()+' (sale con il rango). Tocca un’ombra per i dettagli.</div>';
+  var h='<div class="panel"><div class="lbl"><span>Esercito d’ombra</span><em>Frammenti: '+fq(p.frag)+'</em></div><div class="sm" style="margin:0">Slot squadra con Intelligenza 5, 15, 25 e 40. In squadra al massimo 1 ombra di boss e 1 di élite. Potenziamento massimo +'+upMax()+' (sale con il rango). Tocca un’ombra per i dettagli.</div>';
   var fm=formation();
   if(fm.list.length)h+='<div class="fbox">'+fm.list.join(' · ')+'</div>';
   h+='</div>';
@@ -1516,26 +1524,27 @@ function stBar(){return ''}
 function vQuest(){
   var d=new Date(),left=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)-d,hh=Math.floor(left/36e5),mm=Math.floor(left%36e5/6e4);
   var done=questDone(),r=questReward();
-  var h='';
+  var h='<div class="qv"><div class="chips" style="margin-bottom:8px"><button class="chip'+(qSec==='main'?' on':'')+'" style="--cc:#8f6bff" data-a="qsec" data-v="main">Storia e giornaliere</button><button class="chip'+(qSec==='gate'?' on':'')+'" style="--cc:#8f6bff" data-a="qsec" data-v="gate">Quest dei Gate</button></div>';
+  if(qSec==='main'){
   /* storia */
   if(p.story<STORY.length){
     var S=STORY[p.story],v=stVal(p.story),ok=v>=S.n,sr=stReward(p.story);
-    h+='<div class="panel story"><div class="lbl"><span>Storia · capitolo '+(p.story+1)+'/'+STORY.length+'</span><em>'+S.t+'</em></div><p class="sm" style="font-size:14px;color:var(--fg)">'+S.x+'</p>'+
-     '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>Progresso</span><span>'+v+' / '+S.n+'</span></div>'+bar(v,S.n,ok?'mp':'xp')+'</div>'+
-     '<p class="sm" style="margin-top:8px">Ricompensa: '+fmt(sr.gold)+' oro, '+fmt(sr.exp)+' EXP, '+sr.pts+' punt'+(sr.pts>1?'i':'o')+(sr.frag?', '+sr.frag+' frammenti':'')+'</p>'+
-     '<button class="btn pri full" style="margin-top:8px" data-a="stclaim" '+(ok?'':'disabled')+'>'+(ok?'Ritira e continua la storia':'Capitolo in corso')+'</button></div>';
+    h+='<div class="panel story"><div class="lbl"><span>Storia '+(p.story+1)+'/'+STORY.length+' · '+S.t+'</span><em>'+v+' / '+S.n+'</em></div><p class="sm" style="margin:0 0 4px">'+S.x+'</p>'+bar(v,S.n,ok?'mp':'xp')+
+     '<p class="sm" style="margin:4px 0 0">'+fmt(sr.gold)+' oro · '+fmt(sr.exp)+' EXP · '+sr.pts+' pt'+(sr.frag?' · '+sr.frag+' fr':'')+'</p>'+
+     '<button class="btn pri full" style="margin-top:6px" data-a="stclaim" '+(ok?'':'disabled')+'>'+(ok?'Ritira e continua':'Capitolo in corso')+'</button></div>';
   }else h+='<div class="panel story"><div class="lbl"><span>Storia</span></div><p class="sm">Hai completato tutti i capitoli. Il regno delle ombre è tuo, Monarca.</p></div>';
-  h+='<div class="panel"><div class="lbl"><span>Quest giornaliera</span><em>Reset tra '+hh+'h '+mm+'m</em></div>';
+  h+='<div class="panel"><div class="lbl"><span>Giornaliera</span><em>reset tra '+hh+'h '+mm+'m</em></div>';
   h+=p.quest.t.map(function(t){var ok=t.v>=t.g;return '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>'+t.n+'</span><span>'+t.v+' / '+t.g+'</span></div>'+bar(t.v,t.g,ok?'mp':'xp')+'</div>'}).join('');
-  h+='<p class="sm" style="margin-top:6px">Ricompensa: '+r.pts+' punti attributo, '+fmt(r.gold)+' oro, '+fmt(r.exp)+' EXP</p>';
+  h+='<p class="sm" style="margin:4px 0 0">'+r.pts+' pt · '+fmt(r.gold)+' oro · '+fmt(r.exp)+' EXP</p>';
   h+='<button class="btn pri full" style="margin-top:6px" data-a="claim" '+((done&&!p.quest.claimed)?'':'disabled')+'>'+(p.quest.claimed?'Ricompensa ritirata':(done?'Ritira ricompensa':'Quest in corso'))+'</button>';
-  h+='<p class="warnbox">Se a mezzanotte la quest non è completata, finisci nella zona di penalità e perdi il 25% dell’oro.</p></div>';
+  h+='<p class="sm" style="margin:6px 0 0;color:var(--danger)">Non completata a mezzanotte: −25% oro.</p></div>';
   /* settimanale */
   var wr=weeklyReward(),wd=weeklyDone(),wl=new Date(),dow=(wl.getDay()+6)%7,days=7-dow;
-  h+='<div class="panel"><div class="lbl"><span>Quest settimanale</span><em>Reset tra '+days+' giorni</em></div>';
+  h+='<div class="panel"><div class="lbl"><span>Settimanale</span><em>reset tra '+days+' giorni</em></div>';
   h+=p.weekly.t.map(function(t){var ok=t.v>=t.g;return '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>'+t.n+'</span><span>'+t.v+' / '+t.g+'</span></div>'+bar(t.v,t.g,ok?'mp':'xp')+'</div>'}).join('');
-  h+='<p class="sm" style="margin-top:6px">Ricompensa: '+wr.pts+' punti, '+wr.frag+' frammenti, '+fmt(wr.gold)+' oro, '+fmt(wr.exp)+' EXP</p>';
+  h+='<p class="sm" style="margin:4px 0 0">'+wr.pts+' pt · '+wr.frag+' fr · '+fmt(wr.gold)+' oro · '+fmt(wr.exp)+' EXP</p>';
   h+='<button class="btn gld full" style="margin-top:6px" data-a="wclaim" '+((wd&&!p.weekly.claimed)?'':'disabled')+'>'+(p.weekly.claimed?'Ricompensa ritirata':(wd?'Ritira ricompensa':'Quest in corso'))+'</button></div>';
+  }else{
 
   var list=QD.filter(function(x){return x.g===qRank});
   var nd=list.filter(function(x){var q=p.gq[x.id];return q&&q.s===3}).length;
@@ -1556,7 +1565,8 @@ function vQuest(){
     h+='<div class="qc"><div class="qi"><div class="t'+(st&&st.s===2?' ok':'')+'"><span>'+x.t+'</span><span>'+(st?v+'/'+x.n:'')+'</span></div><div class="d">'+(qConfirm===x.id?'Annullando perdi i progressi: dovrai rifare la quest da capo.':x.x)+'</div>'+(st?bar(v,x.n,st.s===2?'mp':'xp'):'')+'<div class="rw">'+rs+'</div></div>'+btn+'</div>';
   });
   h+='</div>';
-  return h;
+  }
+  return h+'</div>';
 }
 function vShop(){
   var pp=priceP(),wc=priceW(),maxW=p.w>=30,tMax=Math.min(6,Math.min(rIdx(),4)+2);
@@ -1566,12 +1576,15 @@ function vShop(){
   h+='<div class="row"><div class="grow"><div class="rn">Pozione di cura</div><div class="sm">Cura il 50% degli HP, le ombre il 25% · ne hai '+p.potH+'</div></div><button class="btn gld" data-a="buyH" '+(p.gold<pp?'disabled':'')+'>'+pp+' oro</button></div>';
   h+='<div class="row"><div class="grow"><div class="rn">Pozione di mana</div><div class="sm">Recupera il 60% degli MP · ne hai '+p.potM+'</div></div><button class="btn gld" data-a="buyM" '+(p.gold<pp?'disabled':'')+'>'+pp+' oro</button></div>';
   h+='<div class="row"><div class="grow"><div class="rn">Antidoto</div><div class="sm">Rimuove veleno, stordimento e maledizione · ne hai '+p.potA+'</div></div><button class="btn gld" data-a="buyA" '+(p.gold<Math.round(pp*.8)?'disabled':'')+'>'+Math.round(pp*.8)+' oro</button></div>';
-  h+='<div class="row"><div class="grow"><div class="rn">Elisir del Monarca</div><div class="sm">cura 40% HP e MP, toglie ogni status, +30% di danni per 3 turni · ne hai '+p.potB+'</div></div><button class="btn gld" data-a="buyB" '+(p.gold<pp*3?'disabled':'')+'>'+(pp*3)+' oro</button></div>'+'<div class="row"><div class="grow"><div class="rn">Piuma di Fenice</div><div class="sm">Rarissima, non in vendita: se muori ti riporta in vita con il 50% degli HP, da sola · ne hai '+(p.potF|0)+'</div></div></div></div>';
+  h+='<div class="row"><div class="grow"><div class="rn">Elisir del Monarca</div><div class="sm">Non in vendita: cade dai Gate Rinforzati (25%) e Rossi (35%). Cura 40% HP e MP, toglie ogni status, +30% di danni per 3 turni · ne hai '+p.potB+'</div></div></div>'+'<div class="row"><div class="grow"><div class="rn">Piuma di Fenice</div><div class="sm">Rarissima, non in vendita: Gate Rossi (5%) o boss della Torre ogni 10 piani (6%). Se muori ti riporta in vita con il 50% degli HP, da sola · ne hai '+(p.potF|0)+'</div></div></div></div>';
   h+='<div class="panel" style="--cc:'+CL[shopCls].col+'"><div class="lbl"><span>Equipaggiamento ombre</span></div><div class="chips">';
   CLK.forEach(function(k){h+='<button class="chip'+(k===shopCls?' on':'')+'" style="--cc:'+CL[k].col+'" data-a="shopcls" data-v="'+k+'">'+CL[k].n+'</button>'});
   h+='</div>';
+  var top=Math.min(6,tMax+1);
   ['w','a'].forEach(function(k){
-    for(var t=Math.max(0,tMax-2);t<=tMax;t++){
+    h+='<div class="lbl" style="margin:10px 0 0"><span>'+iSlot(shopCls,k)+'</span></div>';
+    for(var t=top-2;t<=top;t++){
+      if(t>tMax){var ur=Math.max(0,t-2);h+='<div class="row"><div class="grow"><div class="rn" style="color:var(--muted)">???</div><div class="sm">Sbloccabile dal Gate '+RANKS[ur]+' o dal livello '+LO[ur]+'</div></div></div>';continue}
       var own=p.inv.filter(function(it){return it.cls===shopCls&&it.k===k&&it.t===t}).length;
       h+='<div class="row"><div class="grow"><div class="rn">'+iName(shopCls,k,t)+'</div><div class="sm">'+bDesc(itemB(shopCls,k,t))+(k==='w'&&t>=3?' · abilità speciale':'')+(own?' · in inventario: '+own:'')+'</div></div><button class="btn gld" data-a="buyI" data-v="'+shopCls+':'+k+':'+t+'" '+(p.gold<PRICE[t]?'disabled':'')+'>'+fmt(PRICE[t])+' oro</button></div>';
     }
@@ -1616,7 +1629,7 @@ function vCombat(){
     '<button class="btn mg" data-a="c" data-v="dar" '+((fight&&p.mp>=skCost('dar'))?'':'disabled')+'>Dardo<small>'+skCost('dar')+' MP · ~'+pv('dar')+'</small></button>'+
     '<button class="btn mg" data-a="c" data-v="fury" '+((fight&&p.mp>=skCost('fury')&&pl>=5)?'':'disabled')+'>Furia<small>'+(pl>=5?skCost('fury')+' MP · ~'+pv('fury'):'Liv. 5')+'</small></button>'+
     '<button class="btn mg" data-a="c" data-v="dom" '+((fight&&p.mp>=skCost('dom')&&pl>=15)?'':'disabled')+'>Dominio<small>'+(pl>=15?skCost('dom')+' MP · ~'+pv('dom'):'Liv. 15')+'</small></button>'+
-    '<button class="btn spc" data-a="c" data-v="spec" style="grid-column:span 2" '+((fight&&sp&&p.mp>=spCost())?'':'disabled')+'>'+(sp?sp.s:'Speciale')+'<small>'+(sp?spCost()+' MP · ~'+pv('spec'):'Liv. 20')+'</small></button>'+
+    '<button class="btn spc" data-a="c" data-v="spec" style="grid-column:span 2" '+((fight&&sp&&p.mp>=spCost()&&!(c.scd>0))?'':'disabled')+'>'+(sp?sp.s:'Speciale')+'<small>'+(sp?spCost()+' MP · ~'+pv('spec')+(c.scd>0?' · pronta tra '+c.scd:''):'Liv. 20')+'</small></button>'+
     '<button class="btn" data-a="c" data-v="ph" '+((fight&&p.potH>0&&(p.hp<maxHp()||team().some(function(s){return s.hp>0&&s.hp<sMax(s)})))?'':'disabled')+'>Cura<small>ne hai '+p.potH+'</small></button>'+
     '<button class="btn" data-a="c" data-v="pm" '+((fight&&p.potM>0&&p.mp<maxMp())?'':'disabled')+'>Mana<small>ne hai '+p.potM+'</small></button>'+
     '<button class="btn" data-a="c" data-v="pa" '+((fight&&p.potA>0&&poisoned)?'':'disabled')+'>Antidoto<small>ne hai '+p.potA+'</small></button>'+
@@ -1626,13 +1639,13 @@ function vCombat(){
     var full=p.shadows.length>=maxTotal(),ac=ariseCost();
     B+='<div class="panel arise"><p class="big">'+e.name+' giace a terra.</p><p class="sm">Classe '+CL[e.cls].n+' · probabilità di estrazione '+Math.round(ariseChance(e)*100)+'% · costa '+ac+' MP</p>'+
      '<p class="sm">Squadra '+team().length+'/'+cap()+' · Panchina '+(p.shadows.length-team().length)+'/4'+(e.boss?' · ombra unica del boss, rarità almeno Cavaliere':(e.el?' · élite: rarità migliore':''))+'</p>'+
-     (full?'<div class="full-warn"><b>Squadra e panchina sono piene.</b> Se l’estrazione riesce, dovrai scegliere quale delle tue ombre sostituire. L’ombra scelta viene eliminata e il suo equipaggiamento torna nell’inventario.</div>':'')+
+     (full?'<div class="full-warn"><b>Squadra e panchina sono piene.</b> Se l’estrazione riesce, dovrai scegliere quale ombra in panchina sostituire. L’ombra scelta viene eliminata e il suo equipaggiamento torna nell’inventario.</div>':'')+
      '<div class="duo"><button class="btn arisebtn" data-a="arise" '+(p.mp<ac?'disabled':'')+'>ARISE</button><button class="btn" data-a="next">Lascia andare</button></div></div>';
   }else if(c.phase==='replace'){
     var n=c.pend;
-    B+='<div class="panel arise"><p class="big" style="color:#b79cff">Estrazione riuscita</p><p class="sm">Gli slot sono pieni. Scegli quale ombra sostituire.</p>'+
+    B+='<div class="panel arise"><p class="big" style="color:#b79cff">Estrazione riuscita</p><p class="sm">Gli slot sono pieni. Scegli quale ombra in panchina sostituire.</p>'+
      '<div class="pend"><div class="nm">'+clsTag(n.cls)+rarTag(n)+(n.boss?'<span class="tag boss">Unica</span>':'')+n.name+'</div><div class="sm">'+shadowStats(n)+'</div><div class="trs">'+trDesc(n)+'</div><div class="sm">'+CL[n.cls].d+'</div></div>';
-    p.shadows.forEach(function(s){
+    p.shadows.filter(function(s){return !s.a}).forEach(function(s){
       B+='<div class="row" style="text-align:left"><div class="grow"><div class="rn" style="color:'+CL[s.cls].col+'">'+CL[s.cls].s+' · '+s.name+' ('+RARITY[s.r||0].n+')'+(s.up?' +'+s.up:'')+'</div><div class="sm">'+shadowStats(s)+(s.eq.w||s.eq.a?' · equipaggiata':'')+'</div></div><button class="btn dng sm2" data-a="repl" data-v="'+s.id+'">Sostituisci</button></div>';
     });
     B+='</div>';
@@ -1705,10 +1718,11 @@ function act(a,v){
     case 'wclaim':claimWeekly(false);break;
     case 'stclaim':
       if(p.story<STORY.length&&stVal(p.story)>=STORY[p.story].n){
-        var sr=stReward(p.story);p.gold+=sr.gold;p.pts+=sr.pts;p.frag+=sr.frag;p.story++;gainExp(sr.exp);
+        var sr=stReward(p.story);p.gold+=sr.gold;p.pts+=sr.pts;p.frag+=sr.frag;p.story++;p.stb=(STORY[p.story]&&STORY[p.story].rel)?STORY[p.story].f():0;p.stm=0;gainExp(sr.exp);
         toast('Capitolo completato! +'+fmt(sr.gold)+' oro, +'+fmt(sr.exp)+' EXP','up');
       }
       break;
+    case 'qsec':qSec=v;break;
     case 'qrank':qRank=+v;qConfirm=null;break;
     case 'qcancel':
       if(p.gq[v]&&p.gq[v].s===1){if(qConfirm===v){delete p.gq[v];qConfirm=null;toast('Quest annullata: puoi sceglierne un’altra.')}else qConfirm=v}
@@ -1725,7 +1739,7 @@ function act(a,v){
     case 'shopcls':shopCls=v;break;
     case 'buyI':
       var bi=v.split(':'),bt=+bi[2];
-      if(p.gold>=PRICE[bt]){p.gold-=PRICE[bt];p.inv.push({id:++p.iid,cls:bi[0],k:bi[1],t:bt});toast(iName(bi[0],bi[1],bt)+' aggiunto all’inventario','up')}
+      if(bt<=Math.min(rIdx(),4)+2&&p.gold>=PRICE[bt]){p.gold-=PRICE[bt];p.inv.push({id:++p.iid,cls:bi[0],k:bi[1],t:bt});toast(iName(bi[0],bi[1],bt)+' aggiunto all’inventario','up')}
       break;
     case 'slot':
       var sl=v.split(':');
