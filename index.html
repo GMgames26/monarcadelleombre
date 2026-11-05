@@ -317,7 +317,50 @@ var MOBS=[
 var BOSS=[{n:'Re dei Goblin',c:'tank',r:[1,1.25]},{n:'Capitano Orco',c:'tank',r:[1.15,.75]},{n:'Signore dei Non Morti',c:'mago',r:[.6,1.3]},{n:'Titano di pietra',c:'tank',r:[.7,1.2]},{n:'Cavaliere della Rovina',c:'assassino',r:[1,.7]},{n:'Sovrano del Vuoto',c:'mago',r:[1.1,.6]}];
 var RSC={tank:{p:.85,m:1.15},mago:{p:1.15,m:.85},assassino:{p:1,m:1},guaritore:{p:1,m:1}};
 function dfR(t){var K=50+2*p.lv;return Math.round((1-K/(K+p.st.vit)*dmgTaken({dt:t}))*100)}
-function dmgTaken(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
+function dmgTaken(e){var g9=gI(),m0=e.dt==='m';return dmgT0(e)*(1-(m0?g9.rm:g9.rp))}
+/* equipaggiamento del cacciatore */
+var GN={sw:['Spada di ferro','Spada d’acciaio','Spada runica','Lama del Cavaliere','Lama del Re','Lama del Monarca'],sc:['Scettro di legno','Scettro d’argento','Scettro arcano','Scettro del Mago','Scettro del Re','Scettro del Monarca'],sh:['Scudo di legno','Scudo di ferro','Scudo rinforzato','Scudo del Guardiano','Scudo del Re','Scudo del Monarca'],cl:['Mantello logoro','Mantello di pelle','Mantello incantato','Mantello d’ombra','Mantello del Re','Mantello del Monarca']};
+var GD=[.06,.10,.15,.21,.28,.36],GC=[.01,.02,.03,.04,.05,.06],GH=[60,130,230,370,580,900],GR=[.03,.05,.07,.10,.13,.16],GP=[60,140,300,600,1200,2400];
+var GSL={sw:'w',sc:'w',sh:'s',cl:'m'},GSLN={w:'Arma',s:'Scudo',m:'Mantello'},GK=['sw','sc','sh','cl'];
+function gI(){
+  var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0};
+  ['w','s','m'].forEach(function(sl){var it=p.gear&&p.gear[sl];if(!it)return;var t=it.t;
+    if(it.k==='sw'){a.dm+=GD[t];a.cr+=GC[t]}
+    else if(it.k==='sc'){a.mm+=GD[t];a.dd+=GC[t]}
+    else if(it.k==='sh'){a.hp+=GH[t];a.rp+=GR[t]}
+    else if(it.k==='cl'){a.hp+=GH[t];a.rm+=GR[t]}});
+  return a;
+}
+function gName(k,t){return GN[k][t]+' · '+RANKS[t]}
+function gDesc(k,t){
+  var P=function(x){return Math.round(x*100)+'%'};
+  if(k==='sw')return '+'+P(GD[t])+' danno fisico, +'+P(GC[t])+' critico';
+  if(k==='sc')return '+'+P(GD[t])+' danno magico, +'+P(GC[t])+' schivata';
+  if(k==='sh')return '+'+GH[t]+' HP, −'+P(GR[t])+' danni fisici';
+  return '+'+GH[t]+' HP, −'+P(GR[t])+' danni magici';
+}
+function bagAdd(k,t){
+  var b=p.bag.filter(function(x){return x.k===k&&x.t===t})[0];
+  if(b)b.n++;else p.bag.push({k:k,t:t,n:1});
+  p.bag.sort(function(a,b){return b.t-a.t||GK.indexOf(a.k)-GK.indexOf(b.k)});
+}
+function bagTake(b){b.n--;if(b.n<=0)p.bag.splice(p.bag.indexOf(b),1)}
+function vGear(){
+  var h='<div class="panel"><div class="lbl"><span>Equipaggiamento</span><em>Zaino: '+p.bag.reduce(function(a,b){return a+b.n},0)+'</em></div>';
+  ['w','s','m'].forEach(function(sl){
+    var it=p.gear[sl];
+    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t):(sl==='w'?'Spada o scettro':(sl==='s'?'Più HP e meno danni fisici':'Più HP e meno danni magici')))+'</div></div>'+(it?'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
+  });
+  if(p.bag.length){
+    h+='<div class="sm" style="margin:8px 0 2px">Zaino</div>';
+    p.bag.forEach(function(b){
+      h+='<div class="row"><div class="grow"><div class="rn">'+gName(b.k,b.t)+(b.n>1?' ×'+b.n:'')+'</div><div class="sm">'+gDesc(b.k,b.t)+'</div></div><button class="btn pri sm2" data-a="geq" data-v="'+b.k+':'+b.t+'" '+(c?'disabled':'')+'>Equipa</button><button class="btn gld sm2" data-a="gsell" data-v="'+b.k+':'+b.t+'">Vendi<small>'+fmt(GP[b.t])+' oro</small></button></div>';
+    });
+  }else h+='<p class="sm" style="margin:8px 0 0">Equipaggiamenti rari cadono dai Gate Rossi.</p>';
+  return h+'</div>';
+}
+function atkF(L){return L<=40?1:(L<=60?1-.4*(L-40)/20:.6*Math.pow(60/L,.5))}
+function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .8;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
 function rsTags(e){if(!e.rs)return'';var o='';[['p','fisico'],['m','magia']].forEach(function(t){var f=e.rs[t[0]];if(f>=1.1)o+='<span class="tag warn">Debole: '+t[1]+'</span>';else if(f<=.9)o+='<span class="tag vio">Resiste: '+t[1]+'</span>'});return o}
 
@@ -508,7 +551,7 @@ var p, c=null, tab='stato', relId=null, sellId=null, timer=null, tt=null, pendin
 var saveBox=null,openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gq:{},tv:2,qv:3,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,gq:{},tv:2,qv:3,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
   if(o.spec==='bers')o.spec='tank';
   if(o.trv===undefined){var oc=[4,8,14,22,35],rf=0;if(o.tree){['o','c','f'].forEach(function(k){for(var i=0;i<(o.tree[k]|0)&&i<5;i++)rf+=oc[i]});o.frag=(o.frag||0)+rf;o.tree={r:0,o:0,c:0,f:0}}o.trv=2}
@@ -516,6 +559,7 @@ function migrate(o){
   var shift=(o.tv===undefined),hadCnt=!!o.cnt;
   if(o.wev===undefined)o.wev=Math.min(5,Math.floor((o.w||0)/5));
   if(o.qv!==3){var oldDone=0,nq={};for(var qk2 in (o.gq||{})){if(/^[ED]\./.test(qk2)&&qk2!=='E.8'&&qk2!=='D.0')nq[qk2]=o.gq[qk2];else if(o.gq[qk2].s===2)oldDone++}o.gq=nq;o.qv=3;if(oldDone)o.gold=(o.gold||0)+oldDone*(150+20*(o.lv||1))}
+  if(o.shv!==1&&o.shadows){o.shadows.forEach(function(s){var f=Math.pow(1.08/1.14,s.up||0);if(s.boss)f*=.4;else if(s.el)f*=.735;s.max=Math.max(5,Math.round(s.max*f))});o.shv=1}
   var d=fresh();for(var k in d){if(o[k]===undefined)o[k]=d[k]}
   if(!hadCnt){o.cnt.kill=o.kills||0;o.cnt.gate=o.gates||0}
   var ic=o.st.int,cp0=(ic>=5?1:0)+(ic>=15?1:0)+(ic>=25?1:0)+(ic>=40?1:0),act0=0;
@@ -587,7 +631,7 @@ function fixRun(r){
   return r;
 }
 function boot(o){
-  p=o;fixTeam();
+  p=o;fixTeam();p.shadows.forEach(function(s){s.hp=Math.min(s.hp,sMax(s))});
   if(p.limitMsg){pendingMsg='Limite di 8 ombre: le pi\u00f9 deboli sono state congedate. Hai ricevuto frammenti e oro, e il loro equipaggiamento \u00e8 nell\u2019inventario.';delete p.limitMsg}
   c=(o.run&&typeof o.run.g==='number'&&o.run.e)?fixRun(o.run):null;
   if(c){c.busy=false;c.flash='';p.hp=clamp(p.hp,1,maxHp());p.mp=clamp(p.mp,0,maxMp())}
@@ -622,13 +666,13 @@ function cloudInit(){
 
 /* ---------- formule ---------- */
 function awkM(){return 1+.08*p.awk}
-function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:1))}
+function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:1))+gI().hp}
 function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1))}
 function pw(v){return Math.round((4+v*2)*(1+.05*p.w)*(1+.1*p.wev)*awkM()*(1+(tn('c')>=3?.06:0)))}
-function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.15:1))}
-function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.2:1))}
-function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0))}
-function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0))}
+function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.15:1)*(1+gI().dm))}
+function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.2:1)*(1+gI().mm))}
+function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
+function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0)+gI().dd)}
 function cap(){var i=p.st.int;return(i>=5?1:0)+(i>=15?1:0)+(i>=25?1:0)+(i>=40?1:0)}
 var UPMAX=20;
 /* tier dei Gate: Normale, Rinforzato, Rosso */
@@ -699,7 +743,7 @@ function team(){return p.shadows.filter(function(s){return s.a})}
 function maxTotal(){return cap()+4+(tn('o')>=3?1:0)}
 function fixTeam(){var t=team();while(t.length>cap()){t.pop().a=false}
   ['b','e'].forEach(function(o){var l=team().filter(function(s){return orig(s)===o}).sort(function(a,b){return sAtk(b)-sAtk(a)});for(var i=1;i<l.length;i++)l[i].a=false})}
-function upgrade(s){s.atk=r1(s.atk*1.14+.3);s.max=Math.round(s.max*1.14)+2;if(s.heal)s.heal=r1(s.heal*1.14+.3);s.up++;s.hp=sMax(s)}
+function upgrade(s){s.atk=r1(s.atk*1.14+.3);s.max=Math.round(s.max*1.08)+2;if(s.heal)s.heal=r1(s.heal*1.14+.3);s.up++;s.hp=sMax(s)}
 function needAt(l){return Math.round(200*Math.pow(l,1.5))}
 function need(){return needAt(p.lv)}
 function rIdx(){var r=0;for(var i=0;i<6;i++){if(p.lv>=LO[i])r=i}return r}
@@ -866,7 +910,7 @@ function hasAb(s){return !!(s.eq&&s.eq.w&&s.eq.w.t>=3)}
 function pickMob(g){return MOBS[g][Math.floor(Math.random()*4)]}
 function mkEnemy(o){
   var g=o.g,L=o.L||eLevel(g),pen=o.tower?1:eDanger(g),m=modOf(),pw=((m&&m.pw)||1)*((c&&!c.tower)?TIERS[c.tier|0].pw*(c.thrM||1):1);
-  var rm=(1+.05*(o.room||0))*(1+L/170)*pen*pw*(o.tower?1+.03*o.floor:1);
+  var rm=(1+.05*(o.room||0))*(1+L/170)*pen*pw*(o.tower?1+.012*o.floor:1);
   var b=Math.pow(L,1.2),ex=Math.max(0,L-8);
   var boss=!!o.boss,el=!boss&&!!o.elite;
   var d=boss?BOSS[g]:pickMob(g);
@@ -874,8 +918,9 @@ function mkEnemy(o){
   if(o.tower&&!boss){var tk=sig();if(tk==='titan'){hm*=2.2;am*=.6}if(tk==='swarm')am*=.85}
   var hp=Math.round((40+9*b)*rm*hm*rnd(.95,1.05));
   var rw=((m&&m.rw)||1)*(sig()==='armor'?1.15:(sig()==='void'?1.2:1)),gm=((m&&m.gm)||1)*(sig()==='fire'?1.3:1);
+  var ar0=(5+1.8*b)*rm*am*rnd(.95,1.05),af=atkF(L)*(o.tower?.9:1);
   var e={name:(el?'Élite · ':'')+d.n,cls:d.c,boss:boss,el:el,g:g,hp:hp,max:hp,
-    atk:Math.round((5+1.8*b)*rm*am*rnd(.95,1.05)),
+    atk:Math.round(ar0*af),atk0:Math.round(ar0),
     exp:Math.max(1,Math.round(needAt(L)/24.5*(boss?4:(el?2.2:1))*pen*rw*(o.tower?1.3:1)*((c&&!c.tower&&c.rwT)||1))),
     gold:Math.round((4+1.6*L)*(boss?4:(el?2.2:1))*pen*gm*((c&&!c.tower&&c.rwT)||1)),
     pas:[],tl:[],ev:4,sh:0,shMax:0,shDone:false,turns:0,tele:null,rs:{p:RSC[d.c].p,m:RSC[d.c].m},dt:(d.c==='mago'||d.c==='guaritore')?'m':'p'};
@@ -891,8 +936,8 @@ function eName(){return c.e.name}
 function startRoom(){
   var o;
   if(c.tower){
-    var L=clamp(Math.round(4+c.floor*1.5),1,160),g=rkL(L),boss=c.floor%5===0;
-    c.g=g;o={g:g,L:L,floor:c.floor,tower:true,boss:boss,elite:!boss&&c.floor%5===2,room:c.floor-1};
+    var L=clamp(Math.round(3+c.floor),1,160),g=rkL(L),boss=c.floor%5===0;
+    c.g=g;o={g:g,L:L,floor:c.floor,tower:true,boss:boss,elite:!boss&&c.floor%5===2,room:Math.round(c.floor/10)};
   }else{
     var boss=c.room===c.rooms;
     var el=!boss&&(c.forceElite||(modOf()&&modOf().allElite)||Math.random()<TIERS[c.tier|0].el);
@@ -1103,12 +1148,18 @@ function enemyTurn(){
   var d=e.atk*rnd(.85,1.15)*en;
   if(c.wall){d*=.5;c.wall=false}
   e.turns++;
-  if(tele){
+  var itk=tele?team().filter(function(s){return s.hp>0&&s.cls==='tank'})[0]:null;
+  if(tele&&itk&&Math.random()<(hasAb(itk)?.6:.4)){
+    var di=Math.max(1,Math.round(d*(tele==='charge'?2:1.2)*CL.tank.dr*(1-sB(itk).red)));
+    itk.hp=Math.max(0,itk.hp-di);
+    log(itk.name+' si getta davanti a te e incassa '+({charge:'il colpo devastante',stun:'lo stordimento',curse:'la maledizione'})[tele]+' di '+e.name+': -'+di,'shadow');
+    if(itk.hp<=0)shFall(itk);
+  }else if(tele){
     var T=TELE[tele];
     if(Math.random()<dodge()){log('Schivi '+e.name+' che '+T.l.replace(/^[^ ]+ /,''),'good');qev('dodge',1)}
     else if(c.def&&tele!=='charge'){log('Ti pari: '+STN[tele]+' è bloccato!','good');qev('tele',1)}
     else{
-      var K=50+2*p.lv,dd=d*dmgTaken(e)*(tele==='charge'?2.4:1.2)*K/(K+p.st.vit);
+      var K=50+2*p.lv,dd=d*dmgTaken(e)*(tele==='charge'?2:1.2)*K/(K+p.st.vit);
       if(c.def){dd*=.5;qev('tele',1);log('Pari parzialmente il colpo!','good')}
       dd=Math.max(1,Math.round(dd));p.hp=Math.max(0,p.hp-dd);c.flash='p';
       log(e.name+' ti colpisce con forza: -'+dd+' HP','bad');
@@ -1215,7 +1266,7 @@ function doArise(){
       p.frag+=2;c.fragGot+=2;c.ok=true;c.msg=BN[e.g]+' è già nel tuo esercito: ottieni 2 frammenti d’ombra.';c.phase='ariseRes';p.cnt.arise++;qev('arise',1);qev('aboss',1);return;
     }
     var r=rollRarity(e);
-    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,u:uid,cls:e.cls,r:r,tr:[],atk:r1(e.atk*.33*m.atk),max:Math.round(e.max*.4*m.hp),heal:e.cls==='guaritore'?r1(e.atk*.28):0,up:0,eq:{w:null,a:null},hp:0};
+    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,u:uid,cls:e.cls,r:r,tr:[],atk:r1((e.atk0||e.atk)*.33*m.atk),max:Math.round(e.max/(e.boss?4:(e.el?1.7:1))*(e.boss?1.6:(e.el?1.25:1))*.4*m.hp),heal:e.cls==='guaritore'?r1((e.atk0||e.atk)*.28):0,up:0,eq:{w:null,a:null},hp:0};
     if(e.boss){var ft=BTR[e.g];if(ft==='devoto'&&e.cls!=='guaritore')ft='furia';sh.tr.push(ft);for(var i=0;i<r-1;i++)addTrait(sh)}
     else for(var j=0;j<r;j++)addTrait(sh);
     sh.hp=sMax(sh);
@@ -1245,6 +1296,7 @@ function rollLoot(){
     out.push({t:iName(cls,k,tier)+' ('+CL[cls].n+', '+(tier===b+2?'raro':'pregiato')+')',rare:true});
     if(tier===b+2)setTimeout(function(){toast('Drop raro: '+iName(cls,k,tier),'up')},900);
   }
+  if(c.tier===2&&Math.random()<.2){var gk2=GK[Math.floor(Math.random()*4)];bagAdd(gk2,c.g);out.push({t:gName(gk2,c.g),rare:true});setTimeout(function(){toast('Drop raro: '+gName(gk2,c.g),'up')},900)}
   if(c.tier===2&&!c.low&&Math.random()<.05){p.potF=(p.potF|0)+1;out.push({t:'1× Piuma di Fenice',rare:true})}
   c.loot=out;
 }
@@ -1340,6 +1392,7 @@ function vStato(){
   h+=S.map(function(s){return '<div class="at"><div class="grow"><div class="rn">'+s[1]+'</div><div class="sm">'+s[2]+'</div></div><div class="val">'+p.st[s[0]]+'</div><button class="btn sq" data-a="stat" data-v="'+s[0]+'" '+(p.pts?'':'disabled')+' aria-label="Aumenta '+s[1]+'">+</button></div>'}).join('');
   var spN=p.st.str+p.st.agi+p.st.int+p.st.vit-20;
   h+='</div><button class="btn full sm2" style="margin-top:8px" data-a="respec" '+((spN>0&&p.gold>=respecCost())?'':'disabled')+'>'+(respecArm?'Conferma: azzera i punti · '+fmt(respecCost())+' oro':'Ridistribuisci i punti · '+fmt(respecCost())+' oro')+'</button>'+(respecArm?'<button class="btn full sm2" style="margin-top:6px" data-a="respecno">Annulla</button>':'')+'</div>';
+  h+=vGear();
   if(p.lv>=20||p.spec){
     h+='<div class="panel"><div class="lbl"><span>Specializzazione</span>'+(p.spec?'<em>'+SPEC[p.spec].n+'</em>':'')+'</div>';
     if(p.spec)h+='<p class="sm" style="margin:0 0 6px">'+SPEC[p.spec].d+'</p>';
@@ -1706,6 +1759,20 @@ function act(a,v){
     case 'up':
       var s2=findShadow(v);
       if(s2&&s2.up<upMax()){var uc=upCost(s2);if(p.gold>=uc){p.gold-=uc;upgrade(s2)}}
+      break;
+    case 'geq':
+      if(c)break;
+      var gp=v.split(':'),gk=gp[0],gt=+gp[1],gb=p.bag.filter(function(x){return x.k===gk&&x.t===gt})[0];
+      if(!gb)break;
+      bagTake(gb);var gsl=GSL[gk],gold9=p.gear[gsl];p.gear[gsl]={k:gk,t:gt};if(gold9)bagAdd(gold9.k,gold9.t);p.hp=Math.min(p.hp,maxHp());
+      break;
+    case 'gun':
+      if(c)break;
+      var gu=p.gear[v];if(gu){bagAdd(gu.k,gu.t);p.gear[v]=null;p.hp=Math.max(1,Math.min(p.hp,maxHp()))}
+      break;
+    case 'gsell':
+      var gq=v.split(':'),gb2=p.bag.filter(function(x){return x.k===gq[0]&&x.t===+gq[1]})[0];
+      if(gb2){var gv=GP[gb2.t];bagTake(gb2);p.gold+=gv;toast('Venduto: +'+fmt(gv)+' oro','up')}
       break;
     case 'sell':
       var sh9=findShadow(v);
