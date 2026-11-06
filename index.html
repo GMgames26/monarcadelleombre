@@ -370,7 +370,7 @@ function vGear(){
     p.bag.forEach(function(b){
       h+='<div class="row"><div class="grow"><div class="rn">'+gName(b.k,b.t,b.u)+(b.n>1?' ×'+b.n:'')+'</div><div class="sm">'+gDesc(b.k,b.t,b.u)+'</div></div><button class="btn pri sm2" data-a="geq" data-v="'+b.k+':'+b.t+':'+(b.u|0)+'" '+(c?'disabled':'')+'>Equipa</button><button class="btn gld sm2" data-a="gsell" data-v="'+b.k+':'+b.t+':'+(b.u|0)+'">Vendi<small>'+fmt(GP[b.t])+' oro</small></button></div>';
     });
-  }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (35% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con oro e frammenti.</p>';
+  }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (50% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con oro e frammenti.</p>';
   return h+'</div>';
 }
 var ATKF=[1,1.42,1.54,1.48,1.4,1.2];
@@ -724,7 +724,7 @@ var NODES={
     {s:'EXP<br>+10%',d:'+10% EXP da ogni nemico.',c:12},
     {s:'Frammenti<br>+15%',d:'+15% di frammenti d’ombra dai drop. Anche le frazioni si accumulano.',c:18},
     {s:'Sconto<br>−40%',d:'Ridistribuire gli attributi e cambiare specializzazione costano il 40% in meno.',c:26},
-    {s:'Fortuna<br>+5%',d:'+5% di drop dell’equipaggiamento dai Gate Rossi (dal 35% al 40%) e +20% di drop di pozioni.',c:38},
+    {s:'Fortuna<br>+5%',d:'+5% di drop dell’equipaggiamento dai Gate Rossi (dal 50% al 55%) e +20% di drop di pozioni.',c:38},
     {s:'Checkpoint<br>ogni 5 piani',d:'Nella Torre il checkpoint scatta ogni 5 piani invece che ogni 10.',c:55}]};
 var tsel=null,respecArm=false;
 function tn(k){return(p&&p.tree&&p.tree[k])|0}
@@ -1316,7 +1316,7 @@ function rollLoot(){
     out.push({t:iName(cls,k,tier)+' ('+CL[cls].n+', '+(tier===b+2?'raro':'pregiato')+')',rare:true});
     if(tier===b+2)setTimeout(function(){toast('Drop raro: '+iName(cls,k,tier),'up')},900);
   }
-  if(c.tier===2&&Math.random()<.35+(tn('f')>=5?.05:0)){var gk2=GK[Math.floor(Math.random()*GK.length)];bagAdd(gk2,c.g,0);out.push({t:gName(gk2,c.g),rare:true});setTimeout(function(){toast('Drop raro: '+gName(gk2,c.g),'up')},900)}
+  if(c.tier===2&&Math.random()<.50+(tn('f')>=5?.05:0)){var gk2=GK[Math.floor(Math.random()*GK.length)];bagAdd(gk2,c.g,0);out.push({t:gName(gk2,c.g),rare:true});setTimeout(function(){toast('Drop raro: '+gName(gk2,c.g),'up')},900)}
   if(c.tier===2&&!c.low&&Math.random()<.05){p.potF=(p.potF|0)+1;out.push({t:'1× Piuma di Fenice',rare:true})}
   c.loot=out;
 }
