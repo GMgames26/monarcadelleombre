@@ -373,7 +373,7 @@ function vGear(){
   }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (50% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con oro e frammenti.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.42,1.54,1.48,1.4,1.2];
+var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1,1.9,2.7,3,3.5,4.6],GAT=[1,1.35,1.65,1.8,1.95,2.4];
 function atkF(L){return ATKF[rkL(L)]}
 function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .75;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
@@ -434,7 +434,7 @@ var SPEC={
 
 /* modificatori dei Gate */
 var MODS={
- rosso:{n:'Portale rosso',d:'Nemici +40% di forza, boss +30% di vita, veleno frequente. Qui cade l’equipaggiamento.',pw:1.4,rw:1,gm:1,lm:1.6},
+ rosso:{n:'Portale rosso',d:'Nemici +10% di forza, boss +15% di vita, veleno frequente. Qui cade l’equipaggiamento.',pw:1.1,rw:1,gm:1,lm:1.6},
  nebbia:{n:'Nebbia fitta',d:'Nessun colpo critico per nessuno. EXP +20%.',pw:1,rw:1.2,nocrit:true},
  maledetto:{n:'Gate maledetto',d:'Le cure valgono la metà. EXP +25%.',pw:1,rw:1.25,heal:.5},
  veleno:{n:'Palude velenosa',d:'Quasi ogni colpo avvelena. Oro +25%, più antidoti.',pw:1.05,rw:1,gm:1.25,poison:true,am:2.5},
@@ -696,7 +696,7 @@ var UPMAX=20;
 /* tier dei Gate: Normale, Rinforzato, Rosso */
 var TIERS=[
  {n:'Normale',pw:1,rooms:3,el:.14,rw:1,poi:0},
- {n:'Rinforzato',pw:1.2,rooms:4,el:.28,rw:1.5,poi:.2},
+ {n:'Rinforzato',pw:1.05,rooms:4,el:.28,rw:1.5,poi:.2},
  {n:'Rosso',pw:1,rooms:5,el:.35,rw:2,poi:.3}];
 function tierLv(g,t){return LO[g]+5*t}
 function hiT(g){var t=0;if(p.lv>=tierLv(g,1))t=1;if(p.lv>=tierLv(g,2))t=2;return t}
@@ -932,12 +932,12 @@ function mkEnemy(o){
   var b=Math.pow(L,1.2),ex=Math.max(0,L-8);
   var boss=!!o.boss,el=!boss&&!!o.elite;
   var d=boss?BOSS[g]:pickMob(g);
-  var hm=(boss?4:(el?1.7:1))*(1+.012*ex)*(boss&&c&&!c.tower&&c.tier===2?1.3:1),am=(boss?1.1:(el?1.25:1))*(1+.018*ex);
+  var hm=(boss?4:(el?1.7:1))*(1+.012*ex)*(boss&&c&&!c.tower&&c.tier===2?1.15:1),am=(boss?1.1:(el?1.25:1))*(1+.018*ex);
   if(o.tower&&!boss){var tk=sig();if(tk==='titan'){hm*=2.2;am*=.6}if(tk==='swarm')am*=.85}
-  var hp=Math.round((40+9*b)*rm*hm*rnd(.95,1.05));
+  var og=(!o.tower&&g<rIdx())?.35:1,gh=o.tower?1:1+(GHP[rkL(L)]-1)*og,hp0=Math.round((40+9*b)*rm*hm*rnd(.95,1.05)),hp=Math.round(hp0*gh);
   var rw=((m&&m.rw)||1)*(sig()==='armor'?1.15:(sig()==='void'?1.2:1)),gm=((m&&m.gm)||1)*(sig()==='fire'?1.3:1);
-  var ar0=(5+1.8*b)*rm*am*rnd(.95,1.05),af=atkF(L)*(o.tower?.9:1);
-  var e={name:(el?'Élite · ':'')+d.n,cls:d.c,boss:boss,el:el,g:g,hp:hp,max:hp,
+  var ar0=(5+1.8*b)*rm*am*rnd(.95,1.05),af=atkF(L)*(o.tower?.9:1+(GAT[rkL(L)]-1)*og);
+  var e={name:(el?'Élite · ':'')+d.n,cls:d.c,boss:boss,el:el,g:g,hp:hp,max:hp,max0:hp0,
     atk:Math.round(ar0*af),atk0:Math.round(ar0),
     exp:Math.max(1,Math.round(needAt(L)/24.5*(boss?4:(el?2.2:1))*pen*rw*(o.tower?1.3:1)*((c&&!c.tower&&c.rwT)||1))),
     gold:Math.round((4+1.6*L)*(boss?4:(el?2.2:1))*pen*gm*((c&&!c.tower&&c.rwT)||1)),
@@ -1286,7 +1286,7 @@ function doArise(){
       p.frag+=2;c.fragGot+=2;c.ok=true;c.msg=BN[e.g]+' è già nel tuo esercito: ottieni 2 frammenti d’ombra.';c.phase='ariseRes';p.cnt.arise++;qev('arise',1);qev('aboss',1);return;
     }
     var r=rollRarity(e);
-    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,u:uid,cls:e.cls,r:r,tr:[],atk:r1((e.atk0||e.atk)*.33*m.atk),max:Math.round(e.max/(e.boss?4:(e.el?1.7:1))*(e.boss?1.6:(e.el?1.25:1))*.4*m.hp),heal:e.cls==='guaritore'?r1((e.atk0||e.atk)*.28):0,up:0,eq:{w:null,a:null},hp:0};
+    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,u:uid,cls:e.cls,r:r,tr:[],atk:r1((e.atk0||e.atk)*.33*m.atk),max:Math.round((e.max0||e.max)/(e.boss?4:(e.el?1.7:1))*(e.boss?1.6:(e.el?1.25:1))*.4*m.hp),heal:e.cls==='guaritore'?r1((e.atk0||e.atk)*.28):0,up:0,eq:{w:null,a:null},hp:0};
     if(e.boss){var ft=BTR[e.g];if(ft==='devoto'&&e.cls!=='guaritore')ft='furia';sh.tr.push(ft);for(var i=0;i<r-1;i++)addTrait(sh)}
     else for(var j=0;j<r;j++)addTrait(sh);
     sh.hp=sMax(sh);
@@ -1463,7 +1463,7 @@ function vGate(){
     for(var t=0;t<3;t++){var un=p.lv>=tierLv(g,t);tb+='<button class="chip'+(t===sl?' on':'')+'" style="--cc:'+(t===2?'#ff4d6d':RK_COL[g])+'" data-a="gtier" data-v="'+g+':'+t+'" '+((un&&!lock)?'':'disabled')+'>'+TIERS[t].n+(un?'':' · Liv. '+tierLv(g,t))+'</button>'}
     h+='<div class="gate'+(lock?' lock':'')+'" style="--rk:'+RK_COL[g]+'"><div class="g">'+RANKS[g]+'</div><div><div class="gt">'+GATES[g].n+' <span class="tag" style="color:'+RK_COL[g]+'">'+RANKS[g]+'</span>'+(g>r?' <span class="tag warn">Pericoloso</span>':'')+(g<r?' <span class="tag warn">EXP bloccata · oro ×0,4</span>':'')+(M?' <span class="tag vio">'+M.n+'</span>':'')+''+'</div>'+
      '<div class="chips" style="margin:4px 0">'+tb+'</div>'+
-     '<div class="sm">Livelli '+lv+' · nemici livello '+L+(pen>1?' (+'+Math.round((pen-1)*100)+'% forza)':'')+(tn2?' · Minaccia +'+(tn2*4)+'%':'')+'</div>'+(M?'<div class="sm" style="color:#b79cff">'+M.d+'</div>':'')+(sl>=1?'<div class="sm" style="color:#7fe0ff">Affinità: '+AFF[affOf(g)].n+' ('+AFF[affOf(g)].d+')</div>':'')+'<div class="sm">'+nr+' stanze + boss · circa '+fmt(ex)+' EXP, '+fmt(go)+' oro'+(sl===2&&!low?' · equipaggiamento in premio':'')+'</div></div>'+
+     '<div class="sm">Livelli '+lv+' · nemici livello '+L+(pen>1?' (+'+Math.round((pen-1)*100)+'% forza)':'')+(tn2?' · Minaccia +'+(tn2*4)+'%':'')+'</div>'+(g>=1?'<div class="sm" style="color:var(--muted)">Consigliato: equip eroe del rango '+RANKS[g-1]+' potenziato (+3), ombre al massimo e attributi ben distribuiti.</div>':'')+(M?'<div class="sm" style="color:#b79cff">'+M.d+'</div>':'')+(sl>=1?'<div class="sm" style="color:#7fe0ff">Affinità: '+AFF[affOf(g)].n+' ('+AFF[affOf(g)].d+')</div>':'')+'<div class="sm">'+nr+' stanze + boss · circa '+fmt(ex)+' EXP, '+fmt(go)+' oro'+(sl===2&&!low?' · equipaggiamento in premio':'')+'</div></div>'+
      '<button class="btn '+(lock?'':'pri')+'" data-a="enter" data-v="'+g+'" '+(lock?'disabled':'')+'>'+(lock?'Bloccato · serve livello '+LO[g]:'Entra nel Gate')+'</button></div>';
   }
   return h;
