@@ -276,8 +276,8 @@ body.cp:not(.tomb){font-size:14px;line-height:1.35;padding-block:18px 74px}
 .sh.act{border-color:#5b3fc0;border-left-color:var(--cc);background:linear-gradient(90deg,#171040,var(--panel))}
 .sh.ben{border-style:dashed;border-left-style:solid;opacity:.88}
 .sh.empty{display:block;border-left-color:#26356f;border-style:dashed;padding:9px 10px;font-size:12px;color:var(--muted);background:transparent;grid-template-columns:none}
-.shh{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 6px 8px 8px;cursor:pointer;min-width:0}
-.shk{display:flex;flex-direction:column;align-items:center;gap:4px}.srk{width:30px;height:30px;display:grid;place-items:center;font:700 19px var(--display);color:var(--rk);border:2px solid var(--rk);border-radius:4px;box-shadow:0 0 8px -2px var(--rk)}
+.shh{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:left;background:transparent;border:0;color:var(--fg);padding:6px 6px 6px 8px;cursor:pointer;min-width:0}
+.shk{display:flex;flex-direction:column;align-items:center;gap:4px}.srk{display:inline-grid;vertical-align:1px;margin-right:6px;width:18px;height:18px;place-items:center;font:700 12px var(--display);color:var(--rk);border:1.5px solid var(--rk);border-radius:3px;box-shadow:0 0 5px -2px var(--rk)}
 .shc{font:700 11px var(--display);color:var(--cc);border:1px solid var(--cc);border-radius:2px;padding:2px 4px;letter-spacing:.06em}
 .shm{display:flex;flex-direction:column;gap:2px;min-width:0}
 .shn{font:600 14px var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1523,7 +1523,7 @@ function shRow(s){
   var open=openSh===s.id||(selSlot&&selSlot.sid===s.id),full=!s.a&&team().length>=cap(),lim=!s.a&&!full&&!canField(s);
   var tr=(s.tr||[]).map(function(k){return '<span class="tg">'+TRAITS[k].n+'</span>'}).join('');
   return '<div class="sh '+(s.a?'act':'ben')+(open?' open':'')+'" style="--cc:'+CL[s.cls].col+'">'+
-   '<button class="shh" data-a="open" data-v="'+s.id+'"><span class="shk"><span class="srk" style="--rk:'+RK_COL[sRank(s)]+'" aria-label="Rango '+RANKS[sRank(s)]+'">'+RANKS[sRank(s)]+'</span><span class="shc">'+CL[s.cls].s+'</span></span><span class="shm"><span class="shn">'+s.name+(s.up?' <i>+'+s.up+'</i>':'')+(s.boss?' <i class="u">unica</i>':(s.el?' <i class="u">élite</i>':''))+'</span>'+
+   '<button class="shh" data-a="open" data-v="'+s.id+'"><span class="shk"><span class="shc">'+CL[s.cls].s+'</span></span><span class="shm"><span class="shn"><span class="srk" style="--rk:'+RK_COL[sRank(s)]+'" aria-label="Rango '+RANKS[sRank(s)]+'">'+RANKS[sRank(s)]+'</span>'+s.name+(s.up?' <i>+'+s.up+'</i>':'')+(s.boss?' <i class="u">unica</i>':(s.el?' <i class="u">élite</i>':''))+'</span>'+
    '<span class="shs"><span style="color:'+RARITY[s.r||0].col+'">'+RARITY[s.r||0].n+'</span> · ATT '+sd(sAtk(s))+' · HP '+fmt(sMax(s))+(s.cls==='guaritore'?' · CURA '+sd(sHeal(s)):'')+'</span>'+(tr?'<span class="shs">'+tr+'</span>':'')+'</span><span class="chev">'+(open?'▲':'▼')+'</span></button>'+
    '<button class="shb'+(s.a?'':' go')+'" data-a="bench" data-v="'+s.id+'" '+((full||lim)?'disabled':'')+'>'+(s.a?'In panchina':(full?'Squadra piena':(lim?'Limite boss/élite':'Schiera')))+'</button>'+
    (open?shDetail(s):'')+'</div>';
