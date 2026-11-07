@@ -341,9 +341,10 @@ function gStat(it){
   else{a.hp=Math.round(GH[t]*.75*U);a.rm=GR[t]*.25*U;a.rp=GR[t]*.15*U;a.mp=MPG[t]*.4*U}
   return a;
 }
+function gDec(t){var g=rIdx()-1-t;return g<=0?1:(g===1?.15:.05)}
 function gI(){
   var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0};
-  ['w','s','m'].forEach(function(sl){var it=p.gear&&p.gear[sl];if(!it)return;var b=gStat(it);for(var x in b)a[x]+=b[x]});
+  ['w','s','m'].forEach(function(sl){var it=p.gear&&p.gear[sl];if(!it)return;var b=gStat(it),d=gDec(it.t);for(var x in b)a[x]+=b[x]*d});
   return a;
 }
 function gName(k,t,u){return GN[k][t]+' · '+RANKS[t]+(u?' +'+u:'')}
@@ -365,7 +366,7 @@ function vGear(){
   var h='<div class="panel"><div class="lbl"><span>Equipaggiamento</span><em>Zaino: '+p.bag.reduce(function(a,b){return a+b.n},0)+'</em></div>';
   ['w','s','m'].forEach(function(sl){
     var it=p.gear[sl];
-    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t,it.u):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t,it.u):(sl==='w'?'Spada o scettro':(sl==='s'?'Scudo (tank) o egida (mago)':'Corazza (tank) o mantello (mago)')))+'</div></div>'+(it?((it.u|0)<5?'<button class="btn gld sm2" data-a="gup" data-v="'+sl+'" '+((c||p.gold<gUCost(it)||p.frag<gUFr(it))?'disabled':'')+'>+'+((it.u|0)+1)+'<small>'+fmt(gUCost(it))+' oro · '+gUFr(it)+' fr</small></button>':'<span class="tag" style="color:var(--gold)">MAX</span>')+'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
+    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t,it.u):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t,it.u)+(gDec(it.t)<1?' <b style="color:var(--danger)">· obsoleto: effetto ×'+gDec(it.t)+'</b>':''):(sl==='w'?'Spada o scettro':(sl==='s'?'Scudo (tank) o egida (mago)':'Corazza (tank) o mantello (mago)')))+'</div></div>'+(it?((it.u|0)<5?'<button class="btn gld sm2" data-a="gup" data-v="'+sl+'" '+((c||p.gold<gUCost(it)||p.frag<gUFr(it))?'disabled':'')+'>+'+((it.u|0)+1)+'<small>'+fmt(gUCost(it))+' oro · '+gUFr(it)+' fr</small></button>':'<span class="tag" style="color:var(--gold)">MAX</span>')+'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
   });
   if(p.bag.length){
     h+='<div class="sm" style="margin:8px 0 2px">Zaino</div>';
