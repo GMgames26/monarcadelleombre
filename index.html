@@ -321,7 +321,7 @@ var MOBS=[
 var BOSS=[{n:'Re dei Goblin',c:'tank',r:[1,1.25]},{n:'Capitano Orco',c:'tank',r:[1.15,.75]},{n:'Signore dei Non Morti',c:'mago',r:[.6,1.3]},{n:'Titano di pietra',c:'tank',r:[.7,1.2]},{n:'Cavaliere della Rovina',c:'assassino',r:[1,.7]},{n:'Sovrano del Vuoto',c:'mago',r:[1.1,.6]}];
 var RSC={tank:{p:.85,m:1.15},mago:{p:1.15,m:.85},assassino:{p:1,m:1},guaritore:{p:1,m:1}};
 function dfR(t){var K=50+2*p.lv;return Math.round((1-K/(K+p.st.vit)*dmgTaken({dt:t}))*100)}
-function dmgTaken(e){var g9=gI(),m0=e.dt==='m';return dmgT0(e)*(1-(m0?g9.rm:g9.rp))}
+function dmgTaken(e){var g9=gI(),m0=e.dt==='m';return dmgT0(e)}
 /* equipaggiamento del cacciatore */
 var GN={sw:['Spada di ferro','Spada d’acciaio','Spada runica','Lama del Cavaliere','Lama del Re','Lama del Monarca'],sc:['Scettro di legno','Scettro d’argento','Scettro arcano','Scettro del Mago','Scettro del Re','Scettro del Monarca'],sh:['Scudo di legno','Scudo di ferro','Scudo rinforzato','Scudo del Guardiano','Scudo del Re','Scudo del Monarca'],sm:['Egida di cristallo','Egida d’argento','Egida runica','Egida dell’Arcimago','Egida del Re','Egida del Monarca'],co:['Corazza di cuoio','Corazza di ferro','Corazza rinforzata','Corazza del Guardiano','Corazza del Re','Corazza del Monarca'],cl:['Mantello logoro','Mantello di pelle','Mantello incantato','Mantello d’ombra','Mantello del Re','Mantello del Monarca']};
 var GD=[0.424, 0.742, 1.256, 2.321, 4.041, 5.682],GC=[0.035,0.058,0.08,0.1,0.125,0.15],GH=[417, 976, 2009, 4352, 8824, 14508],GR=[0.204, 0.346, 0.52, 0.582, 0.582, 0.582],GP=[60,140,300,600,1200,2400];
@@ -331,30 +331,29 @@ function gUp(it){return (1+3*GU[it.t])*GV[Math.min(5,it.u|0)]}
 function gUFr(it){return Math.round([1,2,3,5,8][it.u|0]*(1+.6*it.t))}
 function gUCost(it){return Math.round(GP[it.t]*GUC[it.u|0])}
 var GSL={sw:'w',sc:'w',sh:'s',sm:'s',co:'m',cl:'m'},GSLN={w:'Arma',s:'Scudo',m:'Armatura'},GK=['sw','sc','sh','sm','co','cl'];
+var FD=[48, 222, 618, 2157, 5819, 15344],HS=[255, 934, 1931, 3898, 7010, 12005],HC=[454, 1618, 3243, 6814, 13106, 22446],MS=[6, 15, 24, 39, 57, 111],MC=[4, 10, 16, 26, 38, 74];
 function gStat(it){
-  var t=it.t,U=gUp(it),a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0},k=it.k;
-  if(k==='sw'){a.dm=GD[t]*U;a.cr=GC[t]*U}
-  else if(k==='sc'){a.mm=GD[t]*U;a.dd=GC[t]*U}
-  else if(k==='sh'){a.hp=Math.round(GH[t]*.35*U);a.rp=GR[t]*.55*U;a.rm=GR[t]*.25*U}
-  else if(k==='co'){a.hp=Math.round(GH[t]*.75*U);a.rp=GR[t]*.25*U;a.rm=GR[t]*.15*U}
-  else if(k==='sm'){a.hp=Math.round(GH[t]*.35*U);a.rm=GR[t]*.55*U;a.rp=GR[t]*.25*U;a.mp=MPG[t]*.6*U}
-  else{a.hp=Math.round(GH[t]*.75*U);a.rm=GR[t]*.25*U;a.rp=GR[t]*.15*U;a.mp=MPG[t]*.4*U}
+  var t=it.t,U=gUp(it),V=GV[Math.min(5,it.u|0)],a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0},k=it.k;
+  if(k==='sw'){a.dm=Math.round(FD[t]*V);a.cr=GC[t]*U}
+  else if(k==='sc'){a.mm=Math.round(FD[t]*V);a.dd=GC[t]*U}
+  else if(k==='sh'){a.hp=Math.round(HS[t]*V)}
+  else if(k==='co'){a.hp=Math.round(HC[t]*V)}
+  else if(k==='sm'){a.hp=Math.round(HS[t]*V);a.mp=Math.round(MS[t]*V)}
+  else{a.hp=Math.round(HC[t]*V);a.mp=Math.round(MC[t]*V)}
   return a;
 }
-function gDec(t){var g=rIdx()-1-t;return g<=0?1:(g===1?.15:.05)}
 function gI(){
   var a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0};
-  ['w','s','m'].forEach(function(sl){var it=p.gear&&p.gear[sl];if(!it)return;var b=gStat(it),d=gDec(it.t);for(var x in b)a[x]+=b[x]*d});
+  ['w','s','m'].forEach(function(sl){var it=p.gear&&p.gear[sl];if(!it)return;var b=gStat(it);for(var x in b)a[x]+=b[x]});
   return a;
 }
 function gName(k,t,u){return GN[k][t]+' · '+RANKS[t]+(u?' +'+u:'')}
 function gDesc(k,t,u){
   var P=function(x){return Math.round(x*100)+'%'},a=gStat({k:k,t:t,u:u|0});
-  if(k==='sw')return '+'+P(a.dm)+' danno fisico, +'+P(a.cr)+' critico';
-  if(k==='sc')return '+'+P(a.mm)+' danno magico, +'+P(a.dd)+' schivata';
-  if(k==='sh'||k==='co')return '+'+a.hp+' HP, −'+P(a.rp)+' danni fisici, −'+P(a.rm)+' magici';
-  if(k==='sm')return '+'+a.hp+' HP, −'+P(a.rm)+' danni magici, −'+P(a.rp)+' fisici, +'+P(a.mp)+' MP';
-  return '+'+a.hp+' HP, −'+P(a.rm)+' danni magici, −'+P(a.rp)+' fisici, +'+P(a.mp)+' MP';
+  if(k==='sw')return '+'+fmt(a.dm)+' danno fisico, +'+P(a.cr)+' critico';
+  if(k==='sc')return '+'+fmt(a.mm)+' danno magico, +'+P(a.dd)+' schivata';
+  if(k==='sh'||k==='co')return '+'+fmt(a.hp)+' HP';
+  return '+'+fmt(a.hp)+' HP, +'+fmt(a.mp)+' MP';
 }
 function bagAdd(k,t,u){
   u=u|0;var b=p.bag.filter(function(x){return x.k===k&&x.t===t&&(x.u|0)===u})[0];
@@ -366,7 +365,7 @@ function vGear(){
   var h='<div class="panel"><div class="lbl"><span>Equipaggiamento</span><em>Zaino: '+p.bag.reduce(function(a,b){return a+b.n},0)+'</em></div>';
   ['w','s','m'].forEach(function(sl){
     var it=p.gear[sl];
-    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t,it.u):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t,it.u)+(gDec(it.t)<1?' <b style="color:var(--danger)">· obsoleto: effetto ×'+gDec(it.t)+'</b>':''):(sl==='w'?'Spada o scettro':(sl==='s'?'Scudo (tank) o egida (mago)':'Corazza (tank) o mantello (mago)')))+'</div></div>'+(it?((it.u|0)<5?'<button class="btn gld sm2" data-a="gup" data-v="'+sl+'" '+((c||p.gold<gUCost(it)||p.frag<gUFr(it))?'disabled':'')+'>+'+((it.u|0)+1)+'<small>'+fmt(gUCost(it))+' oro · '+gUFr(it)+' fr</small></button>':'<span class="tag" style="color:var(--gold)">MAX</span>')+'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
+    h+='<div class="row"><div class="grow"><div class="rn">'+GSLN[sl]+': '+(it?gName(it.k,it.t,it.u):'Vuoto')+'</div><div class="sm">'+(it?gDesc(it.k,it.t,it.u):(sl==='w'?'Spada o scettro':(sl==='s'?'Scudo (tank) o egida (mago)':'Corazza (tank) o mantello (mago)')))+'</div></div>'+(it?((it.u|0)<5?'<button class="btn gld sm2" data-a="gup" data-v="'+sl+'" '+((c||p.gold<gUCost(it)||p.frag<gUFr(it))?'disabled':'')+'>+'+((it.u|0)+1)+'<small>'+fmt(gUCost(it))+' oro · '+gUFr(it)+' fr</small></button>':'<span class="tag" style="color:var(--gold)">MAX</span>')+'<button class="btn sm2" data-a="gun" data-v="'+sl+'" '+(c?'disabled':'')+'>Rimuovi</button>':'')+'</div>';
   });
   if(p.bag.length){
     h+='<div class="sm" style="margin:8px 0 2px">Zaino</div>';
@@ -376,7 +375,7 @@ function vGear(){
   }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (50% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con oro e frammenti.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 2.964, 3.402, 4.44, 6.37, 7.636],GAT=[1.25, 2.106, 2.079, 2.664, 3.549, 3.984],TRM=[1.3,.7,.6,.58,.57,.62],TIM=[1.35,.7,.75,.74,.77,.79];
+var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 2.964, 4.082, 5.328, 7.644, 9.163],GAT=[1.25, 2.106, 2.495, 3.197, 4.259, 4.781],TRM=[1.3,.6,.6,.58,.57,.62],TIM=[1.35,.7,.75,.74,.77,.79];
 function atkF(L){return ATKF[rkL(L)]}
 function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?.92:.75;if(s==='sin')return m?.75:.72;if(s==='mago')return m?.75:.92;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
@@ -689,10 +688,10 @@ function cloudInit(){
 /* ---------- formule ---------- */
 function awkM(){return 1+.08*p.awk}
 function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:(p.spec==='sin'?1.2:1)))+gI().hp}
-function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1)*(1+gI().mp))}
+function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1)+gI().mp)}
 function pw(v){return Math.round((4+v*2)*(1+.022*p.lv)*awkM()*(1+(tn('c')>=3?.06:0)))}
-function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.4:(p.spec==='sin'?1.28:1))*(1+gI().dm))}
-function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.04:1)*(1+gI().mm))}
+function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.4:(p.spec==='sin'?1.28:1))+gI().dm)}
+function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.04:1)+gI().mm)}
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
 function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0)+gI().dd)}
 function cap(){var i=p.st.int;return(i>=5?1:0)+(i>=15?1:0)+(i>=25?1:0)+(i>=40?1:0)}
