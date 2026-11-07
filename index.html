@@ -324,7 +324,7 @@ function dfR(t){var K=50+2*p.lv;return Math.round((1-K/(K+p.st.vit)*dmgTaken({dt
 function dmgTaken(e){var g9=gI(),m0=e.dt==='m';return dmgT0(e)*(1-(m0?g9.rm:g9.rp))}
 /* equipaggiamento del cacciatore */
 var GN={sw:['Spada di ferro','Spada d’acciaio','Spada runica','Lama del Cavaliere','Lama del Re','Lama del Monarca'],sc:['Scettro di legno','Scettro d’argento','Scettro arcano','Scettro del Mago','Scettro del Re','Scettro del Monarca'],sh:['Scudo di legno','Scudo di ferro','Scudo rinforzato','Scudo del Guardiano','Scudo del Re','Scudo del Monarca'],sm:['Egida di cristallo','Egida d’argento','Egida runica','Egida dell’Arcimago','Egida del Re','Egida del Monarca'],co:['Corazza di cuoio','Corazza di ferro','Corazza rinforzata','Corazza del Guardiano','Corazza del Re','Corazza del Monarca'],cl:['Mantello logoro','Mantello di pelle','Mantello incantato','Mantello d’ombra','Mantello del Re','Mantello del Monarca']};
-var GD=[0.28,0.38,0.5,0.64,0.79,0.94],GC=[0.035,0.058,0.08,0.1,0.125,0.15],GH=[275,500,800,1200,1725,2400],GR=[0.16,0.23,0.29,0.34,0.39,0.43],GP=[60,140,300,600,1200,2400];
+var GD=[0.424, 0.742, 1.256, 2.321, 4.041, 5.682],GC=[0.035,0.058,0.08,0.1,0.125,0.15],GH=[417, 976, 2009, 4352, 8824, 14508],GR=[0.204, 0.346, 0.52, 0.582, 0.582, 0.582],GP=[60,140,300,600,1200,2400];
 var MPG=[.04,.07,.10,.13,.16,.20],GU=[.08,.055,.04,.035,.025,.04],GUC=[3,5,8,12,18];
 function gUp(it){return 1+GU[it.t]*(it.u|0)}
 function gUFr(it){return Math.round([1,2,3,5,8][it.u|0]*(1+.6*it.t))}
@@ -334,10 +334,10 @@ function gStat(it){
   var t=it.t,U=gUp(it),a={dm:0,mm:0,cr:0,dd:0,hp:0,rp:0,rm:0,mp:0},k=it.k;
   if(k==='sw'){a.dm=GD[t]*U;a.cr=GC[t]*U}
   else if(k==='sc'){a.mm=GD[t]*U;a.dd=GC[t]*U}
-  else if(k==='sh'){a.hp=Math.round(GH[t]*.35*U);a.rp=GR[t]*.7*U}
-  else if(k==='co'){a.hp=Math.round(GH[t]*.75*U);a.rp=GR[t]*.3*U}
-  else if(k==='sm'){a.rm=GR[t]*.7*U;a.mp=MPG[t]*.6*U}
-  else{a.hp=Math.round(GH[t]*.35*U);a.rm=GR[t]*.3*U;a.mp=MPG[t]*.4*U}
+  else if(k==='sh'){a.hp=Math.round(GH[t]*.35*U);a.rp=GR[t]*.55*U;a.rm=GR[t]*.25*U}
+  else if(k==='co'){a.hp=Math.round(GH[t]*.75*U);a.rp=GR[t]*.25*U;a.rm=GR[t]*.15*U}
+  else if(k==='sm'){a.hp=Math.round(GH[t]*.35*U);a.rm=GR[t]*.55*U;a.rp=GR[t]*.25*U;a.mp=MPG[t]*.6*U}
+  else{a.hp=Math.round(GH[t]*.75*U);a.rm=GR[t]*.25*U;a.rp=GR[t]*.15*U;a.mp=MPG[t]*.4*U}
   return a;
 }
 function gI(){
@@ -350,9 +350,9 @@ function gDesc(k,t,u){
   var P=function(x){return Math.round(x*100)+'%'},a=gStat({k:k,t:t,u:u|0});
   if(k==='sw')return '+'+P(a.dm)+' danno fisico, +'+P(a.cr)+' critico';
   if(k==='sc')return '+'+P(a.mm)+' danno magico, +'+P(a.dd)+' schivata';
-  if(k==='sh'||k==='co')return '+'+a.hp+' HP, −'+P(a.rp)+' danni fisici';
-  if(k==='sm')return '−'+P(a.rm)+' danni magici, +'+P(a.mp)+' MP';
-  return '+'+a.hp+' HP, −'+P(a.rm)+' danni magici, +'+P(a.mp)+' MP';
+  if(k==='sh'||k==='co')return '+'+a.hp+' HP, −'+P(a.rp)+' danni fisici, −'+P(a.rm)+' magici';
+  if(k==='sm')return '+'+a.hp+' HP, −'+P(a.rm)+' danni magici, −'+P(a.rp)+' fisici, +'+P(a.mp)+' MP';
+  return '+'+a.hp+' HP, −'+P(a.rm)+' danni magici, −'+P(a.rp)+' fisici, +'+P(a.mp)+' MP';
 }
 function bagAdd(k,t,u){
   u=u|0;var b=p.bag.filter(function(x){return x.k===k&&x.t===t&&(x.u|0)===u})[0];
@@ -374,9 +374,9 @@ function vGear(){
   }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (50% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con oro e frammenti.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1,1.9,2.7,3,3.5,4.6],GAT=[1,1.35,1.65,1.8,1.95,2.4];
+var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 2.964, 3.402, 4.44, 6.37, 7.636],GAT=[1.25, 2.106, 2.079, 2.664, 3.549, 3.984],TRM=[1.3,.7,.6,.58,.57,.62],TIM=[1.35,.7,.75,.74,.77,.79];
 function atkF(L){return ATKF[rkL(L)]}
-function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?1:.75;if(s==='sin'&&!m)return .75;if(s==='mago'&&m)return .75;if(s==='necro'&&m)return .8;return 1}
+function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?.92:.75;if(s==='sin')return m?.75:.72;if(s==='mago')return m?.75:.92;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
 function rsTags(e){if(!e.rs)return'';var o='';[['p','fisico'],['m','magia']].forEach(function(t){var f=e.rs[t[0]];if(f>=1.1)o+='<span class="tag warn">Debole: '+t[1]+'</span>';else if(f<=.9)o+='<span class="tag vio">Resiste: '+t[1]+'</span>'});return o}
 
@@ -428,10 +428,10 @@ var PRICE=[120,300,650,2400,7500,20000,50000];
 
 /* specializzazioni (livello 20) */
 var SPEC={
- tank:{n:'Tank',d:'HP +20%, danno fisico +25%, danni subiti −25% fisici. Abilità Muro d’ombra (50 MP, ogni 3 turni): colpo fisico da 6,5× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[6.5],phys:true,wall:true},
- mago:{n:'Mago',d:'MP +25%, danno magico +10%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana (40 MP, ogni 3 turni): 3 colpi magici da 2,2× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[2.2,2.2,2.2],ign:true},
- sin:{n:'Assassino',d:'HP +20%, danno fisico +12%, critico +15%, schivata +10%, danni subiti −25% fisici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale (50 MP, ogni 3 turni): colpo fisico 5,2×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[5.2],force:true,pierce:true,phys:true},
- necro:{n:'Evocatore',d:'Ombre +15% forza e HP e −10% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra (50 MP, ogni 3 turni): colpo magico 3,5× e le ombre agiscono due volte.',s:'Comando',f:.45,m:[3.5],cmd:true}};
+ tank:{n:'Tank',d:'HP +20%, danno fisico +40%, danni subiti −25% fisici. Abilità Muro d’ombra (50 MP, ogni 3 turni): colpo fisico da 6,5× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[6.5],phys:true,wall:true},
+ mago:{n:'Mago',d:'MP +25%, danno magico +4%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana (40 MP, ogni 3 turni): 3 colpi magici da 2,2× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[2.2,2.2,2.2],ign:true},
+ sin:{n:'Assassino',d:'HP +20%, danno fisico +28%, critico +15%, schivata +10%, danni subiti −28% fisici e −25% magici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale (50 MP, ogni 3 turni): colpo fisico 5,8×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[5.8],force:true,pierce:true,phys:true},
+ necro:{n:'Evocatore',d:'Ombre +8% forza e HP e −5% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra (50 MP, ogni 3 turni): colpo magico 3,5× e le ombre agiscono due volte.',s:'Comando',f:.45,m:[3.5],cmd:true}};
 
 /* modificatori dei Gate */
 var MODS={
@@ -689,8 +689,8 @@ function awkM(){return 1+.08*p.awk}
 function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:(p.spec==='sin'?1.2:1)))+gI().hp}
 function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1)*(1+gI().mp))}
 function pw(v){return Math.round((4+v*2)*(1+.022*p.lv)*awkM()*(1+(tn('c')>=3?.06:0)))}
-function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.25:(p.spec==='sin'?1.12:1))*(1+gI().dm))}
-function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.1:1)*(1+gI().mm))}
+function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.4:(p.spec==='sin'?1.28:1))*(1+gI().dm))}
+function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.04:1)*(1+gI().mm))}
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
 function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0)+gI().dd)}
 function cap(){var i=p.st.int;return(i>=5?1:0)+(i>=15?1:0)+(i>=25?1:0)+(i>=40?1:0)}
@@ -763,7 +763,7 @@ function team(){return p.shadows.filter(function(s){return s.a})}
 function maxTotal(){return cap()+4+(tn('o')>=3?1:0)}
 function fixTeam(){var t=team();while(t.length>cap()){t.pop().a=false}
   ['b','e'].forEach(function(o){var l=team().filter(function(s){return orig(s)===o}).sort(function(a,b){return sAtk(b)-sAtk(a)});for(var i=1;i<l.length;i++)l[i].a=false})}
-function upgrade(s){s.atk=r1(s.atk*1.14+.3);s.max=Math.round(s.max*1.08)+2;if(s.heal)s.heal=r1(s.heal*1.14+.3);s.up++;s.hp=sMax(s)}
+function upgrade(s){var hi=s.up>=5;s.atk=r1(s.atk*(hi?1.07:1.14)+.3);s.max=Math.round(s.max*(hi?1.045:1.08))+2;if(s.heal)s.heal=r1(s.heal*(hi?1.07:1.14)+.3);s.up++;s.hp=sMax(s)}
 function needAt(l){return Math.round(200*Math.pow(l,1.5))}
 function need(){return needAt(p.lv)}
 function rIdx(){var r=0;for(var i=0;i<6;i++){if(p.lv>=LO[i])r=i}return r}
@@ -816,7 +816,7 @@ function sB(s){
   if(hasT(s,'furia'))b.atk+=.2;
   if(hasT(s,'corazza')){b.hp+=.25;b.red+=.1}
   if(hasT(s,'cecchino'))b.crit+=.15;
-  if(p.spec==='necro'){b.atk+=.15;b.hp+=.15;b.red+=.1}
+  if(p.spec==='necro'){b.atk+=.08;b.hp+=.08;b.red+=.05}
   if(tn('o')>=1){b.atk+=.05;b.hp+=.05}
   if(tn('o')>=6){b.atk+=.08;b.hp+=.08}
   b.red=Math.min(.55,b.red);
@@ -840,7 +840,8 @@ function iSlot(cls,k){return IT[cls][k][0]}
 function healAll(){p.shadows.forEach(function(s){s.hp=sMax(s)})}
 function dropShadow(s){['w','a'].forEach(function(k){if(s.eq[k]){p.inv.push(s.eq[k]);s.eq[k]=null}})}
 function sellVal(s){return Math.round((s.boss?300:s.el?120:50)*(1+.25*(s.up||0))*RAR(s))}
-function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s))}
+var UCF=[.85,.21,.098,.046,.025,.013];
+function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s)*UCF[sRank(s)])}
 function findShadow(id){return p.shadows.filter(function(s){return String(s.id)===String(id)})[0]}
 function addTrait(s){
   var pool=TRK.filter(function(k){return s.tr.indexOf(k)<0&&((k!=='devoto'&&k!=='purifica')||s.cls==='guaritore')});
@@ -929,7 +930,7 @@ function rkL(L){var r=0;for(var i=0;i<6;i++){if(L>=LO[i])r=i}return r}
 function hasAb(s){return !!(s.eq&&s.eq.w&&s.eq.w.t>=3)}
 function pickMob(g){return MOBS[g][Math.floor(Math.random()*4)]}
 function mkEnemy(o){
-  var g=o.g,L=o.L||eLevel(g),pen=o.tower?1:eDanger(g),m=modOf(),pw=((m&&m.pw)||1)*((c&&!c.tower)?TIERS[c.tier|0].pw*(c.thrM||1):1);
+  var g=o.g,L=o.L||eLevel(g),pen=o.tower?1:eDanger(g),m=modOf(),pw=((m&&m.pw)||1)*((c&&!c.tower)?TIERS[c.tier|0].pw*(c.tier===2?TRM[g]:(c.tier===1?TIM[g]:1))*(c.thrM||1):1);
   var rm=(1+.05*(o.room||0))*(1+L/170)*pen*pw*(o.tower?1+.012*o.floor:1);
   var b=Math.pow(L,1.2),ex=Math.max(0,L-8);
   var boss=!!o.boss,el=!boss&&!!o.elite;
@@ -1291,7 +1292,7 @@ function doArise(){
       p.frag+=2;c.fragGot+=2;c.ok=true;c.msg=BN[e.g]+' è già nel tuo esercito: ottieni 2 frammenti d’ombra.';c.phase='ariseRes';p.cnt.arise++;qev('arise',1);qev('aboss',1);return;
     }
     var r=rollRarity(e);
-    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,g:e.g,u:uid,cls:e.cls,r:r,tr:[],atk:r1((e.atk0||e.atk)*.33*m.atk),max:Math.round((e.max0||e.max)/(e.boss?4:(e.el?1.7:1))*(e.boss?1.6:(e.el?1.25:1))*.4*m.hp),heal:e.cls==='guaritore'?r1((e.atk0||e.atk)*.28):0,up:0,eq:{w:null,a:null},hp:0};
+    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,g:e.g,u:uid,cls:e.cls,r:r,tr:[],atk:r1((e.atk0||e.atk)*.33*m.atk*(e.boss?.9:(e.el?.85:1))),max:Math.round((e.max0||e.max)/(e.boss?4:(e.el?1.7:1))*(e.boss?1.6:(e.el?1.25:1))*.4*m.hp),heal:e.cls==='guaritore'?r1((e.atk0||e.atk)*.28):0,up:0,eq:{w:null,a:null},hp:0};
     if(e.boss){var ft=BTR[e.g];if(ft==='devoto'&&e.cls!=='guaritore')ft='furia';sh.tr.push(ft);for(var i=0;i<r-1;i++)addTrait(sh)}
     else for(var j=0;j<r;j++)addTrait(sh);
     sh.hp=sMax(sh);
