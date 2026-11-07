@@ -429,9 +429,9 @@ var PRICE=[120,300,650,2400,7500,20000,50000];
 
 /* specializzazioni (livello 20) */
 var SPEC={
- tank:{n:'Tank',d:'HP +20%, danno fisico +40%, danni subiti −25% fisici. Abilità Muro d’ombra (50 MP, ogni 3 turni): colpo fisico da 6,5× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[6.5],phys:true,wall:true},
- mago:{n:'Mago',d:'MP +25%, danno magico +4%, abilità −20% di costo MP, danni subiti −25% magici. Abilità Tempesta arcana (40 MP, ogni 3 turni): 3 colpi magici da 2,2× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[2.2,2.2,2.2],ign:true},
- sin:{n:'Assassino',d:'HP +20%, danno fisico +28%, critico +15%, schivata +10%, danni subiti −28% fisici e −25% magici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale (50 MP, ogni 3 turni): colpo fisico 5,8×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[5.8],force:true,pierce:true,phys:true},
+ tank:{n:'Tank',d:'HP +30%, danno fisico +55%, danni subiti −25% fisici e −8% magici. Abilità Muro d’ombra (50 MP, ogni 3 turni): colpo fisico da 6,5× e i danni subiti da te e dalle ombre sono dimezzati nel turno dopo.',s:'Muro',f:.35,m:[6.5],phys:true,wall:true},
+ mago:{n:'Mago',d:'MP +25%, danno magico +4%, abilità −20% di costo MP, danni subiti −25% magici e −8% fisici. Abilità Tempesta arcana (40 MP, ogni 3 turni): 3 colpi magici da 2,2× che ignorano le resistenze magiche.',s:'Tempesta',f:.4,m:[2.2,2.2,2.2],ign:true},
+ sin:{n:'Assassino',d:'HP +20%, danno fisico +22%, critico +15%, schivata +10%, danni subiti −28% fisici e −25% magici, le ombre schivano il 10% degli attacchi. Abilità Colpo fatale (50 MP, ogni 3 turni): colpo fisico 5,4×, sempre critico, ignora gli scudi.',s:'Colpo fatale',f:.35,m:[5.4],force:true,pierce:true,phys:true},
  necro:{n:'Evocatore',d:'Ombre +8% forza e HP e −5% danni subiti, ARISE +10%, danni subiti −20% magici. Abilità Comando d’ombra (50 MP, ogni 3 turni): colpo magico 3,5× e le ombre agiscono due volte.',s:'Comando',f:.45,m:[3.5],cmd:true}};
 
 /* modificatori dei Gate */
@@ -687,10 +687,10 @@ function cloudInit(){
 
 /* ---------- formule ---------- */
 function awkM(){return 1+.08*p.awk}
-function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.2:(p.spec==='sin'?1.2:1)))+gI().hp}
+function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.3:(p.spec==='sin'?1.2:1)))+gI().hp}
 function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1)+gI().mp)}
 function pw(v){return Math.round((4+v*2)*(1+.022*p.lv)*awkM()*(1+(tn('c')>=3?.06:0)))}
-function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.4:(p.spec==='sin'?1.28:1))+gI().dm)}
+function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.55:(p.spec==='sin'?1.22:1))+gI().dm)}
 function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.04:1)+gI().mm)}
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
 function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0)+gI().dd)}
