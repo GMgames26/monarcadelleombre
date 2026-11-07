@@ -1553,7 +1553,7 @@ function vQuest(){
   h+=p.quest.t.map(function(t){var ok=t.v>=t.g;return '<div class="qrow"><div class="t'+(ok?' ok':'')+'"><span>'+t.n+'</span><span>'+t.v+' / '+t.g+'</span></div>'+bar(t.v,t.g,ok?'mp':'xp')+'</div>'}).join('');
   h+='<p class="sm" style="margin:4px 0 0">'+r.pts+' pt · '+fmt(r.gold)+' oro · '+fmt(r.exp)+' EXP</p>';
   h+='<button class="btn pri full" style="margin-top:6px" data-a="claim" '+((done&&!p.quest.claimed)?'':'disabled')+'>'+(p.quest.claimed?'Ricompensa ritirata':(done?'Ritira ricompensa':'Quest in corso'))+'</button>';
-  h+='<p class="sm" style="margin:6px 0 0;color:var(--danger)">Non completata a mezzanotte: −25% oro.</p></div>';
+  h+='</div>';
   /* settimanale */
   var wr=weeklyReward(),wd=weeklyDone(),wl=new Date(),dow=(wl.getDay()+6)%7,days=7-dow;
   h+='<div class="panel"><div class="lbl"><span>Settimanale</span><em>reset tra '+days+' giorni</em></div>';
