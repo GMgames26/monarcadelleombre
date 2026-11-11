@@ -804,17 +804,25 @@ function nb(){return{atk:0,hp:0,red:0,crit:0,heal:0}}
 function itemB(cls,k,t){var b=nb();addB(b,cls,k,t);return b}
 function eqB(s){var b=nb();['w','a'].forEach(function(k){var it=s.eq&&s.eq[k];if(it)addB(b,s.cls,k,it.t)});return b}
 function hasT(s,k){return !!(s.tr&&s.tr.indexOf(k)>=0)}
-function formation(){
-  var h={},n=0;
-  team().forEach(function(s){if(!h[s.cls]){h[s.cls]=1;n++}});
+function formation(cls){
+  var t=team(),c={},n=0,m=0,mc=null;
+  t.forEach(function(s){if(!c[s.cls]){c[s.cls]=0;n++}c[s.cls]++;if(c[s.cls]>m){m=c[s.cls];mc=s.cls}});
   var b={atk:0,hp:0,list:[]};
-  if(h.tank&&h.guaritore){b.hp+=.10;b.list.push('Tank + Guaritore: HP +10%')}
-  if(h.mago&&h.assassino){b.atk+=.10;b.list.push('Mago + Assassino: attacco +10%')}
-  if(n===4){b.atk+=.06;b.hp+=.06;b.list.push('Tutte e 4 le classi: attacco e HP +6%')}
+  if(t.length<3)return b;
+  var NM={tank:'Tank',guaritore:'Guaritori',mago:'Maghi',assassino:'Assassini',necromante:'Necromanti'};
+  if(m>=3){
+    var q=m>=4,mn=q?.35:.2,ot=q?.08:.05;
+    b.list.push((q?'4 '+(NM[mc]||mc)+' uguali':'3 '+(NM[mc]||mc)+' uguali')+': stat principale +'+Math.round(mn*100)+'%, altra +'+Math.round(ot*100)+'%');
+    if(cls===mc){var hpm=(mc==='tank'||mc==='guaritore');b.hp+=hpm?mn:ot;b.atk+=hpm?ot:mn}
+  }else if(n>=3){
+    var v=n>=4?.08:.04;
+    b.list.push((n>=4?'4 classi diverse':'3 classi diverse')+': attacco e HP +'+Math.round(v*100)+'%');
+    b.atk+=v;b.hp+=v;
+  }
   return b;
 }
 function sB(s){
-  var b=eqB(s),f=formation();
+  var b=eqB(s),f=formation(s.cls);
   b.atk+=f.atk;b.hp+=f.hp;
   if(s.eq&&s.eq.w&&s.eq.a&&s.eq.w.t===s.eq.a.t){b.atk+=.08;b.hp+=.08}
   if(hasT(s,'furia'))b.atk+=.2;
@@ -1536,7 +1544,7 @@ function vOmbre(){
   var tm=team(),bn=p.shadows.filter(function(x){return !x.a});
   var h='<div class="panel"><div class="lbl"><span>Esercito d’ombra</span><em>Frammenti: '+fq(p.frag)+'</em></div><div class="sm" style="margin:0">Slot squadra con Intelligenza 5, 15, 25 e 40. In squadra al massimo 1 ombra di boss e 1 di élite. Potenziamento massimo +'+upMax()+' (sale con il rango). Tocca un’ombra per i dettagli.</div>';
   var fm=formation();
-  if(fm.list.length)h+='<div class="fbox">'+fm.list.join(' · ')+'</div>';
+  h+='<div class="fbox">'+(fm.list.length?fm.list.join(' · '):'Sinergie dal 3° slot: 3 ombre della stessa classe, o 3 classi diverse. Top: 4 uguali.')+'</div>';
   h+='</div>';
   if(!p.shadows.length){
     return h+'<div class="panel hint"><p><b>Nessuna ombra.</b></p><p class="sm">Dopo ogni nemico sconfitto in un Gate puoi usare ARISE per estrarne l’ombra. Elite e boss danno ombre più rare.</p></div>';
