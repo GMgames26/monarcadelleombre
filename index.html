@@ -815,7 +815,7 @@ function formation(cls){
     b.list.push((q?'4 '+(NM[mc]||mc)+' uguali':'3 '+(NM[mc]||mc)+' uguali')+': stat principale +'+Math.round(mn*100)+'%, altra +'+Math.round(ot*100)+'%');
     if(cls===mc){var hpm=(mc==='tank'||mc==='guaritore');b.hp+=hpm?mn:ot;b.atk+=hpm?ot:mn}
   }else if(n>=3){
-    var v=n>=4?.08:.04;
+    var v=n>=4?.3:.04;
     b.list.push((n>=4?'4 classi diverse':'3 classi diverse')+': attacco e HP +'+Math.round(v*100)+'%');
     b.atk+=v;b.hp+=v;
   }
