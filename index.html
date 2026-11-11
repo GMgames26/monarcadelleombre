@@ -375,7 +375,7 @@ function vGear(){
   }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (50% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con oro e frammenti.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 3.424, 5.2, 7.434, 11.984, 14.37],GAT=[1.25, 2.433, 3.178, 4.46, 6.677, 7.498],TRM=[1.394, 0.746, 0.614, 0.659, 0.684, 0.746],TIM=[1.488, 0.869, 0.747, 0.751, 0.714, 0.77];
+var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 3.629, 5.46, 7.806, 12.583, 15.088],GAT=[1.25, 2.579, 3.337, 4.683, 7.011, 7.873],TRM=[1.394, 0.746, 0.614, 0.659, 0.684, 0.746],TIM=[1.488, 0.869, 0.747, 0.751, 0.714, 0.77];
 function atkF(L){return ATKF[rkL(L)]}
 function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?.92:.75;if(s==='sin')return m?.75:.72;if(s==='mago')return m?.75:.92;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
@@ -835,8 +835,8 @@ function sB(s){
   return b;
 }
 function RAR(s){return RARITY[s.r||0].m}
-function sAtk(s){return Math.max(.1,s.atk*RAR(s)*(1+sB(s).atk))}
-function sMax(s){return Math.round(s.max*RAR(s)*(1+sB(s).hp))}
+function sAtk(s){return Math.max(.1,s.atk*(s.boss?1.35:1)*RAR(s)*(1+sB(s).atk))}
+function sMax(s){return Math.round(s.max*(s.boss?1.25:1)*RAR(s)*(1+sB(s).hp))}
 function sHeal(s){return s.heal*RAR(s)*(1+sB(s).heal)}
 function bDesc(b){
   var o=[];
