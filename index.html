@@ -375,7 +375,7 @@ function vGear(){
   }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (50% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con oro e frammenti.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 3.112, 4.407, 5.995, 9.22, 10.887],GAT=[1.25, 2.211, 2.693, 3.597, 5.137, 5.68],TRM=[1.394, 0.746, 0.614, 0.659, 0.684, 0.746],TIM=[1.488, 0.869, 0.747, 0.751, 0.714, 0.77];
+var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 3.424, 5.2, 7.434, 11.984, 14.37],GAT=[1.25, 2.433, 3.178, 4.46, 6.677, 7.498],TRM=[1.394, 0.746, 0.614, 0.659, 0.684, 0.746],TIM=[1.488, 0.869, 0.747, 0.751, 0.714, 0.77];
 function atkF(L){return ATKF[rkL(L)]}
 function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?.92:.75;if(s==='sin')return m?.75:.72;if(s==='mago')return m?.75:.92;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
@@ -568,9 +568,10 @@ var p, c=null, tab='stato', relId=null, sellId=null, timer=null, tt=null, pendin
 var saveBox=null,qSec='main',openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,gtc:{},tbc:{},tw:0,stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{bsf:1,lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,gtc:{},tbc:{},tw:0,stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
   if(o.spec==='bers')o.spec='tank';
+  if(!o.bsf){(o.shadows||[]).forEach(function(s){if(!s.boss)return;var ra=1,rh=1;for(var k=0;k<(s.up|0);k++){var hi=k>=5;ra*=(hi?1.12:1.26)/(hi?1.07:1.14);rh*=(hi?1.09:1.3)/(hi?1.045:1.08)}s.atk=Math.round(s.atk*ra*10)/10;s.max=Math.round(s.max*rh);if(s.heal)s.heal=Math.round(s.heal*ra*10)/10;if(s.hp>0&&s.hp<s.max)s.hp=Math.min(s.max,Math.round(s.hp*rh))});o.bsf=1}
   if(o.trv===undefined){var oc=[4,8,14,22,35],rf=0;if(o.tree){['o','c','f'].forEach(function(k){for(var i=0;i<(o.tree[k]|0)&&i<5;i++)rf+=oc[i]});o.frag=(o.frag||0)+rf;o.tree={r:0,o:0,c:0,f:0}}o.trv=2}
   if(o.stv===undefined&&o.story!==undefined){o.story=[0,1,2,3,4,5,6,7,9,14,19][Math.max(0,Math.min(o.story|0,10))];o.stv=2}
   var shift=(o.tv===undefined),hadCnt=!!o.cnt;
@@ -766,7 +767,7 @@ function team(){return p.shadows.filter(function(s){return s.a})}
 function maxTotal(){return cap()+4+(tn('o')>=3?1:0)}
 function fixTeam(){var t=team();while(t.length>cap()){t.pop().a=false}
   ['b','e'].forEach(function(o){var l=team().filter(function(s){return orig(s)===o}).sort(function(a,b){return sAtk(b)-sAtk(a)});for(var i=1;i<l.length;i++)l[i].a=false})}
-function upgrade(s){var hi=s.up>=5;s.atk=r1(s.atk*(hi?1.07:1.14)+.3);s.max=Math.round(s.max*(hi?1.045:1.08))+2;if(s.heal)s.heal=r1(s.heal*(hi?1.07:1.14)+.3);s.up++;s.hp=sMax(s)}
+function upgrade(s){var hi=s.up>=5,ga=s.boss?(hi?1.12:1.26):(hi?1.07:1.14),gh=s.boss?(hi?1.09:1.3):(hi?1.045:1.08);s.atk=r1(s.atk*ga+.3);s.max=Math.round(s.max*gh)+2;if(s.heal)s.heal=r1(s.heal*ga+.3);s.up++;s.hp=sMax(s)}
 function needAt(l){return Math.round(200*Math.pow(l,1.5))}
 function need(){return needAt(p.lv)}
 function rIdx(){var r=0;for(var i=0;i<6;i++){if(p.lv>=LO[i])r=i}return r}
@@ -844,7 +845,7 @@ function healAll(){p.shadows.forEach(function(s){s.hp=sMax(s)})}
 function dropShadow(s){['w','a'].forEach(function(k){if(s.eq[k]){p.inv.push(s.eq[k]);s.eq[k]=null}})}
 function sellVal(s){return Math.round((s.boss?300:s.el?120:50)*(1+.25*(s.up||0))*RAR(s))}
 var UCF=[.85,.21,.098,.046,.025,.013];
-function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s)*UCF[sRank(s)])}
+function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s)*UCF[sRank(s)]*(s.boss?1.3:1))}
 function findShadow(id){return p.shadows.filter(function(s){return String(s.id)===String(id)})[0]}
 function addTrait(s){
   var pool=TRK.filter(function(k){return s.tr.indexOf(k)<0&&((k!=='devoto'&&k!=='purifica')||s.cls==='guaritore')});
