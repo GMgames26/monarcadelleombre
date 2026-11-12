@@ -375,7 +375,7 @@ function vGear(){
   }else h+='<p class="sm" style="margin:8px 0 0">Gli equipaggiamenti cadono dai Gate Rossi (50% a ogni vittoria). Puoi cambiarli prima di ogni Gate. Si potenziano fino a +5 con oro e frammenti.</p>';
   return h+'</div>';
 }
-var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 3.424, 5.2, 7.434, 11.984, 14.37],GAT=[1.25, 2.433, 3.178, 4.46, 6.677, 7.498],TRM=[1.394, 0.746, 0.614, 0.659, 0.684, 0.746],TIM=[1.488, 0.869, 0.747, 0.751, 0.714, 0.77];
+var ATKF=[1,1.42,1.54,1.48,1.4,1.2],GHP=[1.25, 3.424, 5.2, 7.434, 11.984, 14.37],GAT=[1.25, 2.433, 3.178, 4.46, 6.677, 7.498],TRM=[1.03, 0.66, 0.614, 0.659, 0.684, 0.746],TIM=[1.16, 0.869, 0.747, 0.751, 0.714, 0.77];
 function atkF(L){return ATKF[rkL(L)]}
 function dmgT0(e){var m=e.dt==='m',s=p.spec;if(s==='tank')return m?.92:.75;if(s==='sin')return m?.75:.72;if(s==='mago')return m?.75:.92;if(s==='necro'&&m)return .8;return 1}
 function rsNote(m){var f=(c&&c.e&&c.e.rs&&c.e.rs[m?'m':'p'])||1;return f>=1.1?' · punto debole!':(f<=.9?' · resistito':'')}
@@ -568,10 +568,9 @@ var p, c=null, tab='stato', relId=null, sellId=null, timer=null, tt=null, pendin
 var saveBox=null,qSec='main',openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{bsf:1,bsf2:1,lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,gtc:{},tbc:{},tw:0,stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{bsf:1,lvl:1,lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,gtc:{},tbc:{},tw:0,stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
 function migrate(o){
   if(o.spec==='bers')o.spec='tank';
-  if(!o.bsf2){(o.shadows||[]).forEach(function(s){if(!s.boss)return;var g=s.g|0,bb=bossBase(g,s.cls),fa=1,fh=1;for(var k=0;k<(s.up|0);k++){var hi=k>=5;fa*=hi?1.12:1.26;fh*=hi?1.09:1.3}var na=Math.round(bb.atk*fa*10)/10,nm=Math.round(bb.max*fh);if(na>s.atk){if(s.heal)s.heal=Math.round(s.heal*na/s.atk*10)/10;s.atk=na}if(nm>s.max){if(s.hp>0)s.hp=Math.min(nm,Math.round(s.hp*nm/s.max));s.max=nm}});o.bsf2=1}
   if(!o.bsf){(o.shadows||[]).forEach(function(s){if(!s.boss)return;var ra=1,rh=1;for(var k=0;k<(s.up|0);k++){var hi=k>=5;ra*=(hi?1.12:1.26)/(hi?1.07:1.14);rh*=(hi?1.09:1.3)/(hi?1.045:1.08)}s.atk=Math.round(s.atk*ra*10)/10;s.max=Math.round(s.max*rh);if(s.heal)s.heal=Math.round(s.heal*ra*10)/10;if(s.hp>0&&s.hp<s.max)s.hp=Math.min(s.max,Math.round(s.hp*rh))});o.bsf=1}
   if(o.trv===undefined){var oc=[4,8,14,22,35],rf=0;if(o.tree){['o','c','f'].forEach(function(k){for(var i=0;i<(o.tree[k]|0)&&i<5;i++)rf+=oc[i]});o.frag=(o.frag||0)+rf;o.tree={r:0,o:0,c:0,f:0}}o.trv=2}
   if(o.stv===undefined&&o.story!==undefined){o.story=[0,1,2,3,4,5,6,7,9,14,19][Math.max(0,Math.min(o.story|0,10))];o.stv=2}
@@ -581,6 +580,7 @@ function migrate(o){
   if(o.qv!==4){['D.8','C.8','S.7'].forEach(function(k){var q=o.gq&&o.gq[k];if(q){if(q.s===2)o.gold=(o.gold||0)+150+20*(o.lv||1);delete o.gq[k]}});o.qv=4}
   if(o.wv!==1){var rg=0,rf=0;for(var wi=1;wi<=(o.w||0);wi++)rg+=Math.round(60*Math.pow(wi,1.5));for(var wk=1;wk<=(o.wev||0);wk++)rf+=2*wk+1;o.gold=(o.gold||0)+rg;o.frag=(o.frag||0)+rf;o.w=0;o.wev=0;o.wv=1}
   if(o.shv!==1&&o.shadows){o.shadows.forEach(function(s){var f=Math.pow(1.08/1.14,s.up||0);if(s.boss)f*=.4;else if(s.el)f*=.735;s.max=Math.max(5,Math.round(s.max*f))});o.shv=1}
+  if(!o.lvl){(o.shadows||[]).forEach(function(s){var g=sRank(s),sp=ANL[g+1]-ANL[g],old=s.max||1;var oa=s.atk,om=s.max,l0=Math.min(ANL[g+1],ANL[g]+Math.round((s.up|0)*sp/(5+3*g)));s.v=1;s.lv=l0;recalc(s);while(s.lv<ANL[g+1]&&(s.atk<oa||s.max<om)){s.lv++;recalc(s)}delete s.up;s.hp=s.hp>0?Math.min(s.max,Math.round(s.hp/old*s.max)):s.max});o.lvl=1}
   if(o.tw===undefined)o.tw=Math.max(0,(o.tower|0)-1);
   if(o.tbc===undefined){o.tbc={};for(var tf=5;tf<=(o.tower|0);tf+=5)o.tbc[tf]=1}
   var d=fresh();for(var k in d){if(o[k]===undefined)o[k]=d[k]}
@@ -699,7 +699,6 @@ function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.04:1)+gI().dm)
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
 function dodge(){return Math.min(.5,p.st.agi*.008+(p.spec==='sin'?.10:0)+gI().dd)}
 function cap(){var i=p.st.int;return(i>=5?1:0)+(i>=15?1:0)+(i>=25?1:0)+(i>=40?1:0)}
-var UPMAX=20;
 /* tier dei Gate: Normale, Rinforzato, Rosso */
 var TIERS=[
  {n:'Normale',pw:1,rooms:3,el:.14,rw:1,poi:0},
@@ -711,7 +710,6 @@ function selT(g){var h=hiT(g),s=p.gt&&p.gt[g];return s===undefined?h:Math.min(+s
 function thrN(g,t){return Math.min(15,(p.thr&&p.thr[g+'.'+t])|0)}
 function orig(s){return s.boss?'b':(s.el?'e':'n')}
 function canField(s,ex){var o=orig(s);if(o==='n')return true;return team().filter(function(x){return x!==s&&x!==ex&&orig(x)===o}).length<1}
-function upMax(){return Math.min(UPMAX,5+3*rIdx())}
 var BR={o:{n:'Ombra',col:'#b27cff'},c:{n:'Cacciatore',col:'#4aa8ff'},f:{n:'Fortuna',col:'#ffc24a'}};
 var NODES={
  r:[{s:'Sigillo<br>EXP e oro +5%',d:'Sigillo del Monarca: +5% EXP e +5% oro da ogni nemico. Va sbloccato per primo.',c:5}],
@@ -768,7 +766,7 @@ function team(){return p.shadows.filter(function(s){return s.a})}
 function maxTotal(){return cap()+4+(tn('o')>=3?1:0)}
 function fixTeam(){var t=team();while(t.length>cap()){t.pop().a=false}
   ['b','e'].forEach(function(o){var l=team().filter(function(s){return orig(s)===o}).sort(function(a,b){return sAtk(b)-sAtk(a)});for(var i=1;i<l.length;i++)l[i].a=false})}
-function upgrade(s){var hi=s.up>=5,ga=s.boss?(hi?1.12:1.26):(hi?1.07:1.14),gh=s.boss?(hi?1.09:1.3):(hi?1.045:1.08);s.atk=r1(s.atk*ga+.3);s.max=Math.round(s.max*gh)+2;if(s.heal)s.heal=r1(s.heal*ga+.3);s.up++;s.hp=sMax(s)}
+function upgrade(s){s.lv=Math.min(lvCap(s),(s.lv|0)+1);recalc(s);s.hp=sMax(s)}
 function needAt(l){return Math.round(200*Math.pow(l,1.5))}
 function need(){return needAt(p.lv)}
 function rIdx(){var r=0;for(var i=0;i<6;i++){if(p.lv>=LO[i])r=i}return r}
@@ -852,9 +850,29 @@ function iName(cls,k,t){var d=IT[cls][k];return d[0]+' '+(d[1]?ADJF:ADJM)[t]}
 function iSlot(cls,k){return IT[cls][k][0]}
 function healAll(){p.shadows.forEach(function(s){s.hp=sMax(s)})}
 function dropShadow(s){['w','a'].forEach(function(k){if(s.eq[k]){p.inv.push(s.eq[k]);s.eq[k]=null}})}
-function sellVal(s){return Math.round((s.boss?300:s.el?120:50)*(1+.25*(s.up||0))*RAR(s))}
+/* ombre a livelli: statistiche fisse per rango/categoria/livello */
+var ANL=[1,20,35,50,75,100,150],SHA=null,SHH=null,SBA=null,SBH=null,LFC=[.29,.45,.57,.4,.45,.24];
+function nAtk(L){return (5+1.8*Math.pow(L,1.2))*1.05*(1+L/170)*(1+.018*Math.max(0,L-8))*.33}
+function nHp(L){return (40+9*Math.pow(L,1.2))*1.05*(1+L/170)*(1+.012*Math.max(0,L-8))*.4}
+function shInit(){
+  SHA=[nAtk(1)];SHH=[nHp(1)];SBA=[1.1];SBH=[1.6];
+  for(var k=1;k<=6;k++){var g=k-1,L=HI[g];
+    SHA.push(nAtk(L)*Math.pow(1.14,5)*Math.pow(1.07,3*g));SHH.push(nHp(L)*Math.pow(1.08,5)*Math.pow(1.045,3*g));
+    SBA.push(.99*Math.pow(1.26,5)*Math.pow(1.12,3*g)/(Math.pow(1.14,5)*Math.pow(1.07,3*g)));
+    SBH.push(1.6*Math.pow(1.3,5)*Math.pow(1.09,3*g)/(Math.pow(1.08,5)*Math.pow(1.045,3*g)))}
+}
+function shIp(a,L){var k=0;while(k<5&&L>=ANL[k+1])k++;var t=Math.min(1,Math.max(0,(L-ANL[k])/(ANL[k+1]-ANL[k])));return a[k]*Math.pow(a[k+1]/a[k],t)}
+function recalc(s){
+  if(!SHA)shInit();
+  var L=s.lv,m=CL[s.cls],v=s.v||1,ca=s.boss?shIp(SBA,L):(s.el?1.15:1),ch=s.boss?shIp(SBH,L):(s.el?1.3:1),a=shIp(SHA,L)*ca*v;
+  s.atk=r1(a*m.atk);s.max=Math.round(shIp(SHH,L)*ch*v*m.hp);s.heal=s.cls==='guaritore'?r1(a*.28/.33):0;
+}
+function lvCap(s){return ANL[Math.min(6,sRank(s)+1)]}
+function lvStart(s){return ANL[sRank(s)]}
+function evoLv(s){var g=sRank(s);return ANL[g]+Math.round((ANL[g+1]-ANL[g])*.5)}
+function sellVal(s){return Math.round((s.boss?300:s.el?120:50)*(1+.05*Math.max(0,(s.lv|0)-lvStart(s)))*RAR(s))}
 var UCF=[.85,.21,.098,.046,.025,.013];
-function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s)*UCF[sRank(s)]*(s.boss?1.3:1))}
+function upCost(s){return Math.round((s.atk*8+s.max*.8+s.heal*6)*RAR(s)*UCF[sRank(s)]*LFC[sRank(s)]*(s.boss?1.3:1))}
 function findShadow(id){return p.shadows.filter(function(s){return String(s.id)===String(id)})[0]}
 function addTrait(s){
   var pool=TRK.filter(function(k){return s.tr.indexOf(k)<0&&((k!=='devoto'&&k!=='purifica')||s.cls==='guaritore')});
@@ -1294,7 +1312,6 @@ function rollRarity(e){
   if(e.el)return x<.08?2:(x<.5?1:0);
   return x<.02?2:(x<.14?1:0);
 }
-function bossBase(g,cls){var L=HI[g],b=Math.pow(L,1.2),ex=Math.max(0,L-8),rm=1.15*(1+L/170),m=CL[cls];return{atk:r1((5+1.8*b)*rm*1.1*(1+.018*ex)*.33*m.atk*.9),max:Math.round((40+9*b)*rm*(1+.012*ex)*1.6*.4*m.hp)}}
 function doArise(){
   var ac=ariseCost();
   if(c.phase!=='arise'||p.mp<ac)return;
@@ -1306,8 +1323,8 @@ function doArise(){
       p.frag+=2;c.fragGot+=2;c.ok=true;c.msg=BN[e.g]+' è già nel tuo esercito: ottieni 2 frammenti d’ombra.';c.phase='ariseRes';p.cnt.arise++;qev('arise',1);qev('aboss',1);return;
     }
     var r=rollRarity(e);
-    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,g:e.g,u:uid,cls:e.cls,r:r,tr:[],atk:r1((e.atk0||e.atk)*.33*m.atk*(e.boss?.9:(e.el?.85:1))),max:Math.round((e.max0||e.max)/(e.boss?4:(e.el?1.7:1))*(e.boss?1.6:(e.el?1.25:1))*.4*m.hp),heal:e.cls==='guaritore'?r1((e.atk0||e.atk)*.28):0,up:0,eq:{w:null,a:null},hp:0};
-    if(e.boss){var bb=bossBase(e.g,e.cls);sh.atk=Math.max(sh.atk,bb.atk);sh.max=Math.max(sh.max,bb.max);var ft=BTR[e.g];if(ft==='devoto'&&e.cls!=='guaritore')ft='furia';sh.tr.push(ft);for(var i=0;i<r-1;i++)addTrait(sh)}
+    var sh={id:++p.sid,name:e.boss?BN[e.g]:e.name.replace('Élite · ',''),boss:e.boss,el:!!e.el,g:e.g,u:uid,cls:e.cls,r:r,tr:[],lv:LO[e.g]+5*(c.tier|0),v:Math.round((.95+Math.random()*.1)*100)/100,eq:{w:null,a:null},hp:0};recalc(sh);
+    if(e.boss){var ft=BTR[e.g];if(ft==='devoto'&&e.cls!=='guaritore')ft='furia';sh.tr.push(ft);for(var i=0;i<r-1;i++)addTrait(sh)}
     else for(var j=0;j<r;j++)addTrait(sh);
     sh.hp=sMax(sh);
     p.cnt.arise++;qev('arise',1);if(e.boss)qev('aboss',1);
@@ -1499,7 +1516,7 @@ function partner(s){
 }
 function evoCost(s){return s.r===0?6:14}
 function shDetail(s){
-  var uc=upCost(s),maxed=s.up>=upMax(),pt=partner(s),h='<div class="shd">';
+  var uc=upCost(s),maxed=s.lv>=lvCap(s),pt=partner(s),h='<div class="shd">';
   h+='<div class="sm">'+CL[s.cls].d+'</div>';
   if(s.tr&&s.tr.length)h+='<div class="sm">'+s.tr.map(function(k){return '<b>'+TRAITS[k].n+'</b>: '+TRAITS[k].d}).join(' · ')+'</div>';
   if(hasAb(s))h+='<div class="sm" style="color:var(--gold)">'+ABD[s.cls]+'</div>';
@@ -1518,13 +1535,13 @@ function shDetail(s){
     if(cur)h+='<button class="btn full sm2" style="margin-top:6px" data-a="uneq" data-v="'+s.id+':'+k+'">Rimuovi '+iName(s.cls,k,cur.t).toLowerCase()+'</button>';
     h+='</div>';
   }
-  h+='<div class="btns"><button class="btn gld sm2" data-a="up" data-v="'+s.id+'" '+((maxed||p.gold<uc)?'disabled':'')+'>Potenzia<small>'+(maxed?(upMax()<UPMAX?'Max del rango +'+upMax():'Massimo +'+UPMAX):fmt(uc)+' oro')+'</small></button>'+
+  h+='<div class="btns"><button class="btn gld sm2" data-a="up" data-v="'+s.id+'" '+((maxed||p.gold<uc)?'disabled':'')+'>Potenzia<small>'+(maxed?'Livello max ('+lvCap(s)+')':'Lv '+s.lv+' → '+(s.lv+1)+' · '+fmt(uc)+' oro')+'</small></button>'+
    '<button class="btn dng sm2" data-a="rel" data-v="'+s.id+'">'+(relId===s.id?'Conferma':'Rilascia')+'</button></div>';
   if(!s.a)h+='<div class="btns"><button class="btn gld sm2" data-a="sell" data-v="'+s.id+'">'+(sellId===s.id?'Conferma vendita':'Vendi')+'<small>'+fmt(sellVal(s))+' oro'+(s.boss&&sellId!==s.id?' · ombra di boss':'')+'</small></button></div>';
   if(pt||s.r<2){
     h+='<div class="btns">';
     if(pt)h+='<button class="btn '+(fuseId===s.id?'dng':'pri')+' sm2" data-a="fuse" data-v="'+s.id+'">'+(fuseId===s.id?'Conferma fusione':'Fondi con la copia')+'<small>diventa '+RARITY[s.r+1].n+'</small></button>';
-    if(s.r<2)h+='<button class="btn sm2" data-a="evo" data-v="'+s.id+'" '+((s.up<10||p.frag<evoCost(s))?'disabled':'')+'>Evolvi<small>'+(s.up<10?'serve +10':evoCost(s)+' frammenti')+' · '+RARITY[s.r+1].n+'</small></button>';
+    if(s.r<2)h+='<button class="btn sm2" data-a="evo" data-v="'+s.id+'" '+((s.lv<evoLv(s)||p.frag<evoCost(s))?'disabled':'')+'>Evolvi<small>'+(s.lv<evoLv(s)?'serve Lv '+evoLv(s):evoCost(s)+' frammenti')+' · '+RARITY[s.r+1].n+'</small></button>';
     h+='</div>';
   }
   return h+'</div>';
@@ -1537,14 +1554,14 @@ function shRow(s){
   var open=openSh===s.id||(selSlot&&selSlot.sid===s.id),full=!s.a&&team().length>=cap(),lim=!s.a&&!full&&!canField(s);
   var tr=(s.tr||[]).map(function(k){return '<span class="tg">'+TRAITS[k].n+'</span>'}).join('');
   return '<div class="sh '+(s.a?'act':'ben')+(open?' open':'')+'" style="--cc:'+CL[s.cls].col+'">'+
-   '<button class="shh" data-a="open" data-v="'+s.id+'"><span class="shk"><span class="shc">'+CL[s.cls].s+'</span></span><span class="shm"><span class="shn"><span class="srk" style="--rk:'+RK_COL[sRank(s)]+'" aria-label="Rango '+RANKS[sRank(s)]+'">'+RANKS[sRank(s)]+'</span>'+s.name+(s.up?' <i>+'+s.up+'</i>':'')+(s.boss?' <i class="u">unica</i>':(s.el?' <i class="u">élite</i>':''))+'</span>'+
+   '<button class="shh" data-a="open" data-v="'+s.id+'"><span class="shk"><span class="shc">'+CL[s.cls].s+'</span></span><span class="shm"><span class="shn"><span class="srk" style="--rk:'+RK_COL[sRank(s)]+'" aria-label="Rango '+RANKS[sRank(s)]+'">'+RANKS[sRank(s)]+'</span>'+s.name+' <i>Lv '+s.lv+'</i>'+(s.boss?' <i class="u">unica</i>':(s.el?' <i class="u">élite</i>':''))+'</span>'+
    '<span class="shs"><span style="color:'+RARITY[s.r||0].col+'">'+RARITY[s.r||0].n+'</span> · ATT '+sd(sAtk(s))+' · HP '+fmt(sMax(s))+(s.cls==='guaritore'?' · CURA '+sd(sHeal(s)):'')+'</span>'+(tr?'<span class="shs">'+tr+'</span>':'')+'</span><span class="chev">'+(open?'▲':'▼')+'</span></button>'+
    '<button class="shb'+(s.a?'':' go')+'" data-a="bench" data-v="'+s.id+'" '+((full||lim)?'disabled':'')+'>'+(s.a?'In panchina':(full?'Squadra piena':(lim?'Limite boss/élite':'Schiera')))+'</button>'+
    (open?shDetail(s):'')+'</div>';
 }
 function vOmbre(){
   var tm=team(),bn=p.shadows.filter(function(x){return !x.a});
-  var h='<div class="panel"><div class="lbl"><span>Esercito d’ombra</span><em>Frammenti: '+fq(p.frag)+'</em></div><div class="sm" style="margin:0">Slot squadra con Intelligenza 5, 15, 25 e 40. In squadra al massimo 1 ombra di boss e 1 di élite. Potenziamento massimo +'+upMax()+' (sale con il rango). Tocca un’ombra per i dettagli.</div>';
+  var h='<div class="panel"><div class="lbl"><span>Esercito d’ombra</span><em>Frammenti: '+fq(p.frag)+'</em></div><div class="sm" style="margin:0">Slot squadra con Intelligenza 5, 15, 25 e 40. In squadra al massimo 1 ombra di boss e 1 di élite. Le ombre salgono di livello con l’oro, fino al livello del rango successivo. Tocca un’ombra per i dettagli.</div>';
   var fm=formation();
   h+='<div class="fbox">'+(fm.list.length?fm.list.join(' · '):'Sinergie dal 3° slot: 3 ombre della stessa classe, o 3 classi diverse. Top: 4 uguali.')+'</div>';
   h+='</div>';
@@ -1685,7 +1702,7 @@ function vCombat(){
     B+='<div class="panel arise"><p class="big" style="color:#b79cff">Estrazione riuscita</p><p class="sm">Gli slot sono pieni. Scegli quale ombra in panchina sostituire.</p>'+
      '<div class="pend"><div class="nm">'+clsTag(n.cls)+rarTag(n)+(n.boss?'<span class="tag boss">Unica</span>':'')+n.name+'</div><div class="sm">'+shadowStats(n)+'</div><div class="trs">'+trDesc(n)+'</div><div class="sm">'+CL[n.cls].d+'</div></div>';
     p.shadows.filter(function(s){return !s.a}).forEach(function(s){
-      B+='<div class="row" style="text-align:left"><div class="grow"><div class="rn" style="color:'+CL[s.cls].col+'">'+CL[s.cls].s+' · '+s.name+' ('+RARITY[s.r||0].n+')'+(s.up?' +'+s.up:'')+'</div><div class="sm">'+shadowStats(s)+(s.eq.w||s.eq.a?' · equipaggiata':'')+'</div></div><button class="btn dng sm2" data-a="repl" data-v="'+s.id+'">Sostituisci</button></div>';
+      B+='<div class="row" style="text-align:left"><div class="grow"><div class="rn" style="color:'+CL[s.cls].col+'">'+CL[s.cls].s+' · '+s.name+' ('+RARITY[s.r||0].n+')'+' Lv '+s.lv+'</div><div class="sm">'+shadowStats(s)+(s.eq.w||s.eq.a?' · equipaggiata':'')+'</div></div><button class="btn dng sm2" data-a="repl" data-v="'+s.id+'">Sostituisci</button></div>';
     });
     B+='</div>';
   }else if(c.phase==='ariseRes'){
@@ -1801,7 +1818,7 @@ function act(a,v){
       break;
     case 'up':
       var s2=findShadow(v);
-      if(s2&&s2.up<upMax()){var uc=upCost(s2);if(p.gold>=uc){p.gold-=uc;upgrade(s2)}}
+      if(s2&&s2.lv<lvCap(s2)){var uc=upCost(s2);if(p.gold>=uc){p.gold-=uc;upgrade(s2)}}
       break;
     case 'geq':
       if(c)break;
@@ -1838,7 +1855,7 @@ function act(a,v){
         if(fuseId===fs.id){
           ['w','a'].forEach(function(k){if(!fs.eq[k]&&fp.eq[k]){fs.eq[k]=fp.eq[k];fp.eq[k]=null}});
           dropShadow(fp);
-          fs.r++;fs.atk=r1(Math.max(fs.atk,fp.atk)*1.05);fs.max=Math.round(Math.max(fs.max,fp.max)*1.05);fs.heal=r1(Math.max(fs.heal,fp.heal)*1.05);fs.up=Math.max(fs.up,fp.up);
+          fs.r++;fs.lv=Math.max(fs.lv,fp.lv);recalc(fs);
           addTrait(fs);
           p.shadows=p.shadows.filter(function(s){return s!==fp});
           fs.hp=sMax(fs);fuseId=null;toast(fs.name+' diventa '+RARITY[fs.r].n+'!','up');
@@ -1847,8 +1864,8 @@ function act(a,v){
       break;
     case 'evo':
       var vs=findShadow(v);
-      if(vs&&vs.r<2&&vs.up>=10&&p.frag>=evoCost(vs)){
-        p.frag-=evoCost(vs);vs.r++;vs.up=0;addTrait(vs);vs.hp=sMax(vs);
+      if(vs&&vs.r<2&&vs.lv>=evoLv(vs)&&p.frag>=evoCost(vs)){
+        p.frag-=evoCost(vs);vs.r++;addTrait(vs);vs.hp=sMax(vs);
         toast(vs.name+' evolve in '+RARITY[vs.r].n+'!','up');
       }
       break;
