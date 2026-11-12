@@ -766,7 +766,7 @@ function team(){return p.shadows.filter(function(s){return s.a})}
 function maxTotal(){return cap()+4+(tn('o')>=3?1:0)}
 function fixTeam(){var t=team();while(t.length>cap()){t.pop().a=false}
   ['b','e'].forEach(function(o){var l=team().filter(function(s){return orig(s)===o}).sort(function(a,b){return sAtk(b)-sAtk(a)});for(var i=1;i<l.length;i++)l[i].a=false})}
-function upgrade(s){s.lv=Math.min(lvCap(s),(s.lv|0)+1);recalc(s);s.hp=sMax(s)}
+function upgrade(s){if((s.lv|0)>=lvCap(s))return;s.lv=(s.lv|0)+1;recalc(s);s.hp=sMax(s)}
 function needAt(l){return Math.round(200*Math.pow(l,1.5))}
 function need(){return needAt(p.lv)}
 function rIdx(){var r=0;for(var i=0;i<6;i++){if(p.lv>=LO[i])r=i}return r}
@@ -867,7 +867,7 @@ function recalc(s){
   var L=s.lv,m=CL[s.cls],v=s.v||1,ca=s.boss?shIp(SBA,L):(s.el?1.15:1),ch=s.boss?shIp(SBH,L):(s.el?1.3:1),a=shIp(SHA,L)*ca*v;
   s.atk=r1(a*m.atk);s.max=Math.round(shIp(SHH,L)*ch*v*m.hp);s.heal=s.cls==='guaritore'?r1(a*.28/.33):0;
 }
-function lvCap(s){return ANL[Math.min(6,sRank(s)+1)]}
+function lvCap(s){return Math.min(ANL[Math.min(6,sRank(s)+1)],Math.max(1,p.lv))}
 function lvStart(s){return ANL[sRank(s)]}
 function evoLv(s){var g=sRank(s);return ANL[g]+Math.round((ANL[g+1]-ANL[g])*.5)}
 function sellVal(s){return Math.round((s.boss?300:s.el?120:50)*(1+.05*Math.max(0,(s.lv|0)-lvStart(s)))*RAR(s))}
@@ -1535,7 +1535,7 @@ function shDetail(s){
     if(cur)h+='<button class="btn full sm2" style="margin-top:6px" data-a="uneq" data-v="'+s.id+':'+k+'">Rimuovi '+iName(s.cls,k,cur.t).toLowerCase()+'</button>';
     h+='</div>';
   }
-  h+='<div class="btns"><button class="btn gld sm2" data-a="up" data-v="'+s.id+'" '+((maxed||p.gold<uc)?'disabled':'')+'>Potenzia<small>'+(maxed?'Livello max ('+lvCap(s)+')':'Lv '+s.lv+' → '+(s.lv+1)+' · '+fmt(uc)+' oro')+'</small></button>'+
+  h+='<div class="btns"><button class="btn gld sm2" data-a="up" data-v="'+s.id+'" '+((maxed||p.gold<uc)?'disabled':'')+'>Potenzia<small>'+(maxed?(lvCap(s)<ANL[Math.min(6,sRank(s)+1)]?'Max: tuo livello ('+lvCap(s)+')':'Livello max ('+lvCap(s)+')'):'Lv '+s.lv+' → '+(s.lv+1)+' · '+fmt(uc)+' oro')+'</small></button>'+
    '<button class="btn dng sm2" data-a="rel" data-v="'+s.id+'">'+(relId===s.id?'Conferma':'Rilascia')+'</button></div>';
   if(!s.a)h+='<div class="btns"><button class="btn gld sm2" data-a="sell" data-v="'+s.id+'">'+(sellId===s.id?'Conferma vendita':'Vendi')+'<small>'+fmt(sellVal(s))+' oro'+(s.boss&&sellId!==s.id?' · ombra di boss':'')+'</small></button></div>';
   if(pt||s.r<2){
@@ -1561,7 +1561,7 @@ function shRow(s){
 }
 function vOmbre(){
   var tm=team(),bn=p.shadows.filter(function(x){return !x.a});
-  var h='<div class="panel"><div class="lbl"><span>Esercito d’ombra</span><em>Frammenti: '+fq(p.frag)+'</em></div><div class="sm" style="margin:0">Slot squadra con Intelligenza 5, 15, 25 e 40. In squadra al massimo 1 ombra di boss e 1 di élite. Le ombre salgono di livello con l’oro, fino al livello del rango successivo. Tocca un’ombra per i dettagli.</div>';
+  var h='<div class="panel"><div class="lbl"><span>Esercito d’ombra</span><em>Frammenti: '+fq(p.frag)+'</em></div><div class="sm" style="margin:0">Slot squadra con Intelligenza 5, 15, 25 e 40. In squadra al massimo 1 ombra di boss e 1 di élite. Le ombre salgono di livello con l’oro, fino al tuo livello (e al massimo quello del rango successivo). Tocca un’ombra per i dettagli.</div>';
   var fm=formation();
   h+='<div class="fbox">'+(fm.list.length?fm.list.join(' · '):'Sinergie dal 3° slot: 3 ombre della stessa classe, o 3 classi diverse. Top: 4 uguali.')+'</div>';
   h+='</div>';
