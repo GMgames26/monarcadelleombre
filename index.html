@@ -973,7 +973,7 @@ function mkEnemy(o){
   var ar0=(5+1.8*b)*rm*am*rnd(.95,1.05),af=atkF(L)*(o.tower?.9:1+(GAT[rkL(L)]-1)*og);
   var e={name:(el?'Élite · ':'')+d.n,cls:d.c,boss:boss,el:el,g:g,hp:hp,max:hp,max0:hp0,
     atk:Math.round(ar0*af),atk0:Math.round(ar0),
-    exp:Math.max(1,Math.round(needAt(L)/24.5*(boss?4:(el?2.2:1))*pen*rw*(o.tower?1.3:1)*((c&&!c.tower&&c.rwT)||1))),
+    exp:Math.max(1,Math.round(needAt(L)/24.5*(boss?4:(el?2.2:1))*pen*rw*(o.tower?.26:1)*((c&&!c.tower&&c.rwT)||1))),
     gold:Math.round((4+1.6*L)*(boss?4:(el?2.2:1))*pen*gm*((c&&!c.tower&&c.rwT)||1)),
     pas:[],tl:[],ev:4,sh:0,shMax:0,shDone:false,turns:0,tele:null,rs:{p:RSC[d.c].p,m:RSC[d.c].m},dt:(d.c==='mago'||d.c==='guaritore')?'m':'p'};
   if(c&&!c.tower&&c.aff){var af=AFF[c.aff];e.rs.p*=af.p;e.rs.m*=af.m}
@@ -1282,6 +1282,7 @@ function win(){
   if(c.tower&&e.boss){ex*=2;eg*=2}
   if(rep){ex=0;log('Piano già superato: solo oro.','sys')}
   if(c.old&&!c.tower){ex=0;eg=Math.round(eg*.4)}
+  if(c.tower&&p.lv<150&&p.lv>=HI[rkL(p.lv)]&&ex){ex=0;log('La Torre non ti fa più salire: per il rango successivo servono i Gate.','sys')}
   c.gx+=ex;c.gg+=eg;p.gold+=eg;p.sx.gold+=eg;p.sx.exp+=ex;gainExp(ex);
   log(e.name+' sconfitto. +'+fmt(ex)+' EXP, +'+fmt(eg)+' oro','good');
   if(c.tower&&c.floor>p.tower)p.tower=c.floor;
