@@ -230,9 +230,9 @@ function twAvail(k){return maxDone()>=TW[k].unl-1}
 
 /* ---------- mondi ---------- */
 var WORLDS=[
- {n:'Prato Alieno',boss:'boss1',g:'#2f6b3a',g2:'#2a6234',road:'#9a7a52',edge:'#5e4530',pad:'rgba(255,255,255,.10)',padl:'rgba(200,255,210,.40)',key:'prato',
+ {n:'Prato Alieno',boss:'boss1',g:'#2f9a78',g2:'#2b9072',road:'#b1804f',edge:'#6b4a2c',pad:'rgba(255,255,255,.10)',padl:'rgba(200,255,210,.40)',key:'prato',
   d:'Un prato dai colori strani vicino all’avamposto. I primi nemici sono semplici, ma presto arrivano corridori e volanti. In fondo c’è il Colosso Ruggine.'},
- {n:'Deserto di Ferro',boss:'boss2',g:'#c9a55a',g2:'#bd9a50',road:'#5a616c',edge:'#383d46',pad:'rgba(70,45,10,.16)',padl:'rgba(255,240,205,.45)',key:'deserto',
+ {n:'Deserto di Ferro',boss:'boss2',g:'#e2814a',g2:'#d97a43',road:'#7b93ad',edge:'#44566b',pad:'rgba(70,45,10,.16)',padl:'rgba(255,240,205,.45)',key:'deserto',
   d:'Dune e relitti di navi. Nemici più duri, scudi energetici e guaritori. Il Leviatano delle Sabbie ti aspetta alla fine.'}
 ];
 function wOf(n){return Math.floor((n-1)/PERW)}
@@ -367,7 +367,7 @@ function buildSpawns(n,w,nr){
 
 /* ---------- stato di gioco ---------- */
 var S=null,images={},imgOk={};
-var IMGN=['torre_cannone','torre_laser','torre_rallentatore','torre_missili','torre_radar','nemico_fante','nemico_corridore','nemico_drone','nemico_corazzato','nemico_scudato','nemico_guaritore','boss_1','boss_2','terreno_prato','strada_prato','piazzola_prato','terreno_deserto','strada_deserto','piazzola_deserto'];
+var IMGN=['torre_cannone_base','torre_cannone_top','torre_laser_base','torre_laser_top','torre_missili_base','torre_missili_top','torre_cannone','torre_laser','torre_rallentatore','torre_missili','torre_radar','nemico_fante','nemico_corridore','nemico_drone','nemico_corazzato','nemico_scudato','nemico_guaritore','boss_1','boss_2','piazzola_prato','piazzola_deserto'];
 IMGN.forEach(function(k){var im=new Image();im.onload=function(){imgOk[k]=1;iconCache={}};im.src='img/'+k+'.png';images[k]=im});
 var SPRK={cannon:'torre_cannone',laser:'torre_laser',slow:'torre_rallentatore',missile:'torre_missili',radar:'torre_radar',fante:'nemico_fante',corridore:'nemico_corridore',drone:'nemico_drone',corazzato:'nemico_corazzato',scudato:'nemico_scudato',guaritore:'nemico_guaritore',boss1:'boss_1',boss2:'boss_2'};
 
@@ -508,7 +508,7 @@ function update(dt){
     e=S.en[i];if(e.dead)continue;
     var sp2=e.base*(1-clamp(e.slow,0,.8))*(e.stun>0?0:1);
     e.d+=sp2*dt;
-    var P=posAt(e.rt,e.d);e.x=P.x;e.y=P.y;e.dx=P.dx;e.dy=P.dy;
+    var P=posAt(e.rt,e.d);e.x=P.x;e.y=P.y;e.dx=P.dx;e.dy=P.dy;if(Math.abs(P.dx)>.01)e.fx=P.dx<0?-1:1;
     if(e.d>=e.rt.len){
       e.dead=true;e.leak=true;S.lives-=e.life;fxRing(e.x,ROWS-.4,.8,'#ff5a6e');
       if(S.lives<=0){S.lives=0;endGame(false);return}
@@ -602,6 +602,7 @@ function sprite(name,x,y,sz,rot){
   cx.save();cx.translate(x,y);if(rot)cx.rotate(rot);cx.drawImage(images[k],-sz/2,-sz/2,sz,sz);cx.restore();return true;
 }
 var BASEANG={cannon:-.1,laser:.25,missile:1.57};
+var PIV={cannon:[118,125,'cannone'],laser:[120,150,'laser'],missile:[132,130,'missili']};
 function towerRot(t,tm){
   if(t.type==='slow')return tm*.7;
   if(t.type==='radar')return tm*1.1;
@@ -664,20 +665,30 @@ function drawEnemy(c,t,x,y,s,tm,dx,dy,fl){
   else if(t==='boss2'){c.beginPath();c.ellipse(0,0,R,R*.85,0,0,6.3);c.fill();c.stroke();c.fillStyle='#2a0a30';for(var q=0;q<5;q++){c.beginPath();c.arc((q-2)*R*.4,0,R*.16,0,6.3);c.fill()}c.strokeStyle='#ffa0ef';c.lineWidth=.08*s;c.beginPath();c.arc(0,0,R*1.1,.3,2.8);c.stroke()}
   c.restore();
 }
+var ESZ={fante:.9,corridore:1,drone:.95,corazzato:1.05,scudato:1.0,guaritore:.95,boss1:1.9,boss2:2.0};
 function drawEnemyS(e,x,y,s,tm){
   var k=SPRK[e.type];
   if(imgOk[k]){
-    var sz=(e.boss?1.9:(e.type==='corazzato'||e.type==='scudato'?1.0:.85))*s;
+    var sz=(ESZ[e.type]||.9)*s,t=tm*1+e.ph,bob=0,rot=0,jx=0,tp=e.type;
+    if(tp==='fante'||tp==='guaritore'){bob=-Math.abs(Math.sin(t*9))*.07;rot=Math.sin(t*9)*.07}
+    else if(tp==='corridore'){bob=-Math.abs(Math.sin(t*14))*.05;rot=Math.sin(t*14)*.04}
+    else if(tp==='drone'){bob=Math.sin(t*4)*.06-.12;rot=Math.sin(t*3)*.05}
+    else if(tp==='corazzato'){jx=Math.sin(t*22)*.012;bob=Math.sin(t*17)*.01;rot=Math.sin(t*3)*.015}
+    else if(tp==='scudato'){bob=Math.sin(t*4)*.04;rot=Math.sin(t*2.5)*.03}
+    else{bob=-Math.abs(Math.sin(t*3))*.05;rot=Math.sin(t*3)*.035}
     cx.save();cx.translate(x,y);
-    if(e.air)cx.translate(0,-.12*s);
-    cx.drawImage(images[k],-sz/2,-sz/2+Math.sin(tm*5+e.ph)*.02*s,sz,sz);cx.restore();
+    if(tp!=='drone'){cx.fillStyle='rgba(0,0,0,.28)';cx.beginPath();cx.ellipse(0,sz*.32,sz*.34,sz*.1,0,0,6.3);cx.fill()}
+    else{cx.fillStyle='rgba(0,0,0,.22)';cx.beginPath();cx.ellipse(.05,sz*.42,sz*.26,sz*.07,0,0,6.3);cx.fill()}
+    cx.translate(jx,bob*s);cx.rotate(rot);cx.scale(e.fx||1,1);
+    if(e.flash>0)cx.globalAlpha=.75;
+    cx.drawImage(images[k],-sz/2,-sz/2,sz,sz);cx.restore();
   }else drawEnemy(cx,e.type,x,y,s,tm+e.ph,e.dx,e.dy,e.flash>0);
 }
 function draw(){
   if(!S)return;
   var M=S.map,W=WORLDS[S.w],tm=S.time;
   cx.setTransform(DPR*CELL,0,0,DPR*CELL,0,0);
-  var gk=imgOk['terreno_'+W.key],rk=imgOk['strada_'+W.key],pk=imgOk['piazzola_'+W.key];
+  var gk=0,rk=0,pk=imgOk['piazzola_'+W.key];
   cx.fillStyle=W.g;cx.fillRect(0,0,COLS,ROWS);
   if(gk){for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)cx.drawImage(images['terreno_'+W.key],c,r,1.02,1.02)}
   else{cx.fillStyle=W.g2;for(var r2=0;r2<ROWS;r2++)for(var c2=0;c2<COLS;c2++)if((r2+c2)%2)cx.fillRect(c2,r2,1,1)}
@@ -710,7 +721,7 @@ function draw(){
   /* piazzole */
   M.padList.forEach(function(q){
     var c=q[0],r=q[1];
-    if(pk)cx.drawImage(images['piazzola_'+W.key],c+.04,r+.04,.92,.92);
+    if(pk)cx.drawImage(images['piazzola_'+W.key],c-.02,r-.02,1.04,1.04);
     else{cx.fillStyle=W.pad;cx.strokeStyle=W.padl;cx.lineWidth=.04;rr(cx,c+.08,r+.08,.84,.84,.14);cx.fill();cx.stroke()}
   });
   /* selezione */
@@ -728,7 +739,7 @@ function draw(){
   /* torri */
   var selT=S.sel&&S.sel.t;
   S.towers.forEach(function(t){
-    if(imgOk[SPRK[t.type]]){if(t.type==='radar'){cx.save();cx.translate(t.c+.5,t.r+.5);cx.scale(Math.cos(tm*1.3),1);cx.drawImage(images[SPRK.radar],-.56,-.56,1.12,1.12);cx.restore()}else sprite(t.type,t.c+.5,t.r+.5,1.12,towerRot(t,tm))}
+    if(PIV[t.type]&&imgOk['torre_'+PIV[t.type][2]+'_base']&&imgOk['torre_'+PIV[t.type][2]+'_top']){var pv=PIV[t.type],nm='torre_'+pv[2],S0=1.12,cxp=t.c+.5,cyp=t.r+.5;cx.drawImage(images[nm+'_base'],cxp-S0/2,cyp-S0/2,S0,S0);cx.save();cx.translate(cxp+(pv[0]-128)/256*S0,cyp+(pv[1]-128)/256*S0);cx.rotate(towerRot(t,tm));cx.drawImage(images[nm+'_top'],-pv[0]/256*S0,-pv[1]/256*S0,S0,S0);cx.restore()}else if(imgOk[SPRK[t.type]]){if(t.type==='radar'){cx.save();cx.translate(t.c+.5,t.r+.5);cx.scale(Math.cos(tm*1.3),1);cx.drawImage(images[SPRK.radar],-.56,-.56,1.12,1.12);cx.restore()}else sprite(t.type,t.c+.5,t.r+.5,1.12,towerRot(t,tm))}
     else drawTower(cx,t.type,t.c+.5,t.r+.5,1,t.ang,t.lv,t.br,t.anim||tm);
     if(t.type==='radar'||t.type==='slow')t.anim=(t.anim||0)+.016;
     if(imgOk[SPRK[t.type]]){for(var p=0;p<t.lv;p++){cx.fillStyle=t.lv===3?(t.br==='A'?'#ffd24a':'#ff7ad9'):'#fff';cx.beginPath();cx.arc(t.c+.5+(p-(t.lv-1)/2)*.17,t.r+.94,.055,0,6.3);cx.fill()}}
@@ -985,7 +996,7 @@ show('home');
 if(!save.help){save.help=1;persist();setTimeout(function(){modal(helpHtml())},400)}
 
 /* debug / test */
-window.AZ={get S(){return S},newGame:newGame,update:update,build:build,upgrade:upgrade,sell:sell,startWave:startWave,callEarly:callEarly,save:save,genMap:genMap,TW:TW,EN:EN,twCost:twCost,upCost:upCost,tAt:tAt,waveSpec:waveSpec,recompute:recompute,K:K,mv:mv,META:META,PERW:PERW,NW:NW,wOf:wOf,lOf:lOf};
+window.AZ={spawnEnemy:spawnEnemy,get S(){return S},newGame:newGame,update:update,build:build,upgrade:upgrade,sell:sell,startWave:startWave,callEarly:callEarly,save:save,genMap:genMap,TW:TW,EN:EN,twCost:twCost,upCost:upCost,tAt:tAt,waveSpec:waveSpec,recompute:recompute,K:K,mv:mv,META:META,PERW:PERW,NW:NW,wOf:wOf,lOf:lOf};
 })();
 if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){var hadC=!!navigator.serviceWorker.controller,rl=false;navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadC&&!rl){rl=true;location.reload()}});navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){r.update();document.addEventListener("visibilitychange",function(){if(!document.hidden)r.update()})}).catch(function(){})}
 </script>
