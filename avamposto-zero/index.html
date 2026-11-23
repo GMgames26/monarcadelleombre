@@ -601,6 +601,12 @@ function sprite(name,x,y,sz,rot){
   var k=SPRK[name]||name;if(!imgOk[k])return false;
   cx.save();cx.translate(x,y);if(rot)cx.rotate(rot);cx.drawImage(images[k],-sz/2,-sz/2,sz,sz);cx.restore();return true;
 }
+var BASEANG={cannon:-.1,laser:.25,missile:1.57};
+function towerRot(t,tm){
+  if(t.type==='slow')return tm*.7;
+  if(t.type==='radar')return tm*1.1;
+  return t.ang-BASEANG[t.type];
+}
 function drawTower(c,type,x,y,s,ang,lv,br,tt){
   var d=TW[type];
   c.save();c.translate(x,y);
@@ -722,7 +728,7 @@ function draw(){
   /* torri */
   var selT=S.sel&&S.sel.t;
   S.towers.forEach(function(t){
-    if(imgOk[SPRK[t.type]])sprite(t.type,t.c+.5,t.r+.5,1.0,0);
+    if(imgOk[SPRK[t.type]]){if(t.type==='radar'){cx.save();cx.translate(t.c+.5,t.r+.5);cx.scale(Math.cos(tm*1.3),1);cx.drawImage(images[SPRK.radar],-.56,-.56,1.12,1.12);cx.restore()}else sprite(t.type,t.c+.5,t.r+.5,1.12,towerRot(t,tm))}
     else drawTower(cx,t.type,t.c+.5,t.r+.5,1,t.ang,t.lv,t.br,t.anim||tm);
     if(t.type==='radar'||t.type==='slow')t.anim=(t.anim||0)+.016;
     if(imgOk[SPRK[t.type]]){for(var p=0;p<t.lv;p++){cx.fillStyle=t.lv===3?(t.br==='A'?'#ffd24a':'#ff7ad9'):'#fff';cx.beginPath();cx.arc(t.c+.5+(p-(t.lv-1)/2)*.17,t.r+.94,.055,0,6.3);cx.fill()}}
