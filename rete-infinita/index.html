@@ -373,7 +373,7 @@ var lastTab=null,dirty=true;
 function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(function(){e.style.display='none'},2200)}
 function modal(h){$('modal').innerHTML='<div class="box">'+h+'</div>';$('modal').classList.add('on')}
 function closeModal(){$('modal').classList.remove('on')}
-function showChapter(i){modal('<h2>Capitolo '+(i+1)+' · '+CHAP[i].n+'</h2><p>'+CHAP[i].tx+'</p><div class="col"><button class="btn am" data-a="close">Avanti</button></div>')}
+function showChapter(i){modal('<h2>Capitolo '+(i+1)+' · '+CHAP[i].n+'</h2><p>'+CHAP[i].tx+'</p><p class="am">Ricompensa: il tocco manuale vale +5 J in più.</p><div class="col"><button class="btn am" data-a="close">Avanti</button></div>')}
 
 function renderTabs(){
   var h='';TABS.forEach(function(t){
@@ -425,7 +425,7 @@ function renderGen(){
   });
   return h;
 }
-function clickVal(){return add(1,mul(C_.total||Z,.01*sl('clk')*2))}
+function clickVal(){return add(1+5*S.chap,mul(C_.total||Z,.01*sl('clk')*2))}
 function renderRes(){
   var h=resPills()+'<div class="mu" style="font-size:12px;margin-bottom:10px">Le tecnologie restano per tutta la run. Dopo un riavvio vanno rifatte (salvo Archivio storico).</div>';
   RES.forEach(function(r){
