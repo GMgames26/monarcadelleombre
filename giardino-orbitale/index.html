@@ -11,12 +11,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <style>
-:root{--bg:#f4efe3;--pn:#fffdf7;--pn2:#f0e9d8;--ln:#e0d6bd;--tx:#2b3a33;--mu:#7b8a80;--gr:#3f9d6b;--gr2:#2c7a52;--yl:#e9c63a;--or:#e8863a;--bl:#2f7fb8}
+:root{--bg:#070b1a;--pn:#0f1730;--pn2:#18224a;--ln:#222f5c;--tx:#dbe4ff;--mu:#7f8fbf;--gr:#3f86d8;--gr2:#7ab4ff;--yl:#ffd86a;--or:#e8863a;--bl:#7ab4ff}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
-#hd{padding:calc(env(safe-area-inset-top) + 40px) 14px 8px;background:#05061a;color:#fff;text-align:center;flex:none}
+#hd{padding:calc(env(safe-area-inset-top) + 40px) 14px 8px;background:#050818;color:#fff;text-align:center;flex:none}
 #hd .m{font-size:30px;font-weight:800;color:var(--yl);line-height:1.1}
 #hd .s{font-size:12.5px;opacity:.85;margin-top:2px}
 #sc{flex:none;position:relative;background:#05061a}
@@ -37,28 +37,28 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .pr{font-size:12px;color:var(--bl);margin-top:3px;font-weight:600}
 .btn{background:var(--pn2);border:1px solid var(--ln);border-radius:12px;padding:10px 12px;font-weight:700;font-size:14px}
 .btn:active{transform:scale(.97)}
-.btn.gr{background:linear-gradient(180deg,#52b57f,#3a9566);border-color:#2c7a52;color:#fff}
-.btn.or{background:linear-gradient(180deg,#f0a04e,#dc7e2e);border-color:#c06c20;color:#fff}
+.btn.gr{background:linear-gradient(180deg,#4a90e0,#2f68b8);border-color:#2a5aa0;color:#fff}
+.btn.or{background:linear-gradient(180deg,#7a6ae8,#5546c0);border-color:#4638a0;color:#fff}
 .btn[disabled]{opacity:.45;pointer-events:none}
 .by{min-width:96px;text-align:center;line-height:1.25}
 .by small{display:block;font-weight:600;font-size:11px;opacity:.9}
 .modes{display:flex;gap:6px;margin-bottom:10px}
 .modes button{flex:1;padding:8px 0;border-radius:10px;border:1px solid var(--ln);background:var(--pn);font-size:12px;font-weight:700;color:var(--mu)}
-.modes button.on{background:#e3f2e9;color:var(--gr2);border-color:var(--gr)}
+.modes button.on{background:#16264f;color:var(--gr2);border-color:var(--gr)}
 .sec{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin:12px 2px 6px;font-weight:700}
-.cur{border-color:var(--gr);background:#eef8f1}
+.cur{border-color:var(--gr);background:#101f44}
 .lock{opacity:.5}
 .tag{display:inline-block;font-size:10.5px;font-weight:800;background:var(--gr);color:#fff;border-radius:8px;padding:2px 7px;margin-left:6px;vertical-align:1px}
-#modal{position:fixed;inset:0;background:rgba(20,30,25,.55);display:none;align-items:center;justify-content:center;padding:22px;z-index:20}
+#modal{position:fixed;inset:0;background:rgba(2,4,12,.7);display:none;align-items:center;justify-content:center;padding:22px;z-index:20}
 #modal.on{display:flex}
 #modal .box{background:var(--pn);border-radius:18px;padding:20px 18px;width:100%;max-width:340px;max-height:86vh;overflow:auto;text-align:center}
 #modal h2{margin:0 0 8px;font-size:20px;color:var(--gr2)}
 #modal p{font-size:14px;line-height:1.5;margin:8px 0}
 #modal .col{display:flex;flex-direction:column;gap:8px;margin-top:14px}
-#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translateX(-50%);background:#05061a;color:#fff;padding:9px 14px;border-radius:12px;font-size:13px;font-weight:700;z-index:30;display:none;max-width:88%;text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translateX(-50%);background:#1c2c66;color:#fff;padding:9px 14px;border-radius:12px;font-size:13px;font-weight:700;z-index:30;display:none;max-width:88%;text-align:center}
 .mu{color:var(--mu)}
 .log{font-size:12.5px;line-height:1.55}
-textarea{width:100%;background:#fff;border:1px solid var(--ln);border-radius:10px;padding:9px;font:12px monospace;color:var(--tx)}
+textarea{width:100%;background:#0a1128;border:1px solid var(--ln);border-radius:10px;padding:9px;font:12px monospace;color:var(--tx)}
 </style>
 </head>
 <body>
@@ -263,13 +263,13 @@ function drawScene(){
  cx.save();cx.beginPath();cx.arc(70,140,48,0,6.3);cx.clip();cx.fillStyle='rgba(80,200,100,.8)';cx.beginPath();cx.ellipse(52+Math.sin(T*.1)*6,126,16,9,.5,0,6.3);cx.fill();cx.beginPath();cx.ellipse(94+Math.sin(T*.1)*6,150,14,8,-.4,0,6.3);cx.fill();cx.fillStyle='rgba(255,255,255,.55)';cx.beginPath();cx.ellipse(70+Math.sin(T*.2)*8,118,22,3.5,0,0,6.3);cx.fill();cx.restore();
  var sg=cx.createRadialGradient(320,30,2,320,30,40);sg.addColorStop(0,'rgba(255,240,180,.9)');sg.addColorStop(1,'rgba(255,240,180,0)');cx.fillStyle=sg;cx.beginPath();cx.arc(320,30,40,0,6.3);cx.fill();
  MODS.forEach(function(m){if(S.mods[m[0]]&&OUT[m[0]])drawModule(m[0])});
- cx.fillStyle='#1a2640';cx.beginPath();cx.rect(0,0,VW,VH);cx.rect(14,10,332,140);cx.fill('evenodd');
- cx.strokeStyle='#3a4a6a';cx.lineWidth=3;cx.strokeRect(14,10,332,140);cx.beginPath();cx.moveTo(180,10);cx.lineTo(180,150);cx.moveTo(14,80);cx.lineTo(346,80);cx.stroke();
- var fg=cx.createLinearGradient(0,150,0,VH);fg.addColorStop(0,'#2c3c5a');fg.addColorStop(1,'#1c2840');cx.fillStyle=fg;cx.fillRect(0,150,VW,VH-150);
+ cx.fillStyle='#0b1230';cx.beginPath();cx.rect(0,0,VW,VH);cx.rect(14,10,332,140);cx.fill('evenodd');
+ cx.strokeStyle='#26346a';cx.lineWidth=3;cx.strokeRect(14,10,332,140);cx.beginPath();cx.moveTo(180,10);cx.lineTo(180,150);cx.moveTo(14,80);cx.lineTo(346,80);cx.stroke();
+ var fg=cx.createLinearGradient(0,150,0,VH);fg.addColorStop(0,'#141e40');fg.addColorStop(1,'#0a1030');cx.fillStyle=fg;cx.fillRect(0,150,VW,VH-150);
  cx.strokeStyle='rgba(120,150,190,.25)';cx.lineWidth=1;for(i=0;i<12;i++){cx.beginPath();cx.moveTo(i*30,215);cx.lineTo(i*30,VH);cx.stroke()}
- rr(30,174,300,9,3,'#4a5a7a');var stp=Math.max(1,Math.floor(S.np/9));for(i=0;i<9;i++){var ix=Math.min(S.np-1,i*stp);if(i*stp<S.np){var q=PL[ix];plant(q[1],q[2],q[3],45+i*34,175,.3,T+i,false)}}
+ rr(30,174,300,9,3,'#2a3866');var stp=Math.max(1,Math.floor(S.np/9));for(i=0;i<9;i++){var ix=Math.min(S.np-1,i*stp);if(i*stp<S.np){var q=PL[ix];plant(q[1],q[2],q[3],45+i*34,175,.3,T+i,false)}}
  MODS.forEach(function(m){if(S.mods[m[0]]&&!OUT[m[0]])drawModule(m[0])});
- rr(110,196,140,10,4,'#5a6a8a');rr(120,190,120,8,3,'#8a9ab8');
+ rr(110,196,140,10,4,'#2e3d72');rr(120,190,120,8,3,'#5a6ca8');
  var p=PL[S.sel],k=p[1],sc=(1+.1*bump)*(k==='tree'||k==='stalk'||k==='cactus'?1.3:(k==='leaf'||k==='mush'||k==='pond'||k==='alga'||k==='moss'?1.9:1.6));
  rr(158,180,44,14,4,'#b5683c');rr(155,176,50,6,3,'#c9794a');
  plant(k,p[2],p[3],180,178,sc*(1+.03*Math.sin(T*2)),T,S.sel>=59);
@@ -303,43 +303,43 @@ function Qp(x){return Math.pow(x,CFG.Q)}
 function rm(v){return'×'+(v<10?v.toFixed(2):Math.round(v)).toString().replace('.',',')}
 function pc(x){return'+'+Math.round((Qp(x)-1)*100)+'%'}
 function renderSerra(){
- var h='<div class="card"><div class="nm">La tua serra<i>'+S.np+' / '+PL.length+' specie</i></div><div class="ds">Tocca la scena per raccogliere. Per sbloccare una nuova specie devi prima potenziare quella attuale e migliorare attrezzi, terreno, luce e impollinatori.</div></div>';
- if(S.np<PL.length){var i=S.np,p=PL[i];h+='<div class="sec">Prossima specie</div><div class="card row"><div class="inf"><div class="nm">'+p[0]+'</div><div class="ds">'+KIND_IT[p[1]]+'</div><div class="pr">Vale '+fmt(pw(PLV[i].v,CFG.Q))+' Cr base</div><div class="ds" style="margin-top:4px">Per sbloccarla: Selezione di '+PL[i-1][0]+' <b style="color:'+(gl(i-1)>=reqGen(i)?'#2c7a52':'#c0443a')+'">'+Math.min(gl(i-1),reqGen(i))+'/'+reqGen(i)+'</b> · Potenziamenti (attrezzi, terreno, luce, impollinatori) <b style="color:'+(upTot()>=reqUp(i)?'#2c7a52':'#c0443a')+'">'+Math.min(upTot(),reqUp(i))+'/'+reqUp(i)+'</b></div></div>'+bb(plantOk(),fmt(PLV[i].c)+' Cr','','gr','data-a="plant"')+'</div>'}
- if(S.np+1<PL.length)h+='<div class="card lock row"><div class="inf"><div class="nm">???</div><div class="ds">Altre '+(PL.length-S.np-1)+' specie da scoprire.</div></div><span class="mu">🔒</span></div>';
+ var h='<div class="card"><div class="nm">La tua serra<i>'+S.np+' / '+PL.length+' specie</i></div></div>';
+ if(S.np<PL.length){var i=S.np,p=PL[i];h+='<div class="sec">Prossima specie</div><div class="card row"><div class="inf"><div class="nm">'+p[0]+'</div><div class="pr">Vale '+fmt(pw(PLV[i].v,CFG.Q))+' Cr base</div><div class="ds" style="margin-top:4px">Richiesti: Selezione di '+PL[i-1][0]+' <b style="color:'+(gl(i-1)>=reqGen(i)?'#7ab4ff':'#ff7a8a')+'">'+Math.min(gl(i-1),reqGen(i))+'/'+reqGen(i)+'</b> · Potenziamenti <b style="color:'+(upTot()>=reqUp(i)?'#7ab4ff':'#ff7a8a')+'">'+Math.min(upTot(),reqUp(i))+'/'+reqUp(i)+'</b></div></div>'+bb(plantOk(),fmt(PLV[i].c)+' Cr','','gr','data-a="plant"')+'</div>'}
+ if(S.np+1<PL.length)h+='<div class="card lock row"><div class="inf"><div class="nm">???</div><div class="ds">+'+(PL.length-S.np-1)+' specie</div></div><span class="mu">🔒</span></div>';
  h+='<div class="sec">Le tue piante</div>';
  for(var k=S.np-1;k>=0;k--){var q=PL[k],cur=k===S.sel;
-  h+='<div class="card row '+(cur?'cur':'')+'"><div class="inf"><div class="nm">'+q[0]+(cur?'<span class="tag">in coltivazione</span>':'')+'<i>sel. '+gl(k)+'</i></div><div class="ds">'+KIND_IT[q[1]]+'</div><div class="pr">'+fmt(tapVal(k))+' Cr a raccolto</div></div><div style="display:flex;flex-direction:column;gap:6px">'+(cur?'':'<button class="btn" data-a="sel" data-v="'+k+'">Coltiva</button>')+bb(can(genCost(k)),fmt(genCost(k))+' Cr','Selezione','or','data-a="gen" data-v="'+k+'"')+'</div></div>'}
+  h+='<div class="card row '+(cur?'cur':'')+'"><div class="inf"><div class="nm">'+q[0]+(cur?'<span class="tag">in coltivazione</span>':'')+'<i>sel. '+gl(k)+'</i></div><div class="pr">'+fmt(tapVal(k))+' Cr a raccolto</div></div><div style="display:flex;flex-direction:column;gap:6px">'+(cur?'':'<button class="btn" data-a="sel" data-v="'+k+'">Coltiva</button>')+bb(can(genCost(k)),fmt(genCost(k))+' Cr','Selezione','or','data-a="gen" data-v="'+k+'"')+'</div></div>'}
  return h}
 var KIND_IT={leaf:'Ortaggio a foglia',herb:'Erba aromatica',root:'Ortaggio da radice',stem:'Ortaggio da frutto',low:'Frutto di bosco',vine:'Rampicante',flower:'Fiore',spike:'Fiore a spiga',mush:'Fungo',alga:'Alga',pond:'Pianta acquatica',bush:'Arbusto da frutto',tree:'Albero',stalk:'Cereale o canna',hive:'Prodotto dell’alveare',fish:'Acquaponica',bonsai:'Bonsai',carn:'Pianta carnivora',cactus:'Succulenta',cocoon:'Seta',alien:'Specie aliena',moss:'Muschio',crystal:'Pianta di cristallo',coral:'Corallo vivente'};
-function ladCard(title,desc,arr,idx,key,isB){var nx=arr[idx+1],h='<div class="card"><div class="nm">'+title+'<i>'+arr[idx][0]+'</i></div><div class="ds">'+desc+'</div>';
+function ladCard(title,desc,arr,idx,key,isB){var nx=arr[idx+1],h='<div class="card"><div class="nm">'+title+'<i>'+arr[idx][0]+'</i></div>';
  if(nx)h+='<div style="margin-top:8px" class="row"><div class="inf"><div class="nm" style="font-size:14px">'+nx[0]+'</div><div class="pr">'+(isB?'Raccolti '+pc(nx[2]/arr[idx][2]):'Raccolti '+rm(Qp(nx[2]/arr[idx][2])))+'</div></div>'+bb(can(nx[1]),fmt(nx[1])+' Cr','','gr','data-a="lad" data-v="'+key+'"')+'</div>';else h+='<div class="pr">Livello massimo</div>';return h+'</div>'}
 function renderPot(){
- var h='<div class="card"><div class="nm">Moltiplicatore totale</div><div class="ds">Tutti i potenziamenti si applicano a ogni raccolto: <b>×'+fmt(pw(mx(baseMult(),1e-9),CFG.Q))+'</b></div></div>';
+ var h='<div class="card"><div class="nm">Moltiplicatore<i>×'+fmt(pw(mx(baseMult(),1e-9),CFG.Q))+'</i></div></div>';
  h+=ladCard('Attrezzi','Per raccogliere meglio e più in fretta.',TOOL,S.tool,'tool');
  h+=ladCard('Terreno','Più nutriente = più resa.',SOIL,S.soil,'soil');
  h+=ladCard('Illuminazione','La luce fa crescere tutto.',LIGHT,S.light,'light');
  h+=ladCard('Impollinatori','Aggiungono un bonus in percentuale.',POLL,S.poll,'poll',true);
  return h}
 function renderMod(){
- var h='<div class="card"><div class="nm">La tua stazione</div><div class="ds">Ogni modulo si vede nella scena e aggiunge un bonus. Bonus totale: <b>'+pc(1+modBonus())+'</b></div></div>';
+ var h='<div class="card"><div class="nm">Stazione<i>'+pc(1+modBonus())+'</i></div></div>';
  MODS.forEach(function(m,i){var own=S.mods[m[0]],c=MODC[i][1];
-  h+='<div class="card row '+(own?'cur':'')+'"><div class="inf"><div class="nm">'+m[1]+(own?'<span class="tag">montato</span>':'')+'</div><div class="ds">'+m[2]+'</div><div class="pr">Raccolti '+pc(1+MODC[i][2])+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':bb(can(c),fmt(c)+' Cr','','gr','data-a="mod" data-v="'+m[0]+'"'))+'</div>'});
+  h+='<div class="card row '+(own?'cur':'')+'"><div class="inf"><div class="nm">'+m[1]+(own?'<span class="tag">montato</span>':'')+'</div><div class="pr">Raccolti '+pc(1+MODC[i][2])+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':bb(can(c),fmt(c)+' Cr','','gr','data-a="mod" data-v="'+m[0]+'"'))+'</div>'});
  return h}
 function renderDr(){
- if(!autoUnlocked())return'<div class="card"><div class="nm">Droni raccoglitori</div><div class="ds">Si sbloccano quando hai 10 specie nella serra.</div></div>';
- var h='<div class="card"><div class="nm">Droni raccoglitori</div><div class="ds">Un drone raccoglie al posto tuo la specie a cui è assegnato: '+drRate(1)+' raccolti al secondo per livello. Solo le piante che hai già sbloccato.</div></div>';
- h+='<div class="card row"><div class="inf"><div class="nm">Centrale di controllo<i>liv. '+S.hub+'</i></div><div class="ds">Tutti i droni sono più efficienti: '+rm(CFG.hub[2])+' per livello.</div></div>'+bb(can(hubCost()),fmt(hubCost())+' Cr','','or','data-a="hub"')+'</div>';
+ if(!autoUnlocked())return'<div class="card"><div class="nm">Droni raccoglitori</div><div class="ds">Servono 10 specie.</div></div>';
+ var h='<div class="card"><div class="nm">Droni raccoglitori</div></div>';
+ h+='<div class="card row"><div class="inf"><div class="nm">Centrale di controllo<i>liv. '+S.hub+'</i></div></div>'+bb(can(hubCost()),fmt(hubCost())+' Cr','','or','data-a="hub"')+'</div>';
  for(var i=0;i<S.np;i++){var L=S.dr[i]||0,c=L?drCost(i):DR[i];
   h+='<div class="card row '+(L?'cur':'')+'"><div class="inf"><div class="nm">'+PL[i][0]+'<i>'+(L?'drone liv. '+L:'nessun drone')+'</i></div><div class="pr">'+(L?fmt(mul(tapVal(i),drRate(L)))+' Cr/s':'Raccolta automatica')+'</div></div>'+bb(can(c),fmt(c)+' Cr',L?'Potenzia':'Installa','gr','data-a="dr" data-v="'+i+'"')+'</div>'}
  return h}
 function renderAlt(){
  var g=semiGain(),ok=g.m>0;
- var h='<div class="card"><div class="nm">Nuova orbita</div><div class="ds">Si sblocca a '+fmt(CFG.SEASON)+' Cr guadagnati. Ricominci da una serra spoglia, ma i moduli della stazione restano e ottieni <b>Semi rari</b>: valgono per sempre e si spendono qui sotto.</div><div style="margin-top:8px;font-size:13px">Guadagnati in questa orbita: <b>'+fmt(S.tot)+' Cr</b></div>'+(ok?'<div style="font-size:13px;margin-top:3px">Semi ottenibili: <b>+'+fmt(g)+'</b></div>':'')+'<button class="btn or" style="width:100%;margin-top:10px" data-a="orbit" '+(ok?'':'disabled')+'>Inizia una nuova orbita</button></div>';
- h+='<div class="card"><div class="nm">Semi rari<i>'+fmt(S.semi)+'</i></div><div class="ds">Ogni seme dà circa '+pc(1.1)+' ai raccolti.</div></div>';
+ var h='<div class="card"><div class="nm">Nuova orbita<i>da '+fmt(CFG.SEASON)+' Cr</i></div><div style="margin-top:8px;font-size:13px">Guadagnati in questa orbita: <b>'+fmt(S.tot)+' Cr</b></div>'+(ok?'<div style="font-size:13px;margin-top:3px">Semi ottenibili: <b>+'+fmt(g)+'</b></div>':'')+'<button class="btn or" style="width:100%;margin-top:10px" data-a="orbit" '+(ok?'':'disabled')+'>Inizia una nuova orbita</button></div>';
+ h+='<div class="card"><div class="nm">Semi rari<i>'+fmt(S.semi)+'</i></div></div>';
  SHOP.forEach(function(s){var L=shopL(s[0]),c=shopCost(s[0]),mxl=L>=shopMax(s[0]);
-  h+='<div class="card row"><div class="inf"><div class="nm">'+s[1]+'<i>liv. '+L+'</i></div><div class="ds">'+s[2]+'</div></div>'+(mxl?'<span class="mu">max</span>':bb(cmp(S.semi,c)>=0,fmt(c)+' semi','','or','data-a="shop" data-v="'+s[0]+'"'))+'</div>'});
+  h+='<div class="card row"><div class="inf"><div class="nm">'+s[1]+'<i>liv. '+L+'</i></div></div>'+(mxl?'<span class="mu">max</span>':bb(cmp(S.semi,c)>=0,fmt(c)+' semi','','or','data-a="shop" data-v="'+s[0]+'"'))+'</div>'});
  h+='<div class="card log"><b>Statistiche</b><br>Orbite: '+S.orbits+' · Raccolti con il tocco: '+S.hits.toLocaleString('it-IT')+'<br>Record in un’orbita: '+fmt(S.best)+' Cr<br>Guadagni totali: '+fmt(S.ok)+' Cr<br>Tempo di gioco: '+fmtT(S.played)+'</div>';
- h+='<div class="card"><b>Salvataggio</b><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="flex:1" data-a="export">Esporta</button><button class="btn" style="flex:1" data-a="import">Importa</button></div><textarea id="sv" rows="3" placeholder="Qui compare il codice di salvataggio" style="margin-top:8px"></textarea></div><button class="btn" style="width:100%;color:#c0443a" data-a="reset">Cancella tutto e ricomincia</button>';
+ h+='<div class="card"><b>Salvataggio</b><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="flex:1" data-a="export">Esporta</button><button class="btn" style="flex:1" data-a="import">Importa</button></div><textarea id="sv" rows="3" placeholder="Qui compare il codice di salvataggio" style="margin-top:8px"></textarea></div><button class="btn" style="width:100%;color:#ff7a8a" data-a="reset">Cancella tutto e ricomincia</button>';
  return h}
 function syncAttrs(x,y){var i,at;for(i=0;i<y.attributes.length;i++){at=y.attributes[i];if(x.getAttribute(at.name)!==at.value)x.setAttribute(at.name,at.value)}for(i=x.attributes.length-1;i>=0;i--){at=x.attributes[i];if(!y.hasAttribute(at.name))x.removeAttribute(at.name)}}
 function morph(a,b){while(a.childNodes.length>b.childNodes.length)a.removeChild(a.lastChild);for(var i=0;i<b.childNodes.length;i++){var x=a.childNodes[i],y=b.childNodes[i];if(!x){a.appendChild(y.cloneNode(true));continue}if(x.nodeType!==y.nodeType||x.nodeName!==y.nodeName){a.replaceChild(y.cloneNode(true),x);continue}if(x.nodeType===3){if(x.nodeValue!==y.nodeValue)x.nodeValue=y.nodeValue;continue}if(x.nodeType!==1)continue;if(x.nodeName==='TEXTAREA')continue;syncAttrs(x,y);morph(x,y)}}
@@ -362,11 +362,11 @@ document.addEventListener('click',function(ev){
  if(a==='hub'){if(pay(hubCost())){S.hub++;render();save()}return}
  if(a==='dr'){var d=+v;if(pay(drCost(d))){S.dr[d]=(S.dr[d]||0)+1;render();save()}return}
  if(a==='shop'){var c=shopCost(v);if(shopL(v)<shopMax(v)&&cmp(S.semi,c)>=0){S.semi=sub(S.semi,c);S.shop[v]=shopL(v)+1;render();save()}return}
- if(a==='orbit'){var g=semiGain();modal('<h2>Nuova orbita?</h2><p>Ottieni <b>+'+fmt(g)+' semi rari</b>. Piante, potenziamenti e droni ripartono da zero; i moduli della stazione restano.</p><div class="col"><button class="btn or" data-a="orbit2">Parti</button><button class="btn" data-a="close">Aspetta</button></div>');return}
+ if(a==='orbit'){var g=semiGain();modal('<h2>Nuova orbita?</h2><p>Ottieni <b>+'+fmt(g)+' semi rari</b>. I moduli restano.</p><div class="col"><button class="btn or" data-a="orbit2">Parti</button><button class="btn" data-a="close">Aspetta</button></div>');return}
  if(a==='orbit2'){var gg=newOrbit();closeModal();render();save();if(gg.m)toast('+'+fmt(gg)+' semi rari');return}
  if(a==='export'){save();$('sv').value=btoa(unescape(encodeURIComponent(localStorage.getItem(KEY)||'')));return}
  if(a==='import'){var t=$('sv').value.trim();try{var raw=decodeURIComponent(escape(atob(t)));if(load(raw)){save();render();toast('Salvataggio caricato')}else toast('Codice non valido')}catch(e){toast('Codice non valido')}return}
- if(a==='reset'){modal('<h2>Cancellare tutto?</h2><p>Perderai stazione, semi e progressi.</p><div class="col"><button class="btn" style="color:#c0443a" data-a="reset2">Sì, cancella</button><button class="btn" data-a="close">No</button></div>');return}
+ if(a==='reset'){modal('<h2>Cancellare tutto?</h2><p>Perderai stazione, semi e progressi.</p><div class="col"><button class="btn" style="color:#ff7a8a" data-a="reset2">Sì, cancella</button><button class="btn" data-a="close">No</button></div>');return}
  if(a==='reset2'){S=fresh();save();closeModal();render();return}
 });
 /* ================= CICLO E OFFLINE ================= */
@@ -380,7 +380,7 @@ window.addEventListener('pagehide',save);
 /* ================= AVVIO ================= */
 build();fitCanvas();
 if(load()){var s0=(Date.now()-S.last)/1000;if(s0>30)offline(s0)}
-else{modal('<h2>Giardino Orbitale</h2><p>Una serra in orbita, una piantina di lattuga e tutto lo spazio che vuoi. Tocca la scena per raccogliere: ogni raccolto lo fai tu. Compra nuove specie e potenziamenti, e più avanti potrai automatizzare quelle che hai sbloccato all’inizio.</p><p class="mu">Nessuna fretta, nessuna sconfitta.</p><div class="col"><button class="btn gr" data-a="close">Entriamo in serra</button></div>')}
+else{modal('<h2>Giardino Orbitale</h2><p>Tocca la serra per raccogliere.</p><div class="col"><button class="btn gr" data-a="close">Inizia</button></div>')}
 S.last=Date.now();calc();render();requestAnimationFrame(loop);
 window.TB={reqGen:reqGen,reqUp:reqUp,upTot:upTot,get S(){return S},set S(v){S=v},CFG:CFG,build:build,calc:calc,CA:CA,hit:hit,PL:PL,PLV:function(){return PLV},TOOL:function(){return TOOL},SOIL:function(){return SOIL},LIGHT:function(){return LIGHT},POLL:function(){return POLL},MODS:MODS,MODC:function(){return MODC},DR:function(){return DR},pay:pay,fmt:fmt,fresh:fresh,tickGain:tickGain,cmp:cmp,add:add,n:n,genCost:genCost,drCost:drCost,hubCost:hubCost,semiGain:semiGain,newOrbit:newOrbit,render:render,tapVal:tapVal,fmtT:fmtT,mul:mul,toNum:toNum};
 })();
