@@ -124,7 +124,7 @@ function fmtT(sec){sec=Math.max(0,Math.floor(sec));var d=Math.floor(sec/86400),h
 
 
 /* ================= DATI ================= */
-var CFG={G:1.5,R:2.2,C0:12,tool:[40,5.5,1.3],soil:[120,6,1.9],light:[400,6.5,1.2],poll:[800,7,.3],mod:[250,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[5000,3.2,1.15],K:250,Q:.5,rg:[10,1.25,150],SEASON:3e11};
+var CFG={G:1.5,R:1.8,tool:[2.5,5.5,1.3],soil:[7.6,6,1.9],light:[25,6.5,1.2],poll:[50,7,.3],mod:[16,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[316,3.2,1.15],K:1,Q:.5,rg:[10,.6,150],mg:1.2,SEASON:3e10};
 var KINDS={leaf:1,herb:1,root:1,stem:1,low:1,vine:1,flower:1,spike:1,mush:1,alga:1,pond:1,bush:1,tree:1,stalk:1,hive:1,fish:1,bonsai:1,carn:1,cactus:1,cocoon:1,alien:1,moss:1,crystal:1,coral:1};
 var PL=[
 ['Lattuga','leaf','#7fd36a','#4fa84a'],['Ravanello','root','#62b455','#e0476b'],['Spinaci','leaf','#2f8a46','#1f6a36'],['Basilico','herb','#3fb35a','#2e8a44'],['Prezzemolo','herb','#2f9a4a','#4fb86a'],
@@ -152,7 +152,7 @@ var MODS=[['shelf','Mensola con vasetti','Piccoli vasi sulla parete.'],['solar',
 var SHOP=[['rich','Terreno ricco','Raccolti circa ×1,22 per livello.',3,2],['nurs','Vivaio','Ogni livello: riparti con 4 piante già sbloccate.',5,3],['drn','Droni efficienti','Automazione ×1,4 per livello.',4,2],['off','Ore offline','+2 ore di guadagno offline per livello (max 6).',3,2.5],['luck','Raccolto d’oro','+3% di probabilità di un raccolto ×8 per livello (max 10).',6,2.5]];
 var PLV=[],TOOL=[],SOIL=[],LIGHT=[],POLL=[],MODC=[],DR=[];
 function build(){
- PLV=[];DR=[];PL.forEach(function(p,i){var v=mul(CFG.K,pw(CFG.G,i)),c=i?mul(CFG.C0,pw(CFG.R,i-1)):Z;PLV.push({v:v,c:c});DR.push(i?mul(c,CFG.drone[0]):n(4000))});
+ PLV=[];DR=[];PL.forEach(function(p,i){var v=mul(CFG.K,pw(CFG.G,i)),c=Z;if(i){var nn=reqGen(i);c=mul(mul(CFG.gen[0]*CFG.mg,pw(CFG.R,i-1)),(Math.pow(CFG.gen[1],Math.min(nn,400))-1)/(CFG.gen[1]-1))}PLV.push({v:v,c:c});DR.push(i?mul(c,CFG.drone[0]):n(253))});
  function lad(L,names,pr,add){var a=[];names.forEach(function(nm,k){a.push([nm,k?mul(pr[0],pw(pr[1],k-1)):Z,add?(1+pr[2]*k):Math.pow(pr[2],k)])});return a}
  TOOL=lad(0,TOOLN,CFG.tool);SOIL=lad(0,SOILN,CFG.soil);LIGHT=lad(0,LIGHTN,CFG.light);POLL=lad(0,POLLN,CFG.poll,1);
  MODC=MODS.map(function(m,i){return[m[0],mul(CFG.mod[0],pw(CFG.mod[1],i)),.05+i*.012]});
@@ -187,8 +187,8 @@ function pay(c){if(cmp(S.m,c)<0)return false;S.m=mx(0,sub(S.m,c));return true}
 function reqGen(i){return Math.min(CFG.rg[0]+Math.floor(i*CFG.rg[1]),CFG.rg[2])}
 function reqUp(i){return Math.min(Math.floor(i*.45),40)}
 function upTot(){return S.tool+S.soil+S.light+S.poll}
-function plantOk(){var i=S.np;return i<PL.length&&gl(i-1)>=reqGen(i)&&upTot()>=reqUp(i)&&cmp(S.m,PLV[i].c)>=0}
-function genCost(i){return mul(mul(mx(PLV[i].c,20),CFG.gen[0]),pw(CFG.gen[1],gl(i)))}
+function plantOk(){var i=S.np;return i<PL.length&&cmp(S.m,PLV[i].c)>=0}
+function genCost(i){return mul(mul(CFG.gen[0],pw(CFG.R,i)),pw(CFG.gen[1],gl(i)))}
 function drCost(i){var L=S.dr[i]||0;return mul(DR[i],pw(CFG.drone[1]||1.3,L))}
 function hubCost(){return mul(CFG.hub[0],pw(CFG.hub[1],S.hub))}
 function shopCost(k){var d=SHOP.filter(function(x){return x[0]===k})[0];return mul(d[3],pw(d[4],shopL(k)))}
@@ -296,7 +296,7 @@ var TABS=[['serra','Serra'],['pot','Potenziamenti'],['mod','Stazione'],['dr','Dr
 function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(function(){e.style.display='none'},2000)}
 function modal(h){$('modal').innerHTML='<div class="box">'+h+'</div>';$('modal').classList.add('on')}
 function closeModal(){$('modal').classList.remove('on')}
-function renderTop(){calc();$('mn').textContent=fmt(S.m)+' Cr';$('ms').textContent=PL[S.sel][0]+' · '+fmt(CA.tap)+' Cr · '+Math.ceil(100/power()-1e-9)+' tocchi'+(CA.inc.m?' · auto '+fmt(CA.inc)+'/s':'')}
+function renderTop(){calc();$('mn').textContent=fmt(S.m)+' Linfa';$('ms').textContent=PL[S.sel][0]+' · '+fmt(CA.tap)+' Linfa · '+Math.ceil(100/power()-1e-9)+' tocchi'+(CA.inc.m?' · auto '+fmt(CA.inc)+'/s':'')}
 function renderTabs(){var h='';TABS.forEach(function(t){var dot='';
  if(t[0]==='serra'&&plantOk())dot='<span class="dot"></span>';
  if(t[0]==='dr'&&!autoUnlocked())return;
@@ -310,15 +310,15 @@ function rm(v){return'×'+(v<10?v.toFixed(2):Math.round(v)).toString().replace('
 function pc(x){return'+'+Math.round((Qp(x)-1)*100)+'%'}
 function renderSerra(){
  var h='<div class="card"><div class="nm">La tua serra<i>'+S.np+' / '+PL.length+' specie</i></div></div>';
- if(S.np<PL.length){var i=S.np,p=PL[i];h+='<div class="sec">Prossima specie</div><div class="card row"><div class="inf"><div class="nm">'+p[0]+'</div><div class="pr">Vale '+fmt(pw(PLV[i].v,CFG.Q))+' Cr base</div><div class="ds" style="margin-top:4px">Richiesti: Selezione di '+PL[i-1][0]+' <b style="color:'+(gl(i-1)>=reqGen(i)?'#7ab4ff':'#ff7a8a')+'">'+Math.min(gl(i-1),reqGen(i))+'/'+reqGen(i)+'</b> · Potenziamenti <b style="color:'+(upTot()>=reqUp(i)?'#7ab4ff':'#ff7a8a')+'">'+Math.min(upTot(),reqUp(i))+'/'+reqUp(i)+'</b></div></div>'+bb(plantOk(),fmt(PLV[i].c)+' Cr','','gr','data-a="plant"')+'</div>'}
+ if(S.np<PL.length){var i=S.np,p=PL[i];h+='<div class="sec">Prossima specie</div><div class="card row"><div class="inf"><div class="nm">'+p[0]+'</div><div class="pr">Vale '+fmt(pw(PLV[i].v,CFG.Q))+' Linfa base</div></div>'+bb(plantOk(),fmt(PLV[i].c)+' Linfa','','gr','data-a="plant"')+'</div>'}
  if(S.np+1<PL.length)h+='<div class="card lock row"><div class="inf"><div class="nm">???</div><div class="ds">+'+(PL.length-S.np-1)+' specie</div></div><span class="mu">🔒</span></div>';
  h+='<div class="sec">Le tue piante</div>';
  for(var k=S.np-1;k>=0;k--){var q=PL[k],cur=k===S.sel;
-  h+='<div class="card row '+(cur?'cur':'')+'"><div class="inf"><div class="nm">'+q[0]+(cur?'<span class="tag">in coltivazione</span>':'')+'<i>sel. '+gl(k)+'</i></div><div class="pr">'+fmt(tapVal(k))+' Cr a raccolto</div></div><div style="display:flex;flex-direction:column;gap:6px">'+(cur?'':'<button class="btn" data-a="sel" data-v="'+k+'">Coltiva</button>')+bb(can(genCost(k)),fmt(genCost(k))+' Cr','Selezione','or','data-a="gen" data-v="'+k+'"')+'</div></div>'}
+  h+='<div class="card row '+(cur?'cur':'')+'"><div class="inf"><div class="nm">'+q[0]+(cur?'<span class="tag">in coltivazione</span>':'')+'<i>sel. '+gl(k)+'</i></div><div class="pr">'+fmt(tapVal(k))+' Linfa a raccolto</div></div><div style="display:flex;flex-direction:column;gap:6px">'+(cur?'':'<button class="btn" data-a="sel" data-v="'+k+'">Coltiva</button>')+bb(can(genCost(k)),fmt(genCost(k))+' Linfa','Selezione','or','data-a="gen" data-v="'+k+'"')+'</div></div>'}
  return h}
 var KIND_IT={leaf:'Ortaggio a foglia',herb:'Erba aromatica',root:'Ortaggio da radice',stem:'Ortaggio da frutto',low:'Frutto di bosco',vine:'Rampicante',flower:'Fiore',spike:'Fiore a spiga',mush:'Fungo',alga:'Alga',pond:'Pianta acquatica',bush:'Arbusto da frutto',tree:'Albero',stalk:'Cereale o canna',hive:'Prodotto dell’alveare',fish:'Acquaponica',bonsai:'Bonsai',carn:'Pianta carnivora',cactus:'Succulenta',cocoon:'Seta',alien:'Specie aliena',moss:'Muschio',crystal:'Pianta di cristallo',coral:'Corallo vivente'};
 function ladCard(title,desc,arr,idx,key,isB,sp){var nx=arr[idx+1],h='<div class="card"><div class="nm">'+title+'<i>'+arr[idx][0]+'</i></div>';
- if(nx)h+='<div style="margin-top:8px" class="row"><div class="inf"><div class="nm" style="font-size:14px">'+nx[0]+'</div><div class="pr">'+(sp?'Crescita per tocco '+rm(nx[2]/arr[idx][2]):(isB?'Raccolti '+pc(nx[2]/arr[idx][2]):'Raccolti '+rm(Qp(nx[2]/arr[idx][2]))))+'</div></div>'+bb(can(nx[1]),fmt(nx[1])+' Cr','','gr','data-a="lad" data-v="'+key+'"')+'</div>';else h+='<div class="pr">Livello massimo</div>';return h+'</div>'}
+ if(nx)h+='<div style="margin-top:8px" class="row"><div class="inf"><div class="nm" style="font-size:14px">'+nx[0]+'</div><div class="pr">'+(sp?'Crescita per tocco '+rm(nx[2]/arr[idx][2]):(isB?'Raccolti '+pc(nx[2]/arr[idx][2]):'Raccolti '+rm(Qp(nx[2]/arr[idx][2]))))+'</div></div>'+bb(can(nx[1]),fmt(nx[1])+' Linfa','','gr','data-a="lad" data-v="'+key+'"')+'</div>';else h+='<div class="pr">Livello massimo</div>';return h+'</div>'}
 function renderPot(){
  var h='<div class="card"><div class="nm">Raccolto<i>×'+fmt(pw(mx(baseMult(),1e-9),CFG.Q))+'</i></div><div class="pr">Tocchi per crescita: '+Math.ceil(100/power()-1e-9)+' · Potatura '+pruneT().toFixed(1).replace('.',',')+' s</div></div>';
  h+=ladCard('Attrezzi','Per raccogliere meglio e più in fretta.',TOOL,S.tool,'tool',0,1);
@@ -329,22 +329,22 @@ function renderPot(){
 function renderMod(){
  var h='<div class="card"><div class="nm">Stazione<i>'+pc(1+modBonus())+'</i></div></div>';
  MODS.forEach(function(m,i){var own=S.mods[m[0]],c=MODC[i][1];
-  h+='<div class="card row '+(own?'cur':'')+'"><div class="inf"><div class="nm">'+m[1]+(own?'<span class="tag">montato</span>':'')+'</div><div class="pr">Raccolti '+pc(1+MODC[i][2])+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':bb(can(c),fmt(c)+' Cr','','gr','data-a="mod" data-v="'+m[0]+'"'))+'</div>'});
+  h+='<div class="card row '+(own?'cur':'')+'"><div class="inf"><div class="nm">'+m[1]+(own?'<span class="tag">montato</span>':'')+'</div><div class="pr">Raccolti '+pc(1+MODC[i][2])+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':bb(can(c),fmt(c)+' Linfa','','gr','data-a="mod" data-v="'+m[0]+'"'))+'</div>'});
  return h}
 function renderDr(){
  if(!autoUnlocked())return'<div class="card"><div class="nm">Droni raccoglitori</div><div class="ds">Servono 10 specie.</div></div>';
  var h='<div class="card"><div class="nm">Droni raccoglitori</div></div>';
- h+='<div class="card row"><div class="inf"><div class="nm">Centrale di controllo<i>liv. '+S.hub+'</i></div></div>'+bb(can(hubCost()),fmt(hubCost())+' Cr','','or','data-a="hub"')+'</div>';
+ h+='<div class="card row"><div class="inf"><div class="nm">Centrale di controllo<i>liv. '+S.hub+'</i></div></div>'+bb(can(hubCost()),fmt(hubCost())+' Linfa','','or','data-a="hub"')+'</div>';
  for(var i=0;i<S.np;i++){var L=S.dr[i]||0,c=L?drCost(i):DR[i];
-  h+='<div class="card row '+(L?'cur':'')+'"><div class="inf"><div class="nm">'+PL[i][0]+'<i>'+(L?'drone liv. '+L:'nessun drone')+'</i></div><div class="pr">'+(L?fmt(mul(tapVal(i),drRate(L)))+' Cr/s':'Raccolta automatica')+'</div></div>'+bb(can(c),fmt(c)+' Cr',L?'Potenzia':'Installa','gr','data-a="dr" data-v="'+i+'"')+'</div>'}
+  h+='<div class="card row '+(L?'cur':'')+'"><div class="inf"><div class="nm">'+PL[i][0]+'<i>'+(L?'drone liv. '+L:'nessun drone')+'</i></div><div class="pr">'+(L?fmt(mul(tapVal(i),drRate(L)))+' Linfa/s':'Raccolta automatica')+'</div></div>'+bb(can(c),fmt(c)+' Linfa',L?'Potenzia':'Installa','gr','data-a="dr" data-v="'+i+'"')+'</div>'}
  return h}
 function renderAlt(){
  var g=semiGain(),ok=g.m>0;
- var h='<div class="card"><div class="nm">Nuova orbita<i>da '+fmt(CFG.SEASON)+' Cr</i></div><div style="margin-top:8px;font-size:13px">Guadagnati in questa orbita: <b>'+fmt(S.tot)+' Cr</b></div>'+(ok?'<div style="font-size:13px;margin-top:3px">Semi ottenibili: <b>+'+fmt(g)+'</b></div>':'')+'<button class="btn or" style="width:100%;margin-top:10px" data-a="orbit" '+(ok?'':'disabled')+'>Inizia una nuova orbita</button></div>';
+ var h='<div class="card"><div class="nm">Nuova orbita<i>da '+fmt(CFG.SEASON)+' Linfa</i></div><div style="margin-top:8px;font-size:13px">Guadagnati in questa orbita: <b>'+fmt(S.tot)+' Linfa</b></div>'+(ok?'<div style="font-size:13px;margin-top:3px">Semi ottenibili: <b>+'+fmt(g)+'</b></div>':'')+'<button class="btn or" style="width:100%;margin-top:10px" data-a="orbit" '+(ok?'':'disabled')+'>Inizia una nuova orbita</button></div>';
  h+='<div class="card"><div class="nm">Semi rari<i>'+fmt(S.semi)+'</i></div></div>';
  SHOP.forEach(function(s){var L=shopL(s[0]),c=shopCost(s[0]),mxl=L>=shopMax(s[0]);
   h+='<div class="card row"><div class="inf"><div class="nm">'+s[1]+'<i>liv. '+L+'</i></div></div>'+(mxl?'<span class="mu">max</span>':bb(cmp(S.semi,c)>=0,fmt(c)+' semi','','or','data-a="shop" data-v="'+s[0]+'"'))+'</div>'});
- h+='<div class="card log"><b>Statistiche</b><br>Orbite: '+S.orbits+' · Raccolti con il tocco: '+S.hits.toLocaleString('it-IT')+'<br>Record in un’orbita: '+fmt(S.best)+' Cr<br>Guadagni totali: '+fmt(S.ok)+' Cr<br>Tempo di gioco: '+fmtT(S.played)+'</div>';
+ h+='<div class="card log"><b>Statistiche</b><br>Orbite: '+S.orbits+' · Raccolti con il tocco: '+S.hits.toLocaleString('it-IT')+'<br>Record in un’orbita: '+fmt(S.best)+' Linfa<br>Guadagni totali: '+fmt(S.ok)+' Linfa<br>Tempo di gioco: '+fmtT(S.played)+'</div>';
  h+='<div class="card"><b>Salvataggio</b><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="flex:1" data-a="export">Esporta</button><button class="btn" style="flex:1" data-a="import">Importa</button></div><textarea id="sv" rows="3" placeholder="Qui compare il codice di salvataggio" style="margin-top:8px"></textarea></div><button class="btn" style="width:100%;color:#ff7a8a" data-a="reset">Cancella tutto e ricomincia</button>';
  return h}
 function syncAttrs(x,y){var i,at;for(i=0;i<y.attributes.length;i++){at=y.attributes[i];if(x.getAttribute(at.name)!==at.value)x.setAttribute(at.name,at.value)}for(i=x.attributes.length-1;i>=0;i--){at=x.attributes[i];if(!y.hasAttribute(at.name))x.removeAttribute(at.name)}}
@@ -361,7 +361,7 @@ document.addEventListener('click',function(ev){
  if(a==='close'){closeModal();return}
  if(a==='tab'){S.tab=v;render();$('main').scrollTop=0;return}
  if(a==='sel'){S.sel=+v;render();return}
- if(a==='plant'){if(S.np<PL.length&&gl(S.np-1)>=reqGen(S.np)&&upTot()>=reqUp(S.np)&&pay(PLV[S.np].c)){S.sel=S.np;S.np++;toast('Nuova specie: '+PL[S.sel][0]);render();save()}return}
+ if(a==='plant'){if(S.np<PL.length&&pay(PLV[S.np].c)){S.sel=S.np;S.np++;toast('Nuova specie: '+PL[S.sel][0]);render();save()}return}
  if(a==='gen'){var i=+v;if(pay(genCost(i))){S.gen[i]=gl(i)+1;render();save()}return}
  if(a==='lad'){var arr=ladOf(v)[0],k=ladOf(v)[1],nx=arr[S[k]+1];if(nx&&pay(nx[1])){S[k]++;toast(nx[0]);render();save()}return}
  if(a==='mod'){var mi=MODS.map(function(m){return m[0]}).indexOf(v);if(!S.mods[v]&&pay(MODC[mi][1])){S.mods[v]=1;toast(MODS[mi][1]+' montato');render();save()}return}
@@ -380,7 +380,7 @@ var lastT=0,uiT=0,saveT=0;
 function loop(ts){var dt=Math.min(.5,(ts-lastT)/1000||0);lastT=ts;
  if(dt>0){S.played+=dt;tickGain(dt);frame(dt);renderTop();uiT+=dt;saveT+=dt;if(uiT>=.3){uiT=0;render()}if(saveT>=10){saveT=0;save()}}
  requestAnimationFrame(loop)}
-function offline(sec){var use=Math.min(sec,offCap());calc();var g=mul(CA.inc,use);if(g.m>0){addMoney(g);modal('<h2>Bentornato!</h2><p>Mentre eri via i droni hanno lavorato per <b>'+fmtT(use)+'</b>.</p><p>Hai guadagnato <b>+'+fmt(g)+' Cr</b></p><div class="col"><button class="btn gr" data-a="close">Grazie</button></div>')}}
+function offline(sec){var use=Math.min(sec,offCap());calc();var g=mul(CA.inc,use);if(g.m>0){addMoney(g);modal('<h2>Bentornato!</h2><p>Mentre eri via i droni hanno lavorato per <b>'+fmtT(use)+'</b>.</p><p>Hai guadagnato <b>+'+fmt(g)+' Linfa</b></p><div class="col"><button class="btn gr" data-a="close">Grazie</button></div>')}}
 document.addEventListener('visibilitychange',function(){if(document.hidden){save();return}var sec=(Date.now()-S.last)/1000;if(sec>30)offline(sec);S.last=Date.now()});
 window.addEventListener('pagehide',save);
 /* ================= AVVIO ================= */
