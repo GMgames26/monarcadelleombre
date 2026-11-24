@@ -124,7 +124,7 @@ function fmtT(sec){sec=Math.max(0,Math.floor(sec));var d=Math.floor(sec/86400),h
 
 
 /* ================= DATI ================= */
-var CFG={G:1.5,R:2.2,C0:12,tool:[40,5.5,1.55],soil:[120,6,1.55],light:[400,6.5,1.55],poll:[800,7,.3],mod:[250,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[5000,3.2,1.15],Q:.5,SEASON:1e12};
+var CFG={G:1.5,R:2.2,C0:12,tool:[40,5.5,1.55],soil:[120,6,1.55],light:[400,6.5,1.55],poll:[800,7,.3],mod:[250,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[5000,3.2,1.15],Q:.5,SEASON:3e11};
 var KINDS={leaf:1,herb:1,root:1,stem:1,low:1,vine:1,flower:1,spike:1,mush:1,alga:1,pond:1,bush:1,tree:1,stalk:1,hive:1,fish:1,bonsai:1,carn:1,cactus:1,cocoon:1,alien:1,moss:1,crystal:1,coral:1};
 var PL=[
 ['Lattuga','leaf','#7fd36a','#4fa84a'],['Ravanello','root','#62b455','#e0476b'],['Spinaci','leaf','#2f8a46','#1f6a36'],['Basilico','herb','#3fb35a','#2e8a44'],['Prezzemolo','herb','#2f9a4a','#4fb86a'],
@@ -181,6 +181,10 @@ function calc(){CA.tap=tapVal(S.sel);CA.inc=autoInc();return CA}
 function addMoney(v){S.m=add(S.m,v);S.tot=add(S.tot,v);S.ok=add(S.ok,v);if(cmp(S.tot,S.best)>0)S.best=S.tot}
 function tickGain(dt){calc();if(CA.inc.m)addMoney(mul(CA.inc,dt))}
 function pay(c){if(cmp(S.m,c)<0)return false;S.m=mx(0,sub(S.m,c));return true}
+function reqGen(i){return Math.min(3+Math.floor(i/4),15)}
+function reqUp(i){return Math.min(Math.floor(i*.45),40)}
+function upTot(){return S.tool+S.soil+S.light+S.poll}
+function plantOk(){var i=S.np;return i<PL.length&&gl(i-1)>=reqGen(i)&&upTot()>=reqUp(i)&&cmp(S.m,PLV[i].c)>=0}
 function genCost(i){return mul(mul(mx(PLV[i].c,20),CFG.gen[0]),pw(CFG.gen[1],gl(i)))}
 function drCost(i){var L=S.dr[i]||0;return mul(DR[i],pw(CFG.drone[1]||1.3,L))}
 function hubCost(){return mul(CFG.hub[0],pw(CFG.hub[1],S.hub))}
@@ -288,7 +292,7 @@ function modal(h){$('modal').innerHTML='<div class="box">'+h+'</div>';$('modal')
 function closeModal(){$('modal').classList.remove('on')}
 function renderTop(){calc();$('mn').textContent=fmt(S.m)+' Cr';$('ms').textContent=PL[S.sel][0]+' · raccolto '+fmt(CA.tap)+' Cr'+(CA.inc.m?' · auto '+fmt(CA.inc)+'/s':'')}
 function renderTabs(){var h='';TABS.forEach(function(t){var dot='';
- if(t[0]==='serra'&&S.np<PL.length&&cmp(S.m,PLV[S.np].c)>=0)dot='<span class="dot"></span>';
+ if(t[0]==='serra'&&plantOk())dot='<span class="dot"></span>';
  if(t[0]==='dr'&&!autoUnlocked())return;
  if(t[0]==='alt'&&semiGain().m)dot='<span class="dot"></span>';
  h+='<button data-a="tab" data-v="'+t[0]+'" class="'+(S.tab===t[0]?'on':'')+'">'+t[1]+dot+'</button>'});
@@ -299,8 +303,8 @@ function Qp(x){return Math.pow(x,CFG.Q)}
 function rm(v){return'×'+(v<10?v.toFixed(2):Math.round(v)).toString().replace('.',',')}
 function pc(x){return'+'+Math.round((Qp(x)-1)*100)+'%'}
 function renderSerra(){
- var h='<div class="card"><div class="nm">La tua serra<i>'+S.np+' / '+PL.length+' specie</i></div><div class="ds">Tocca la scena per raccogliere. Ogni raccolto è un tocco: nessuno lavora al posto tuo, all’inizio.</div></div>';
- if(S.np<PL.length){var i=S.np,p=PL[i];h+='<div class="sec">Prossima specie</div><div class="card row"><div class="inf"><div class="nm">'+p[0]+'</div><div class="ds">'+KIND_IT[p[1]]+'</div><div class="pr">Vale '+fmt(pw(PLV[i].v,CFG.Q))+' Cr base</div></div>'+bb(can(PLV[i].c),fmt(PLV[i].c)+' Cr','','gr','data-a="plant"')+'</div>'}
+ var h='<div class="card"><div class="nm">La tua serra<i>'+S.np+' / '+PL.length+' specie</i></div><div class="ds">Tocca la scena per raccogliere. Per sbloccare una nuova specie devi prima potenziare quella attuale e migliorare attrezzi, terreno, luce e impollinatori.</div></div>';
+ if(S.np<PL.length){var i=S.np,p=PL[i];h+='<div class="sec">Prossima specie</div><div class="card row"><div class="inf"><div class="nm">'+p[0]+'</div><div class="ds">'+KIND_IT[p[1]]+'</div><div class="pr">Vale '+fmt(pw(PLV[i].v,CFG.Q))+' Cr base</div><div class="ds" style="margin-top:4px">Per sbloccarla: Selezione di '+PL[i-1][0]+' <b style="color:'+(gl(i-1)>=reqGen(i)?'#2c7a52':'#c0443a')+'">'+Math.min(gl(i-1),reqGen(i))+'/'+reqGen(i)+'</b> · Potenziamenti (attrezzi, terreno, luce, impollinatori) <b style="color:'+(upTot()>=reqUp(i)?'#2c7a52':'#c0443a')+'">'+Math.min(upTot(),reqUp(i))+'/'+reqUp(i)+'</b></div></div>'+bb(plantOk(),fmt(PLV[i].c)+' Cr','','gr','data-a="plant"')+'</div>'}
  if(S.np+1<PL.length)h+='<div class="card lock row"><div class="inf"><div class="nm">???</div><div class="ds">Altre '+(PL.length-S.np-1)+' specie da scoprire.</div></div><span class="mu">🔒</span></div>';
  h+='<div class="sec">Le tue piante</div>';
  for(var k=S.np-1;k>=0;k--){var q=PL[k],cur=k===S.sel;
@@ -345,15 +349,15 @@ function render(){renderTop();renderTabs();
  var m=$('main'),h=S.tab==='serra'?renderSerra():(S.tab==='pot'?renderPot():(S.tab==='mod'?renderMod():(S.tab==='dr'?renderDr():renderAlt())));
  var t=document.createElement('div');t.innerHTML=h;var st=m.scrollTop;if(shownTab!==S.tab){m.innerHTML='';shownTab=S.tab}morph(m,t);m.scrollTop=st}
 /* ================= EVENTI ================= */
-var LAD={tool:[TOOL,'tool'],soil:[SOIL,'soil'],light:[LIGHT,'light'],poll:[POLL,'poll']};
+function ladOf(v){return{tool:[TOOL,'tool'],soil:[SOIL,'soil'],light:[LIGHT,'light'],poll:[POLL,'poll']}[v]}
 document.addEventListener('click',function(ev){
  var b=ev.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,v=b.dataset.v;
  if(a==='close'){closeModal();return}
  if(a==='tab'){S.tab=v;render();$('main').scrollTop=0;return}
  if(a==='sel'){S.sel=+v;render();return}
- if(a==='plant'){if(S.np<PL.length&&pay(PLV[S.np].c)){S.sel=S.np;S.np++;toast('Nuova specie: '+PL[S.sel][0]);render();save()}return}
+ if(a==='plant'){if(S.np<PL.length&&gl(S.np-1)>=reqGen(S.np)&&upTot()>=reqUp(S.np)&&pay(PLV[S.np].c)){S.sel=S.np;S.np++;toast('Nuova specie: '+PL[S.sel][0]);render();save()}return}
  if(a==='gen'){var i=+v;if(pay(genCost(i))){S.gen[i]=gl(i)+1;render();save()}return}
- if(a==='lad'){var arr=LAD[v][0],k=LAD[v][1],nx=arr[S[k]+1];if(nx&&pay(nx[1])){S[k]++;toast(nx[0]);render();save()}return}
+ if(a==='lad'){var arr=ladOf(v)[0],k=ladOf(v)[1],nx=arr[S[k]+1];if(nx&&pay(nx[1])){S[k]++;toast(nx[0]);render();save()}return}
  if(a==='mod'){var mi=MODS.map(function(m){return m[0]}).indexOf(v);if(!S.mods[v]&&pay(MODC[mi][1])){S.mods[v]=1;toast(MODS[mi][1]+' montato');render();save()}return}
  if(a==='hub'){if(pay(hubCost())){S.hub++;render();save()}return}
  if(a==='dr'){var d=+v;if(pay(drCost(d))){S.dr[d]=(S.dr[d]||0)+1;render();save()}return}
@@ -378,7 +382,7 @@ build();fitCanvas();
 if(load()){var s0=(Date.now()-S.last)/1000;if(s0>30)offline(s0)}
 else{modal('<h2>Giardino Orbitale</h2><p>Una serra in orbita, una piantina di lattuga e tutto lo spazio che vuoi. Tocca la scena per raccogliere: ogni raccolto lo fai tu. Compra nuove specie e potenziamenti, e più avanti potrai automatizzare quelle che hai sbloccato all’inizio.</p><p class="mu">Nessuna fretta, nessuna sconfitta.</p><div class="col"><button class="btn gr" data-a="close">Entriamo in serra</button></div>')}
 S.last=Date.now();calc();render();requestAnimationFrame(loop);
-window.TB={get S(){return S},set S(v){S=v},CFG:CFG,build:build,calc:calc,CA:CA,hit:hit,PL:PL,PLV:function(){return PLV},TOOL:function(){return TOOL},SOIL:function(){return SOIL},LIGHT:function(){return LIGHT},POLL:function(){return POLL},MODS:MODS,MODC:function(){return MODC},DR:function(){return DR},pay:pay,fmt:fmt,fresh:fresh,tickGain:tickGain,cmp:cmp,add:add,n:n,genCost:genCost,drCost:drCost,hubCost:hubCost,semiGain:semiGain,newOrbit:newOrbit,render:render,tapVal:tapVal,fmtT:fmtT,mul:mul,toNum:toNum};
+window.TB={reqGen:reqGen,reqUp:reqUp,upTot:upTot,get S(){return S},set S(v){S=v},CFG:CFG,build:build,calc:calc,CA:CA,hit:hit,PL:PL,PLV:function(){return PLV},TOOL:function(){return TOOL},SOIL:function(){return SOIL},LIGHT:function(){return LIGHT},POLL:function(){return POLL},MODS:MODS,MODC:function(){return MODC},DR:function(){return DR},pay:pay,fmt:fmt,fresh:fresh,tickGain:tickGain,cmp:cmp,add:add,n:n,genCost:genCost,drCost:drCost,hubCost:hubCost,semiGain:semiGain,newOrbit:newOrbit,render:render,tapVal:tapVal,fmtT:fmtT,mul:mul,toNum:toNum};
 })();
 if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){var hadC=!!navigator.serviceWorker.controller,rl=false;navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadC&&!rl){rl=true;location.reload()}});navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){r.update();document.addEventListener("visibilitychange",function(){if(!document.hidden)r.update()})}).catch(function(){})}
 </script>
