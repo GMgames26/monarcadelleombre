@@ -124,7 +124,7 @@ function fmtT(sec){sec=Math.max(0,Math.floor(sec));var d=Math.floor(sec/86400),h
 
 
 /* ================= DATI ================= */
-var CFG={G:1.5,R:1.8,up:{gro:[3,1.7],pru:[5,1.6],dbl:[40,1.8],chn:[30,1.8],ter:[10,2]},mod:[16,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[316,3.2,1.15],K:1,Q:.5,rg:[10,.6,150],mg:1.2,SEASON:3e10};
+var CFG={G:1.5,R:2.4,up:{gro:[3.5,1.8],pru:[5.5,1.65],dbl:[50,1.95],chn:[35,1.95],ter:[12,2.2]},mod:[16,4.6],drone:[30,1.3],gen:[7,1.58,1],hub:[316,3.2,1.15],K:1,Q:1,tb:.2,rg:[10,.6,150],mg:1.2,SEASON:6e10};
 var KINDS={leaf:1,herb:1,root:1,stem:1,low:1,vine:1,flower:1,spike:1,mush:1,alga:1,pond:1,bush:1,tree:1,stalk:1,hive:1,fish:1,bonsai:1,carn:1,cactus:1,cocoon:1,alien:1,moss:1,crystal:1,coral:1};
 var PL=[
 ['Lattuga','leaf','#7fd36a','#4fa84a'],['Ravanello','root','#62b455','#e0476b'],['Spinaci','leaf','#2f8a46','#1f6a36'],['Basilico','herb','#3fb35a','#2e8a44'],['Prezzemolo','herb','#2f9a4a','#4fb86a'],
@@ -152,7 +152,7 @@ var MODS=[['shelf','Mensola con vasetti','Piccoli vasi sulla parete.'],['solar',
 var SHOP=[['rich','Terreno ricco','Raccolti circa ×1,22 per livello.',3,2],['nurs','Vivaio','Ogni livello: riparti con 4 piante già sbloccate.',5,3],['drn','Droni efficienti','Automazione ×1,4 per livello.',4,2],['off','Ore offline','+2 ore di guadagno offline per livello (max 6).',3,2.5],['luck','Raccolto d’oro','+3% di probabilità di un raccolto ×8 per livello (max 10).',6,2.5]];
 var PLV=[],MODC=[],DR=[];
 function build(){
- PLV=[];DR=[];PL.forEach(function(p,i){var v=mul(CFG.K,pw(CFG.G,i)),c=Z;if(i){var nn=reqGen(i);c=mul(mul(CFG.gen[0]*CFG.mg,pw(CFG.R,i-1)),(Math.pow(CFG.gen[1],Math.min(nn,400))-1)/(CFG.gen[1]-1))}PLV.push({v:v,c:c});DR.push(i?mul(c,CFG.drone[0]):n(253))});
+ PLV=[];DR=[];PL.forEach(function(p,i){var v=floor(add(mul(CFG.K,pw(CFG.G,i)),.999999)),c=Z;if(i){var nn=reqGen(i);c=mul(mul(CFG.gen[0]*CFG.mg,pw(CFG.R,i-1)),(Math.pow(CFG.gen[1],Math.min(nn,400))-1)/(CFG.gen[1]-1))}PLV.push({v:v,c:c});DR.push(i?mul(c,CFG.drone[0]):n(253))});
  MODC=MODS.map(function(m,i){return[m[0],mul(CFG.mod[0],pw(CFG.mod[1],i)),.05+i*.012]});
 }
 var KEY='giardino-orbitale-v1';
@@ -175,11 +175,11 @@ function growMax(){return 10*Math.pow(1.15,upL('gro'))>=100}
 function pruMax(){return 1.5/(1+.08*upL('pru'))<=.4}
 function dblCh(){return .02*upL('dbl')}
 function chainMult(){return 1+Math.min(S.chain,20)*.005*upL('chn')}
-function terMult(){return Math.pow(1.25,upL('ter'))}
+function terMult(){return 1+CFG.tb*upL('ter')}
 function terName(){var l=upL('ter');return TERN[Math.min(l,TERN.length-1)]+(l>=TERN.length?' +'+(l-TERN.length+1):'')}
 function baseMult(){var m=mul(terMult(),1+modBonus());m=mul(m,semiMult());m=mul(m,Math.pow(1.5,shopL('rich')));return m}
-function plantMult(i){return mul(baseMult(),Math.pow(CFG.gen[2],gl(i)))}
-function tapVal(i){return pw(mx(mul(PLV[i].v,plantMult(i)),1e-9),CFG.Q)}
+function plantMult(i){return mul(baseMult(),1+gl(i))}
+function tapVal(i){return floor(add(mul(PLV[i].v,plantMult(i)),.5))}
 function drRate(L){return .25*L}
 function autoInc(){var t=Z;for(var k in S.dr){var L=S.dr[k];if(L>0&&+k<S.np)t=add(t,mul(tapVal(+k),drRate(L)))}
  return mul(mul(t,Math.pow(CFG.hub[2],S.hub)),Math.pow(1.4,shopL('drn')))}
@@ -290,7 +290,7 @@ function frame(dt){T+=dt;bump=Math.max(0,bump-dt*6);parts.forEach(function(a){a.
 function burst(n,p,gold){for(var i=0;i<n;i++)parts.push({x:180+(Math.random()-.5)*40,y:135+(Math.random()-.5)*40,vx:(Math.random()-.5)*80,vy:-30-Math.random()*50,r:2+Math.random()*2,c:i%2?p[3]:p[2],t:0});if(parts.length>70)parts.splice(0,parts.length-70)}
 function hit(x,y){
  if(PR.lock>0)return;var p=PL[S.sel];S.hits++;bump=1;S.gr=Math.min(100,S.gr+power());burst(2,p);
- if(S.gr>=100-1e-9){calc();var v=mul(CA.tap,Math.pow(chainMult(),CFG.Q)),gold=false,lk=shopL('luck');if(lk&&Math.random()<.03*lk){v=mul(v,8);gold=true}
+ if(S.gr>=100-1e-9){calc();var v=floor(add(mul(CA.tap,chainMult()),.5)),gold=false,lk=shopL('luck');if(lk&&Math.random()<.03*lk){v=mul(v,8);gold=true}
   var dc=dblCh(),ex=Math.floor(dc)+(Math.random()<dc-Math.floor(dc)?1:0);if(ex){v=mul(v,1+ex)}S.chain++;chainIdle=0;
   addMoney(v);S.gr=100;PR.tot=PR.lock=pruneT();burst(gold?18:10,p,gold);floats.push({x:180,y:112,t:0,s:'+'+fmt(v)+(ex?' ×'+(1+ex):''),gold:gold||ex>0});if(floats.length>8)floats.shift()}
 }
@@ -326,7 +326,7 @@ function upDesc(k){var L=upL(k);
  if(k==='pru')return pruMax()?'Massimo: 0,4 s':(pruneT().toFixed(2)+' → '+Math.max(.4,1.5/(1+.08*(L+1))).toFixed(2)+' s di potatura').replace(/\./g,',');
  if(k==='dbl')return 'Raccolto doppio: '+Math.round(dblCh()*100)+'% → '+Math.round(.02*(L+1)*100)+'%';
  if(k==='chn')return 'Bonus per potatura di fila: +'+(L*.5).toFixed(1).replace('.',',')+'% → +'+((L+1)*.5).toFixed(1).replace('.',',')+'% (max 20 di fila)';
- return 'Linfa di tutte le specie '+rm(Qp(1.25))+' per livello'}
+ return 'Linfa di tutte le specie +'+Math.round(CFG.tb*100)+'% per livello'}
 function upMax(k){return(k==='gro'&&growMax())||(k==='pru'&&pruMax())}
 function renderPot(){
  var h='';UPS.forEach(function(u){var k=u[0],c=upCost(k),nm=k==='ter'?terName():u[1];
