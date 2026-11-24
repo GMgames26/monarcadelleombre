@@ -539,7 +539,11 @@ var QL=[
   ['squad','Sovrano delle ombre','Completa {n} Gate S con tutte e 4 le classi vive a fine Gate',4,3],
   ['gate','Monarca dei Gate','Completa {n} Gate S',25,4]]];
 var QD=[];
-QL.forEach(function(list,g){list.forEach(function(t,i){QD.push({id:RANKS[g]+'.'+i,g:g,k:t[0],t:t[1],x:t[2].replace('{n}',t[3]),n:t[3],w:t[4]})})});
+QL.forEach(function(list,g){list.forEach(function(t,i){QD.push({id:RANKS[g]+'.'+i,g:g,k:t[0],t:t[1],r:t[2],n:t[3],w:t[4]})})});
+function genQr(){var q={};QD.forEach(function(d){q[d.id]={f:Math.round((.75+Math.random()*.8)*100)/100,h:Math.random()<.3}});return q}
+function qn(d){var r=p&&p.qr&&p.qr[d.id];return Math.max(1,Math.round(d.n*(r?r.f:1)))}
+function qtx(d){return d.r.replace('{n}',qn(d))}
+function qvis(d){var r=p.qr&&p.qr[d.id];return !(r&&r.h)||!!p.gq[d.id]}
 
 /* storia: un capitolo alla volta */
 var STORY=[
@@ -568,7 +572,7 @@ var p, c=null, tab='stato', relId=null, sellId=null, timer=null, tt=null, pendin
 var saveBox=null,qSec='main',openSh=null,statsOpen=false,leaveArm=false,qRank=0, shopCls='tank', selSlot=null, resetArm=false, qConfirm=null, fuseId=null, specArm=null, awkArm=false;
 var cloud={ref:null,busy:false,dirty:false,timer:null}, syncTxt='Salvataggio su questo dispositivo';
 
-function fresh(){return{bsf:1,lvl:1,lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,gtc:{},tbc:{},tw:0,stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[]}}
+function fresh(){return{bsf:1,lvl:1,lv:1,exp:0,hp:1,mp:1,pts:0,st:{str:5,agi:5,int:5,vit:5},gold:30,w:0,potH:2,potM:1,potA:0,potB:0,wev:0,frag:0,shadows:[],sid:0,kills:0,gates:0,quest:null,weekly:null,inv:[],iid:0,gear:{w:null,s:null,m:null},bag:[],shv:1,wv:1,gq:{},tv:2,qv:4,gtc:{},tbc:{},tw:0,stb:0,stm:0,sv:0,run:null,mods:[],cnt:{kill:0,boss:0,bossR:[0,0,0,0,0,0],elite:0,gate:0,arise:0},story:0,stv:2,tree:{r:0,o:0,c:0,f:0},trv:2,potF:0,af:{},gt:{},thr:{},spec:'',awk:0,tower:0,tcp:0,noArise:false,sx:{dmg:0,crit:0,max:0,pot:0,def:0,fall:0,ok:0,fail:0,gold:0,exp:0},hist:[],ess:0,essT:0,et:{},isl:0,ib:false,sc:false,beru:false,qr:null}}
 function migrate(o){
   if(o.spec==='bers')o.spec='tank';
   if(!o.bsf){(o.shadows||[]).forEach(function(s){if(!s.boss)return;var ra=1,rh=1;for(var k=0;k<(s.up|0);k++){var hi=k>=5;ra*=(hi?1.12:1.26)/(hi?1.07:1.14);rh*=(hi?1.09:1.3)/(hi?1.045:1.08)}s.atk=Math.round(s.atk*ra*10)/10;s.max=Math.round(s.max*rh);if(s.heal)s.heal=Math.round(s.heal*ra*10)/10;if(s.hp>0&&s.hp<s.max)s.hp=Math.min(s.max,Math.round(s.hp*rh))});o.bsf=1}
@@ -583,7 +587,9 @@ function migrate(o){
   if(!o.lvl){(o.shadows||[]).forEach(function(s){var g=sRank(s),sp=ANL[g+1]-ANL[g],old=s.max||1;var oa=s.atk,om=s.max,l0=Math.min(ANL[g+1],ANL[g]+Math.round((s.up|0)*sp/(5+3*g)));s.v=1;s.lv=l0;recalc(s);while(s.lv<ANL[g+1]&&(s.atk<oa||s.max<om)){s.lv++;recalc(s)}delete s.up;s.hp=s.hp>0?Math.min(s.max,Math.round(s.hp/old*s.max)):s.max});o.lvl=1}
   if(o.tw===undefined)o.tw=Math.max(0,(o.tower|0)-1);
   if(o.tbc===undefined){o.tbc={};for(var tf=5;tf<=(o.tower|0);tf+=5)o.tbc[tf]=1}
+  if(o.sc===undefined)o.sc=!!(o.gtc&&o.gtc[5]&&o.gtc[5].some(function(x){return x>0}));
   var d=fresh();for(var k in d){if(o[k]===undefined)o[k]=d[k]}
+  if(!o.qr)o.qr=genQr();
   if(!hadCnt){o.cnt.kill=o.kills||0;o.cnt.gate=o.gates||0}
   var ic=o.st.int,cp0=(ic>=5?1:0)+(ic>=15?1:0)+(ic>=25?1:0)+(ic>=40?1:0),act0=0;
   o.shadows.forEach(function(s,i){
@@ -688,12 +694,14 @@ function cloudInit(){
 }
 
 /* ---------- formule ---------- */
-function awkM(){return 1+.08*p.awk}
+function el(k){return(p&&p.et&&p.et[k])|0}
+function awkD(){return(1+.03*p.awk)*(1+.05*el('d'))}
+function awkH(){return(1+.03*p.awk)*(1+.05*el('h'))}
 var LVP=[1,20,35,50,75,100,150],RMD=[1,1,1.26,1.74,2.76,4.3,6.5],RMH=[1,1,2.5,3.5,4.7,6.6,9];
 function ip(A){var l=p.lv;for(var i=1;i<LVP.length;i++)if(l<=LVP[i])return A[i-1]+(A[i]-A[i-1])*(l-LVP[i-1])/(LVP[i]-LVP[i-1]);return A[A.length-1]}
-function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*ip(RMH)*awkM()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.3:(p.spec==='sin'?1.2:1)))+gI().hp}
+function maxHp(){return Math.round((60+p.st.vit*12+p.lv*8)*ip(RMH)*awkH()*(1+(tn('c')>=2?.06:0))*(p.spec==='tank'?1.3:(p.spec==='sin'?1.2:1)))+gI().hp}
 function maxMp(){return Math.round((20+p.st.int*6)*(p.spec==='mago'?1.25:1)+gI().mp)}
-function pw(v){return Math.round((4+v*2)*(1+.022*p.lv)*ip(RMD)*awkM()*(1+(tn('c')>=3?.06:0)))}
+function pw(v){return Math.round((4+v*2)*(1+.022*p.lv)*ip(RMD)*awkD()*(1+(tn('c')>=3?.06:0)))}
 function atk(){return Math.round(pw(p.st.str)*(p.spec==='tank'?1.55:(p.spec==='sin'?1.15:1))+gI().dm)}
 function matk(){return Math.round(pw(p.st.int)*(p.spec==='mago'?1.04:1)+gI().dm)}
 function crit(){return Math.min(.7,.05+p.st.agi*.012+(p.spec==='sin'?.15:0)+(tn('c')>=1?.04:0)+gI().cr)}
@@ -734,7 +742,7 @@ var NODES={
 var tsel=null,respecArm=false;
 function tn(k){return(p&&p.tree&&p.tree[k])|0}
 function fq(n){return String(Math.round(n*100)/100).replace('.',',')}
-function addFrag(n){p.frag=Math.round((p.frag+n)*100)/100}
+function addFrag(n){if(n>0)n*=1+.08*el('f');p.frag=Math.round((p.frag+n)*100)/100}
 function respecCost(){return Math.round(80*p.lv*(tn('f')>=4?.6:1))}
 function specCost(){return Math.round(8*(tn('f')>=4?.6:1))}
 var AFF={ward:{n:'Barriera arcana',d:'magia −25%, fisico +15%',p:1.15,m:.75},plate:{n:'Corazza pesante',d:'fisico −25%, magia +15%',p:.75,m:1.15}};
@@ -879,18 +887,89 @@ function addTrait(s){
   if(pool.length)s.tr.push(pool[Math.floor(Math.random()*pool.length)]);
 }
 
+/* ---------- Risveglio, Essenza, Isola ---------- */
+var ET=[
+ {k:'x',n:'Fame di esperienza',d:'+10% EXP per livello',b:6,g:1.17,m:25},
+ {k:'d',n:'Furia del Monarca',d:'+5% danno per livello',b:6,g:1.17,m:25},
+ {k:'h',n:'Corpo d’ombra',d:'+5% HP per livello',b:5,g:1.16,m:25},
+ {k:'g',n:'Avidità',d:'+8% oro per livello',b:5,g:1.16,m:25},
+ {k:'s',n:'Memoria del Monarca',d:'Dopo il Risveglio parti da 2 livelli in più',b:10,g:1.26,m:15},
+ {k:'e',n:'Eco dell’Essenza',d:'+4% Essenza ai Risvegli',b:14,g:1.3,m:15},
+ {k:'f',n:'Polvere d’ombra',d:'+8% frammenti d’ombra',b:6,g:1.2,m:12},
+ {k:'a',n:'Richiamo',d:'+1% probabilità ARISE',b:8,g:1.25,m:10}];
+function etCost(n){return Math.round(n.b*Math.pow(n.g,el(n.k)))}
+var ISLN=['Cunicoli di Jeju','Radura delle Operaie','Foresta dei Soldati','Alveare Settentrionale','Nido dei Cavalieri','Palude Acida','Fosse delle Larve','Bastione della Regina','Camera della Regina','Trono di Beru'];
+var ISLC=['Guardiano dei cunicoli','Caporale delle operaie','Sergente Mandibola','Capitano d’alveare','Cavaliere Chitina','Strega della palude','Custode delle larve','Generale Acido','Regina delle Formiche'];
+var ISLT=36;
+function islL(){return clamp(100+Math.round(p.isl*1.3),100,150)}
+function islM(){return 1.05*(1+.03*Math.min(p.isl,ISLT))*(p.isl>=ISLT?1.15:1)}
+function essGain(){var sec=Math.floor(Math.min(p.isl,ISLT)/4);return Math.round((5+Math.floor(p.lv/10)+4*sec+(p.ib?5:0)+(p.sc?5:0))*(1+.04*el('e')))}
+function islName(){
+  var e=c.e,sec=Math.floor(p.isl/4);e.g=5;
+  if(e.boss){
+    if(p.isl>=ISLT){e.name='Beru, Re delle Formiche';e.hp=e.max=Math.round(e.hp*1.35);e.atk=Math.round(e.atk*1.2)}
+    else e.name=ISLC[sec]+' '+['I','II','III','IV'][p.isl%4];
+  }else e.name=['Formica soldato','Formica corazzata','Formica velenosa','Formica sciamante'][Math.floor(Math.random()*4)];
+}
+function enterIsland(){
+  if(c||!(p.awk>=1&&p.sc&&!p.ib&&p.isl<=ISLT))return;
+  p.hp=maxHp();p.mp=maxMp();healAll();
+  c=newRun({g:5,isl:true,rooms:2,tier:1,low:false,old:false,aff:'',thrN:0,thrM:islM(),rwT:1.2});
+  c.snap=JSON.stringify(Object.assign({},p,{run:null}));
+  log('Isola di Jeju: '+ISLN[Math.min(9,Math.floor(p.isl/4))]+'.','sys');
+  startRoom();
+}
+function addBeru(){
+  var sh={id:++p.sid,name:'Beru',boss:true,el:false,g:0,u:'beru',cls:'assassino',r:2,tr:['furia'],lv:1,v:1.1,eq:{w:null,a:null},hp:0,a:false};
+  recalc(sh);addTrait(sh);sh.hp=sMax(sh);sh.a=team().length<cap()&&canField(sh);p.shadows.push(sh);
+}
+function islandWin(){
+  p.ib=true;pushHist('Isola');c.phase='cleared';
+  if(p.isl>=ISLT){p.isl=ISLT+1;p.beru=true;if(!p.shadows.some(function(x){return x.u==='beru'}))addBeru();toast('Beru è sconfitto e si inginocchia: ora è la tua ombra.','up')}
+  else{p.isl++;toast('Settore avanzato: '+p.isl+'/'+ISLT,'up')}
+  save();render();
+}
+function doAwake(){
+  var gain=essGain(),o=p,n=migrate(fresh());
+  ['story','stv','stb','stm','cnt','hist','tower','tcp','tw','noArise','sx','et','isl','beru','sid','trv','shv','wv','qv','tv'].forEach(function(k){n[k]=o[k]});
+  n.awk=o.awk+1;n.ess=o.ess+gain;n.essT=o.essT+gain;n.qr=genQr();
+  p=n;p.lv=1+2*el('s');p.pts=2*(p.lv-1);p.gold=30+40*(p.lv-1);
+  if(p.beru)addBeru();
+  fixTeam();p.hp=maxHp();p.mp=maxMp();tab='stato';
+  toast('Risveglio! +'+gain+' Essenza del Monarca.','up');
+}
+function vEss(){
+  var h='<div class="panel"><div class="lbl"><span>Albero dell’Essenza</span><em>Essenza: '+fmt(p.ess)+'</em></div><p class="sm" style="margin:0">L’Essenza resta per sempre, anche dopo i Risvegli. Più ne spendi, più i prossimi Risvegli diventano rapidi.</p></div>';
+  ET.forEach(function(n){
+    var L=el(n.k),max=L>=n.m,cost=etCost(n);
+    h+='<div class="panel"><div class="row"><div class="grow"><div class="rn">'+n.n+' <span class="tag">Liv. '+L+'/'+n.m+'</span></div><div class="sm">'+n.d+'</div></div><button class="btn '+(max?'':'pri')+' sm2" data-a="etbuy" data-v="'+n.k+'" '+((max||p.ess<cost)?'disabled':'')+'>'+(max?'Max':fmt(cost)+' Es.')+'</button></div></div>';
+  });
+  return h;
+}
+function vIsola(){
+  if(!(p.sc||p.awk))return '';
+  var h='<div class="panel"><div class="lbl"><span>Isola delle Formiche</span><em>'+(p.isl>ISLT?'Liberata':Math.min(p.isl,ISLT)+' / '+ISLT)+'</em></div>';
+  if(!p.awk)return h+'<p class="sm" style="margin:0">Compi il primo Risveglio per aprire la rotta verso Jeju.</p></div>';
+  var beru=p.isl===ISLT,sec=ISLN[Math.min(9,Math.floor(p.isl/4))];
+  if(p.isl>ISLT)return h+'<p class="sm" style="margin:0">Beru è tuo. Jeju è liberata: un nuovo orizzonte arriverà presto.</p></div>';
+  h+='<p class="sm" style="margin:0 0 4px">Settore: <b>'+sec+'</b>. '+(beru?'Il Re delle Formiche ti aspetta.':'Sconfiggi il capitano del settore: ogni Risveglio puoi avanzare di un passo.')+'</p>'+bar(Math.min(p.isl,ISLT),ISLT,'xp')+
+   '<button class="btn '+(p.sc&&!p.ib?'pri':'')+' full" style="margin-top:6px" data-a="isle" '+((p.sc&&!p.ib)?'':'disabled')+'>'+(p.ib?'Settore già affrontato: Risvegliati':(p.sc?(beru?'Sfida Beru':'Affronta il capitano'):'Prima completa un Gate S'))+'</button></div>';
+  return h;
+}
+
 /* ---------- quest giornaliera e settimanale ---------- */
 function today(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function weekKey(){var d=new Date(),t=new Date(d.getFullYear(),d.getMonth(),d.getDate()),dow=(t.getDay()+6)%7;t.setDate(t.getDate()-dow);return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()}
-function newQuest(){var r=rIdx();return{date:today(),claimed:false,t:[
- {k:'kills',n:'Sconfiggi nemici',g:8+r*2,v:0},
- {k:'gates',n:'Completa un Gate',g:1,v:0},
- {k:'skills',n:'Usa abilità in combattimento',g:5,v:0}]}}
-function newWeekly(){var r=rIdx();return{wk:weekKey(),claimed:false,t:[
- {k:'kills',n:'Sconfiggi nemici',g:100+25*r,v:0},
- {k:'gates',n:'Completa Gate',g:12+2*r,v:0},
- {k:'bosses',n:'Sconfiggi boss',g:8+r,v:0},
- {k:'elite',n:'Sconfiggi élite',g:6+r,v:0}]}}
+var DP=[['kills','Sconfiggi nemici',8,2],['gates','Completa un Gate',1,.4],['skills','Usa abilità in combattimento',5,1],['bosses','Sconfiggi boss',1,.4],['elite','Sconfiggi élite',2,.6],['arise','Estrai ombre con ARISE',1,.4],['ants','Elimina formiche a Jeju',6,1,1]];
+var WP=[['kills','Sconfiggi nemici',70,18],['gates','Completa Gate',8,1.5],['skills','Usa abilità in combattimento',40,6],['bosses','Sconfiggi boss',6,1],['elite','Sconfiggi élite',5,1],['arise','Estrai ombre con ARISE',6,1],['ants','Elimina formiche a Jeju',30,5,1],['isl','Sconfiggi il capitano del settore',1,0,1]];
+function pickQ(pool,n,r,mn,mx){
+  var l=pool.filter(function(d){return !d[4]||p.awk>=1}),out=[];
+  while(out.length<n&&l.length){var d=l.splice(Math.floor(Math.random()*l.length),1)[0],f=d[0]==='isl'?1:(mn+Math.random()*(mx-mn));
+    var nm=d[1];if(d[0]==='gates'&&p.awk>=1&&Math.random()<.5)nm='Difendi la terraferma: completa Gate';
+    out.push({k:d[0],n:nm,g:Math.max(1,Math.round((d[2]+d[3]*r)*f)),v:0})}
+  return out}
+function newQuest(){return{date:today(),claimed:false,t:pickQ(DP,3,rIdx(),.8,1.4)}}
+function newWeekly(){return{wk:weekKey(),claimed:false,t:pickQ(WP,4,rIdx(),.85,1.3)}}
 function questDone(){return p.quest.t.every(function(x){return x.v>=x.g})}
 function weeklyDone(){return p.weekly.t.every(function(x){return x.v>=x.g})}
 function questReward(){return{pts:1,gold:25+10*p.lv,exp:Math.round(need()*.25)}}
@@ -924,7 +1003,8 @@ function weekly(k,n){var t=p.weekly&&p.weekly.t.filter(function(x){return x.k===
 /* ---------- quest dei Gate e storia ---------- */
 function qReward(d){
   var L=REPL[d.g];
-  return{gold:d.w*Math.round(14+4*L),exp:d.w*Math.round(needAt(L)*.07),pts:[0,0,1,2][d.w-1]};
+  var f=Math.pow((p.qr&&p.qr[d.id]&&p.qr[d.id].f)||1,.8);
+  return{gold:Math.round(d.w*Math.round(14+4*L)*f),exp:Math.round(d.w*Math.round(needAt(L)*.07)*f),pts:[0,0,1,2][d.w-1]};
 }
 function qActive(){var n=0;QD.forEach(function(d){var s=p.gq[d.id];if(s&&s.s===1)n++});return n}
 function qev(key,n){
@@ -932,8 +1012,8 @@ function qev(key,n){
   QD.forEach(function(d){
     if(d.g!==c.g||d.k!==key)return;
     var st=p.gq[d.id];if(!st||st.s!==1)return;
-    st.v=Math.min(d.n,st.v+n);
-    if(st.v>=d.n){st.s=2;toast('Quest completata: '+d.t,'up')}
+    st.v=Math.min(qn(d),st.v+n);
+    if(st.v>=qn(d)){st.s=2;toast('Quest completata: '+d.t,'up')}
   });
 }
 function stVal(i){var s=STORY[i],v=s.f();if(s.rel)v-=(p.stb|0);return Math.max(0,Math.min(s.n,v))}
@@ -942,7 +1022,7 @@ function stReward(i){var s=STORY[i];return{exp:Math.round(needAt(s.ref)*.3),gold
 function toast(m,k){var t=$('#toast');t.textContent=m;t.className='show '+(k||'');clearTimeout(tt);tt=setTimeout(function(){t.className=''},2800)}
 
 function gainExp(n){
-  n=Math.round(n*(1+.15*p.awk));
+  n=Math.round(n*(1+.03*p.awk)*(1+.10*el('x')));
   var r0=rIdx(),up=0;p.exp+=n;
   while(p.exp>=need()){p.exp-=need();p.lv++;p.pts+=2;up++}
   if(up){
@@ -998,7 +1078,9 @@ function startRoom(){
     o={g:c.g,room:c.room,boss:boss,elite:el};
   }
   c.forceElite=false;
+  if(c.isl)o.L=islL();
   c.e=mkEnemy(o);
+  if(c.isl)islName();
   c.e.exp=Math.round(c.e.exp*c.rwX);c.e.gold=Math.round(c.e.gold*c.rwX);c.rwX=1;
   c.altarOn=c.altar;c.altar=false;
   c.phase='fight';c.def=false;c.flash='';
@@ -1280,7 +1362,7 @@ function win(){
   
   if(rep)fr=0;
   if(fr){if(tn('f')>=3)fr*=1.15;addFrag(fr);c.fragGot+=fr;log('+'+fq(fr)+' frammenti d’ombra','good')}
-  var eg=Math.round(e.gold*(1+(tn('r')>=1?.05:0)+(tn('f')>=1?.1:0))),ex=Math.round(e.exp*(1+(tn('r')>=1?.05:0)+(tn('f')>=2?.1:0)));
+  var eg=Math.round(e.gold*(1+(tn('r')>=1?.05:0)+(tn('f')>=1?.1:0))*(1+.08*el('g'))),ex=Math.round(e.exp*(1+(tn('r')>=1?.05:0)+(tn('f')>=2?.1:0)));
   if(c.tower&&e.boss){ex*=2;eg*=2}
   if(rep){ex=0;log('Piano già superato: solo oro.','sys')}
   if(c.old&&!c.tower){ex=0;eg=Math.round(eg*.4)}
@@ -1293,6 +1375,7 @@ function win(){
     if(e.boss&&c.floor%(tn('f')>=6?5:10)===0&&c.floor>p.tcp){p.tcp=c.floor;toast('Checkpoint: piano '+(c.floor+1),'up')}
     c.busy=false;c.flash='';nextRoom();return;
   }
+  if(c.isl){quest('ants',1);weekly('ants',1);if(e.boss)weekly('isl',1);if(e.boss){c.busy=false;c.flash='';nextRoom();return}}
   if(p.noArise){c.busy=false;c.flash='';nextRoom();return}
   c.phase='arise';c.busy=false;c.flash='';save();render();
 }
@@ -1308,7 +1391,7 @@ function lose(){
   else{c.lost=Math.floor(p.gold*.15);p.gold-=c.lost}
   c.phase='lost';healAll();save();render();
 }
-function ariseChance(e){return Math.min(.6,(c&&c.oracle?.05:0)+(e.boss?.08+p.st.int*.005:e.el?.15+p.st.int*.006:.22+p.st.int*.008)+(tn('o')>=4&&!e.boss?.06:0)+(p.spec==='necro'?.1:0))}
+function ariseChance(e){return Math.min(.6,(c&&c.oracle?.05:0)+(e.boss?.08+p.st.int*.005:e.el?.15+p.st.int*.006:.22+p.st.int*.008)+(tn('o')>=4&&!e.boss?.06:0)+(p.spec==='necro'?.1:0)+.01*el('a'))}
 function rollRarity(e){
   var x=Math.random();
   if(e.boss)return x<.3?2:1;
@@ -1330,7 +1413,7 @@ function doArise(){
     if(e.boss){var ft=BTR[e.g];if(ft==='devoto'&&e.cls!=='guaritore')ft='furia';sh.tr.push(ft);for(var i=0;i<r-1;i++)addTrait(sh)}
     else for(var j=0;j<r;j++)addTrait(sh);
     sh.hp=sMax(sh);
-    p.cnt.arise++;qev('arise',1);if(e.boss)qev('aboss',1);
+    p.cnt.arise++;quest('arise',1);weekly('arise',1);qev('arise',1);if(e.boss)qev('aboss',1);
     if(p.shadows.length<maxTotal()){
       sh.a=team().length<cap()&&canField(sh);p.shadows.push(sh);c.ok=true;c.msg=sh.name+' ('+RARITY[r].n+') '+(sh.a?'si unisce alla tua squadra come ':'va in panchina come ')+CL[sh.cls].n+'.';c.got.push(sh.name);c.phase='ariseRes';
     }else{c.pend=sh;c.phase='replace'}
@@ -1407,6 +1490,7 @@ function chooseDoor(k){
   startRoom();save();render();
 }
 function nextRoom(){
+  if(c.isl&&c.e.boss){islandWin();return}
   if(c.e.boss&&!c.tower){
     p.gates++;p.cnt.gate++;(p.gtc[c.g]=p.gtc[c.g]||[0,0,0])[c.tier|0]++;quest('gates',1);weekly('gates',1);qev('gate',1);rollLoot();
     if(!c.pot)qev('clean',1);
@@ -1419,6 +1503,7 @@ function nextRoom(){
     if(CLK.every(function(k){return team().some(function(s){return s.hp>0&&s.cls===k})}))qev('squad',1);
     var b=Math.round((14+5*eLevel(c.g))*((modOf()&&modOf().gm)||1)*(c.rwT||1)*(c.old?.4:1));p.gold+=b;c.gg+=b;
         p.mods[c.g]=rollMod();p.af=p.af||{};p.af[c.g]=Math.random()<.5?'ward':'plate';
+    if(c.g===5)p.sc=true;
     pushHist('Completato');c.phase='cleared';
     toast('Gate completato!','up');save();render();return;
   }
@@ -1461,11 +1546,12 @@ function vStato(){
     });
     h+='</div>';
   }
-  if(p.lv>=100){
-    h+='<div class="panel"><div class="lbl"><span>Risveglio</span><em>Risvegli: '+p.awk+'</em></div><p class="sm" style="margin:0 0 6px">Torni al livello 1 mantenendo ombre, oggetti, oro, arma e specializzazione. Ogni Risveglio: +8% HP e attacco, +15% EXP per sempre.</p>'+
-     '<button class="btn '+(awkArm?'dng':'gld')+' full" data-a="awake">'+(awkArm?'Conferma il Risveglio':'Risvegliati')+'</button>'+(awkArm?'<button class="btn full" style="margin-top:6px" data-a="awakeno">Annulla</button>':'')+'</div>';
-  }else if(p.awk){
-    h+='<div class="panel"><p class="sm" style="margin:0">Risvegli: '+p.awk+' · HP e attacco +'+(8*p.awk)+'%, EXP +'+(15*p.awk)+'%.</p></div>';
+  if(p.sc||p.awk){
+    h+='<div class="panel"><div class="lbl"><span>Risveglio</span><em>Risvegli: '+p.awk+' · Essenza: '+fmt(p.ess)+'</em></div>';
+    if(p.sc)h+='<p class="sm" style="margin:0 0 6px">Torni al livello '+(1+2*el('s'))+': ombre, oggetti, oro e Gate si azzerano. Restano Essenza, albero, Isola e Beru. Guadagni <b>'+essGain()+' Essenza</b> (livello, settore dell’isola, Gate S'+(p.ib?', capitano sconfitto':'')+').</p>'+
+     '<button class="btn '+(awkArm?'dng':'gld')+' full" data-a="awake">'+(awkArm?'Conferma il Risveglio':'Risvegliati')+'</button>'+(awkArm?'<button class="btn full" style="margin-top:6px" data-a="awakeno">Annulla</button>':'');
+    else h+='<p class="sm" style="margin:0">Completa un Gate di grado S per poterti risvegliare.</p>';
+    h+='</div>';
   }
   h+='<div class="panel"><div class="lbl"><span>Backup salvataggio</span></div><div class="btns" style="margin-top:0"><button class="btn sm2" data-a="exp">Esporta</button><button class="btn sm2" data-a="imp">Importa</button></div>'+(saveBox!==null?'<textarea id="savebox" rows="4" style="width:100%;margin-top:8px;background:#0a0f22;color:var(--fg);border:1px solid var(--line);border-radius:3px;padding:6px;font-size:11px" placeholder="Incolla qui il salvataggio da importare">'+saveBox+'</textarea>'+(saveBox===''?'<button class="btn pri full sm2" style="margin-top:6px" data-a="impgo">Carica questo salvataggio</button>':'<p class="sm">Salvataggio copiato. Incollalo nell\u2019altro dispositivo con Importa.</p>')+'':'')+'</div>';
   h+='<button class="btn dng full sm2" data-a="reset">'+(resetArm?'Conferma: cancella tutti i progressi':'Ricomincia da zero')+'</button>'+(resetArm?'<button class="btn full sm2" style="margin-top:6px" data-a="resetno">Annulla</button>':'');
@@ -1489,6 +1575,7 @@ function vStat(){
 function vGate(){
   var r=rIdx(),h='';
   h+='<div class="panel" style="display:flex;align-items:center;gap:10px"><div class="grow"><div class="rn">ARISE dopo i nemici</div><div class="sm" style="margin:0">'+(p.noArise?'Disattivato: nessuna estrazione, si va avanti da soli.':'Attivo: dopo ogni nemico puoi estrarre un\u2019ombra.')+'</div></div><button class="btn sm2 '+(p.noArise?'':'pri')+'" data-a="noarise">'+(p.noArise?'Attiva':'Disattiva')+'</button></div>';
+  h+=vIsola();
   if(p.lv>=10){
     h+='<div class="panel tower"><div class="lbl"><span>La Torre</span><em>Record: piano '+p.tower+'</em></div><p class="sm">Niente ARISE. Un boss ogni 5 piani, con EXP e oro doppi e molti frammenti, ma solo la prima volta che superi un piano: i piani già superati danno solo oro e un checkpoint ogni '+(tn('f')>=6?5:10)+'. Ogni fascia di 10 piani ha regole diverse: scopri quale squadra funziona meglio. Gli HP non si ripristinano tra i piani. Se cadi tieni ciò che hai guadagnato.</p><div class="btns"><button class="btn pri" data-a="tower" data-v="1">Dal piano 1</button>'+(p.tcp>0?'<button class="btn gld" data-a="tower" data-v="'+(p.tcp+1)+'">Dal piano '+(p.tcp+1)+'<small>checkpoint</small></button>':'')+'</div></div>';
   }else h+='<div class="panel"><div class="lbl"><span>La Torre</span></div><p class="sm">Si sblocca al livello 10.</p></div>';
@@ -1605,7 +1692,7 @@ function vQuest(){
   h+='<button class="btn gld full" style="margin-top:6px" data-a="wclaim" '+((wd&&!p.weekly.claimed)?'':'disabled')+'>'+(p.weekly.claimed?'Ricompensa ritirata':(wd?'Ritira ricompensa':'Quest in corso'))+'</button></div>';
   }else{
 
-  var list=QD.filter(function(x){return x.g===qRank});
+  var list=QD.filter(function(x){return x.g===qRank&&qvis(x)});
   var nd=list.filter(function(x){var q=p.gq[x.id];return q&&q.s===3}).length;
   var ord=function(x){var q=p.gq[x.id];return q?(q.s===2?0:q.s===1?1:3):2};
   list=list.map(function(x,i){return{x:x,i:i}}).sort(function(a,b){return ord(a.x)-ord(b.x)||a.i-b.i}).map(function(o){return o.x});
@@ -1621,7 +1708,7 @@ function vQuest(){
     var rs=fmt(rw.gold)+' oro · '+fmt(rw.exp)+' EXP'+(rw.pts?' · '+rw.pts+(rw.pts>1?' punti':' punto'):'');
     var btn=!st?'<button class="btn pri sm2" data-a="qact" data-v="'+x.id+'" '+(qActive()>=3?'disabled':'')+'>Attiva</button>':
       (st.s===1?'<button class="btn dng sm2" data-a="qcancel" data-v="'+x.id+'">'+(qConfirm===x.id?'Conferma':'Annulla')+'</button>':'<button class="btn gld sm2" data-a="qclaim" data-v="'+x.id+'">Ritira</button>');
-    h+='<div class="qc"><div class="qi"><div class="t'+(st&&st.s===2?' ok':'')+'"><span>'+x.t+'</span><span>'+(st?v+'/'+x.n:'')+'</span></div><div class="d">'+(qConfirm===x.id?'Annullando perdi i progressi: dovrai rifare la quest da capo.':x.x)+'</div>'+(st?bar(v,x.n,st.s===2?'mp':'xp'):'')+'<div class="rw">'+rs+'</div></div>'+btn+'</div>';
+    h+='<div class="qc"><div class="qi"><div class="t'+(st&&st.s===2?' ok':'')+'"><span>'+x.t+'</span><span>'+(st?v+'/'+qn(x):'')+'</span></div><div class="d">'+(qConfirm===x.id?'Annullando perdi i progressi: dovrai rifare la quest da capo.':qtx(x))+'</div>'+(st?bar(v,qn(x),st.s===2?'mp':'xp'):'')+'<div class="rw">'+rs+'</div></div>'+btn+'</div>';
   });
   h+='</div>';
   }
@@ -1716,7 +1803,7 @@ function vCombat(){
     if(c.tower)B+='<div class="leaverow">'+(leaveArm?'<span>Scendere dalla Torre?</span><button class="mini dng" data-a="leave">S\u00ec, scendi</button><button class="mini" data-a="leavecancel">No</button>':'<button class="mini" data-a="leavearm">Scendi dalla Torre\u2026</button>')+'</div>';
     B+='</div>';
   }else if(c.phase==='cleared'){
-    B+='<div class="panel"><div class="lbl"><span>Gate completato</span></div><div class="sum"><span>EXP ottenuta</span><span>'+fmt(c.gx)+'</span><span>Oro ottenuto</span><span>'+fmt(c.gg)+'</span><span>Ombre estratte</span><span>'+c.got.length+'</span><span>Frammenti</span><span>'+c.fragGot+'</span></div>'+
+    B+='<div class="panel"><div class="lbl"><span>'+(c.isl?'Settore superato':'Gate completato')+'</span></div><div class="sum"><span>EXP ottenuta</span><span>'+fmt(c.gx)+'</span><span>Oro ottenuto</span><span>'+fmt(c.gg)+'</span><span>Ombre estratte</span><span>'+c.got.length+'</span><span>Frammenti</span><span>'+c.fragGot+'</span></div>'+
      '<div class="lbl"><span>Bottino</span></div><div class="loot">'+(c.loot&&c.loot.length?c.loot.map(function(o){return '<div'+(o.rare?' class="rare"':'')+'>'+o.t+'</div>'}).join(''):'<div style="color:var(--muted)">Nessun oggetto questa volta.</div>')+'</div><button class="btn pri full" data-a="leave">Torna al rifugio</button></div>';
   }else if(c.phase==='lost'){
     B+='<div class="panel"><div class="lbl"><span>Sconfitta</span></div><p class="sm" style="font-size:14px">'+(c.tower?'Sei caduto al piano '+c.floor+'. Tieni tutto ciò che hai guadagnato.':'Sei caduto nel Gate'+(c.rest?': tutto torna com’era prima di entrare (EXP, oro, ombre e oggetti).':'. Perdi '+fmt(c.lost)+' oro, l’EXP guadagnata resta tua.'))+'</p><button class="btn full" data-a="leave">Torna al rifugio</button></div>';
@@ -1725,7 +1812,7 @@ function vCombat(){
   return h;
 }
 
-var TABS=[['stato','Stato'],['gate','Gate'],['ombre','Ombre'],['albero','Albero'],['quest','Quest'],['shop','Negozio'],['stat','Stat.']];
+var TABS=[['stato','Stato'],['gate','Gate'],['ombre','Ombre'],['albero','Albero'],['ess','Essenza'],['quest','Quest'],['shop','Negozio'],['stat','Stat.']];
 function render(){
   checkQuest();
   document.body.classList.add('cp');document.body.classList.toggle('tomb',false);
@@ -1746,9 +1833,9 @@ function render(){
   }
   ab.hidden=true;document.body.style.paddingBottom='';root.style.removeProperty('--bar-h');
   nav.hidden=false;
-  v.innerHTML=({stato:vStato,gate:vGate,ombre:vOmbre,albero:vAlbero,quest:vQuest,shop:vShop,stat:vStat})[tab]();
-  nav.innerHTML=TABS.map(function(t){
-    var dot=(t[0]==='albero'&&treeBuy())||(t[0]==='stato'&&(p.pts>0||(p.lv>=20&&!p.spec)))||(t[0]==='quest'&&((questDone()&&!p.quest.claimed)||(weeklyDone()&&!p.weekly.claimed)||(p.story<STORY.length&&stVal(p.story)>=STORY[p.story].n)||QD.some(function(d){var s=p.gq[d.id];return s&&s.s===2})));
+  v.innerHTML=({stato:vStato,gate:vGate,ombre:vOmbre,albero:vAlbero,quest:vQuest,ess:vEss,shop:vShop,stat:vStat})[tab]();
+  nav.innerHTML=TABS.filter(function(t){return t[0]!=='ess'||p.awk||p.sc}).map(function(t){
+    var dot=(t[0]==='albero'&&treeBuy())||(t[0]==='ess'&&ET.some(function(n){return el(n.k)<n.m&&p.ess>=etCost(n)}))||(t[0]==='stato'&&(p.pts>0||(p.lv>=20&&!p.spec)))||(t[0]==='quest'&&((questDone()&&!p.quest.claimed)||(weeklyDone()&&!p.weekly.claimed)||(p.story<STORY.length&&stVal(p.story)>=STORY[p.story].n)||QD.some(function(d){var s=p.gq[d.id];return s&&s.s===2})));
     return '<button data-a="tab" data-v="'+t[0]+'" class="'+(tab===t[0]?'on':'')+(dot?' dot':'')+'">'+t[1]+'</button>';
   }).join('');
   if(pendingMsg){var m=pendingMsg;pendingMsg=null;toast(m,'bad')}
@@ -1766,10 +1853,14 @@ function act(a,v){
       if(p.lv>=20&&SPEC[v]&&p.spec!==v){var scc=p.spec?specCost():0;if(p.frag<scc)break;if(specArm===v){addFrag(-scc);p.spec=v;specArm=null;p.hp=Math.min(p.hp,maxHp());toast('Specializzazione: '+SPEC[v].n,'up')}else specArm=v}
       break;
     case 'awake':
-      if(p.lv<100)break;
+      if(!p.sc)break;
       if(!awkArm){awkArm=true;break}
-      p.awk++;p.thr={};p.lv=1;p.exp=0;p.pts=0;p.st={str:5,agi:5,int:5,vit:5};fixTeam();awkArm=false;p.hp=maxHp();p.mp=maxMp();
-      toast('Risveglio completato! Bonus permanenti attivi.','up');break;
+      awkArm=false;doAwake();break;
+    case 'etbuy':
+      var en=ET.filter(function(x){return x.k===v})[0];
+      if(en&&el(v)<en.m&&p.ess>=etCost(en)){p.ess-=etCost(en);p.et[v]=el(v)+1}
+      break;
+    case 'isle':enterIsland();break;
     case 'awakeno':awkArm=false;break;
     case 'enter':enterGate(+v);break;
     case 'tower':enterTower(v);break;
