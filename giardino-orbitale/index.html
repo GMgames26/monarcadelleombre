@@ -124,7 +124,7 @@ function fmtT(sec){sec=Math.max(0,Math.floor(sec));var d=Math.floor(sec/86400),h
 
 
 /* ================= DATI ================= */
-var CFG={G:1.5,R:2.2,C0:12,tool:[40,5.5,1.55],soil:[120,6,1.55],light:[400,6.5,1.55],poll:[800,7,.3],mod:[250,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[5000,3.2,1.15],Q:.5,SEASON:3e11};
+var CFG={G:1.5,R:2.2,C0:12,tool:[40,5.5,1.55],soil:[120,6,1.55],light:[400,6.5,1.55],poll:[800,7,.3],mod:[250,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[5000,3.2,1.15],Q:.5,rg:[10,1.25,150],SEASON:3e11};
 var KINDS={leaf:1,herb:1,root:1,stem:1,low:1,vine:1,flower:1,spike:1,mush:1,alga:1,pond:1,bush:1,tree:1,stalk:1,hive:1,fish:1,bonsai:1,carn:1,cactus:1,cocoon:1,alien:1,moss:1,crystal:1,coral:1};
 var PL=[
 ['Lattuga','leaf','#7fd36a','#4fa84a'],['Ravanello','root','#62b455','#e0476b'],['Spinaci','leaf','#2f8a46','#1f6a36'],['Basilico','herb','#3fb35a','#2e8a44'],['Prezzemolo','herb','#2f9a4a','#4fb86a'],
@@ -181,7 +181,7 @@ function calc(){CA.tap=tapVal(S.sel);CA.inc=autoInc();return CA}
 function addMoney(v){S.m=add(S.m,v);S.tot=add(S.tot,v);S.ok=add(S.ok,v);if(cmp(S.tot,S.best)>0)S.best=S.tot}
 function tickGain(dt){calc();if(CA.inc.m)addMoney(mul(CA.inc,dt))}
 function pay(c){if(cmp(S.m,c)<0)return false;S.m=mx(0,sub(S.m,c));return true}
-function reqGen(i){return Math.min(3+Math.floor(i/4),15)}
+function reqGen(i){return Math.min(CFG.rg[0]+Math.floor(i*CFG.rg[1]),CFG.rg[2])}
 function reqUp(i){return Math.min(Math.floor(i*.45),40)}
 function upTot(){return S.tool+S.soil+S.light+S.poll}
 function plantOk(){var i=S.np;return i<PL.length&&gl(i-1)>=reqGen(i)&&upTot()>=reqUp(i)&&cmp(S.m,PLV[i].c)>=0}
