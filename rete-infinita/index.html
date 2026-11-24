@@ -461,19 +461,34 @@ function renderAlt(){
   h+='<button class="btn" style="width:100%;color:var(--rd)" data-a="reset">Cancella tutto e ricomincia</button>';
   return h;
 }
-var lastKey='';
+function syncAttrs(x,y){
+  var i,at;
+  for(i=0;i<y.attributes.length;i++){at=y.attributes[i];if(x.getAttribute(at.name)!==at.value)x.setAttribute(at.name,at.value)}
+  for(i=x.attributes.length-1;i>=0;i--){at=x.attributes[i];if(!y.hasAttribute(at.name))x.removeAttribute(at.name)}
+}
+function morph(a,b){
+  while(a.childNodes.length>b.childNodes.length)a.removeChild(a.lastChild);
+  for(var i=0;i<b.childNodes.length;i++){
+    var x=a.childNodes[i],y=b.childNodes[i];
+    if(!x){a.appendChild(y.cloneNode(true));continue}
+    if(x.nodeType!==y.nodeType||x.nodeName!==y.nodeName){a.replaceChild(y.cloneNode(true),x);continue}
+    if(x.nodeType===3){if(x.nodeValue!==y.nodeValue)x.nodeValue=y.nodeValue;continue}
+    if(x.nodeType!==1)continue;
+    syncAttrs(x,x.nodeName==='TEXTAREA'?x:y);
+    if(x.nodeName==='TEXTAREA')continue;
+    morph(x,y);
+  }
+}
+var lastTabShown=null;
 function render(force){
   renderTop();renderTabs();
   var m=$('main');
-  if(S.tab==='alt'||S.tab==='pre'){
-    // pagine con testo: aggiorna solo se cambiano, per non perdere lo scroll/selezione
-    var key=S.tab+'|'+fmt(S.cr)+fmt(S.tot,0).slice(0,4)+S.pres+Object.keys(S.shop).map(function(k){return k+S.shop[k]}).join()+(S.tab==='pre'?fmt(prGain()):'')+(S.tab==='alt'?Math.floor(S.played/10):'');
-    if(!force&&key===lastKey&&!dirty)return;
-    lastKey=key;
-  }else lastKey='';
-  var st=m.scrollTop;
   var h=S.tab==='gen'?renderGen():(S.tab==='res'?renderRes():(S.tab==='pre'?renderPre():renderAlt()));
-  if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h;m.scrollTop=st}
+  var t=document.createElement('div');t.innerHTML=h;
+  var st=m.scrollTop;
+  if(lastTabShown!==S.tab){m.innerHTML='';lastTabShown=S.tab}
+  morph(m,t);
+  m.scrollTop=st;
   dirty=false;
 }
 
@@ -482,7 +497,7 @@ document.addEventListener('click',function(ev){
   var b=ev.target.closest('[data-a]');if(!b)return;
   var a=b.dataset.a,v=b.dataset.v;
   if(a==='close'){closeModal();return}
-  if(a==='tab'){S.tab=v;dirty=true;$('main').scrollTop=0;render(true);return}
+  if(a==='tab'){S.tab=v;dirty=true;render(true);$('main').scrollTop=0;return}
   if(a==='click')return;
   if(a==='mode'){S.mode=v==='max'?'max':+v;render(true);return}
   if(a==='buy'){var k=buy(v,S.mode);render(true);return}
