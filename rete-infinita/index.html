@@ -483,7 +483,7 @@ document.addEventListener('click',function(ev){
   var a=b.dataset.a,v=b.dataset.v;
   if(a==='close'){closeModal();return}
   if(a==='tab'){S.tab=v;dirty=true;$('main').scrollTop=0;render(true);return}
-  if(a==='click'){var c=clickVal();S.e=add(S.e,c);S.tot=add(S.tot,c);S.ok=add(S.ok,c);chapterCheck();render(true);return}
+  if(a==='click')return;
   if(a==='mode'){S.mode=v==='max'?'max':+v;render(true);return}
   if(a==='buy'){var k=buy(v,S.mode);render(true);return}
   if(a==='res'){var r=RES.filter(function(x){return x.id===v})[0];if(!S.res[v]&&cmp(S.dati,r.c)>=0){S.dati=sub(S.dati,r.c);S.res[v]=true;calc();render(true)}return}
@@ -498,6 +498,14 @@ document.addEventListener('click',function(ev){
   if(a==='reset2'){S=fresh();save();closeModal();dirty=true;calc();render(true);return}
 });
 
+/* tocco veloce: ogni dito conta, senza ricostruire la pagina */
+document.addEventListener('pointerdown',function(ev){
+  var b=ev.target.closest('[data-a=click]');if(!b)return;
+  ev.preventDefault();
+  var c=clickVal();S.e=add(S.e,c);S.tot=add(S.tot,c);S.ok=add(S.ok,c);
+  if(chapterCheck()&&!S.seen[S.chap]){S.seen[S.chap]=1;showChapter(S.chap);dirty=true}
+  renderTop();
+},{passive:false});
 /* ================= CICLO ================= */
 var lastT=0,saveT=0,uiT=0;
 function loop(ts){
@@ -506,6 +514,7 @@ function loop(ts){
     var ch=tick(dt);
     if(ch&&!S.seen[S.chap]){S.seen[S.chap]=1;S.log.push('Capitolo '+(S.chap+1)+' sbloccato: '+CHAP[S.chap].n+'.');showChapter(S.chap);dirty=true}
     uiT+=dt;saveT+=dt;
+    renderTop();
     if(uiT>=.25){uiT=0;render(false)}
     if(saveT>=10){saveT=0;save()}
   }
