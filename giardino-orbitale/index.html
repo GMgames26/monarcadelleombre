@@ -179,7 +179,7 @@ function terMult(){return 1+CFG.tb*upL('ter')}
 function terName(){var l=upL('ter');return TERN[Math.min(l,TERN.length-1)]+(l>=TERN.length?' +'+(l-TERN.length+1):'')}
 function baseMult(){var m=mul(terMult(),1+modBonus());m=mul(m,semiMult());m=mul(m,Math.pow(1.5,shopL('rich')));return m}
 function plantMult(i){return mul(baseMult(),1+gl(i))}
-function tapVal(i){return floor(add(mul(PLV[i].v,plantMult(i)),.5))}
+function tapVal(i){return mul(PLV[i].v,plantMult(i))}
 function drRate(L){return .25*L}
 function autoInc(){var t=Z;for(var k in S.dr){var L=S.dr[k];if(L>0&&+k<S.np)t=add(t,mul(tapVal(+k),drRate(L)))}
  return mul(mul(t,Math.pow(CFG.hub[2],S.hub)),Math.pow(1.4,shopL('drn')))}
@@ -290,7 +290,7 @@ function frame(dt){T+=dt;bump=Math.max(0,bump-dt*6);parts.forEach(function(a){a.
 function burst(n,p,gold){for(var i=0;i<n;i++)parts.push({x:180+(Math.random()-.5)*40,y:135+(Math.random()-.5)*40,vx:(Math.random()-.5)*80,vy:-30-Math.random()*50,r:2+Math.random()*2,c:i%2?p[3]:p[2],t:0});if(parts.length>70)parts.splice(0,parts.length-70)}
 function hit(x,y){
  if(PR.lock>0)return;var p=PL[S.sel];S.hits++;bump=1;S.gr=Math.min(100,S.gr+power());burst(2,p);
- if(S.gr>=100-1e-9){calc();var v=floor(add(mul(CA.tap,chainMult()),.5)),gold=false,lk=shopL('luck');if(lk&&Math.random()<.03*lk){v=mul(v,8);gold=true}
+ if(S.gr>=100-1e-9){calc();var v=mul(CA.tap,chainMult()),gold=false,lk=shopL('luck');if(lk&&Math.random()<.03*lk){v=mul(v,8);gold=true}
   var dc=dblCh(),ex=Math.floor(dc)+(Math.random()<dc-Math.floor(dc)?1:0);if(ex){v=mul(v,1+ex)}S.chain++;chainIdle=0;
   addMoney(v);S.gr=100;PR.tot=PR.lock=pruneT();burst(gold?18:10,p,gold);floats.push({x:180,y:112,t:0,s:'+'+fmt(v)+(ex?' ×'+(1+ex):''),gold:gold||ex>0});if(floats.length>8)floats.shift()}
 }
