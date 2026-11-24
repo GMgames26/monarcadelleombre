@@ -171,7 +171,7 @@ var DECO=[
  ['heli','Elicottero',6e10,.12,'Le riprese dall’alto.'],
  ['stad','Stadio',5e11,.15,'Il tuo circolo diventa uno stadio.']
 ];
-var KEY='tiebreak-club-v1';
+var KEY='tiebreak-club-v1';var CFG={AP:1,SP:.8,Q:.6};
 var SEASON_AT=1e12;
 
 /* ================= STATO ================= */
@@ -186,15 +186,19 @@ function decoBonus(){var b=0;DECO.forEach(function(d){if(S.deco[d[0]])b+=d[3]});
 function techMult(){return Math.pow(1.12,S.tech)}
 function fitMult(){return Math.pow(1.1,S.fit)}
 function trophMult(){return 1+.2*S.troph}
-function hitValue(){return mul(mul(SHOTS[S.shot][2],RACK[S.rack][2]*BALL[S.ball][2]),(1+decoBonus())*techMult()*trophMult())}
-function msM(c){var x=toNum(c);if(x<10)return 1;var k=x<25?1:(x<50?2:3+Math.floor(Math.log2(x/50)));return Math.pow(2,k)}
-function autoRate(){var a=Z;SPAR.forEach(function(s){var c=sc(s.id);if(c.m)a=add(a,mul(mul(c,s.r),msM(c)))});return mul(a,fitMult())}
+function hitValue(){return mul(mul(SHOTS[S.shot][2],RACK[S.rack][2]+BALL[S.ball][2]-1),(1+decoBonus())*techMult()*trophMult())}
+function msM(c){var x=toNum(c);if(x<25)return 1;return Math.pow(2,1+Math.floor(Math.log2(x/25)))}
+function autoRate(){var a=Z;SPAR.forEach(function(s){var c=sc(s.id);if(c.m)a=add(a,mul(mul(c,s.r),msM(c)))});return mul(pw(mx(a,1e-9),CFG.AP),fitMult())}
 var CA={H:Z,A:Z,inc:Z,tap:Z};
-function calc(){var H=hitValue(),A=autoRate();CA.H=H;CA.A=A;CA.inc=mul(H,A);CA.tap=mul(H,1+.05*toNum(A)>1e15?1e15:1+.05*toNum(A));return CA}
+function calc(){var H=pw(mx(hitValue(),1e-9),CFG.Q),A=autoRate();CA.H=H;CA.A=A;CA.inc=mul(H,pw(mx(A,1e-9),CFG.Q));if(!A.m)CA.inc=Z;CA.tap=mul(H,Math.min(1e15,1+.05*toNum(A)));return CA}
+function Qp(x){return Math.pow(x,CFG.Q)}
+function pc(x){return '+'+Math.round((Qp(x)-1)*100)+'%'}
+function hv(i){return pw(mx(mul(mul(SHOTS[i][2],RACK[S.rack][2]+BALL[S.ball][2]-1),(1+decoBonus())*techMult()*trophMult()),1e-9),CFG.Q)}
 function techCost(){return mul(200,pw(1.6,S.tech))}
 function fitCost(){return mul(500,pw(1.7,S.fit))}
-function sCost(s,k){var own=sc(s.id),b=mul(s.c,pw(1.15,toNum(own)));return mul(b,div(sub(pw(1.15,k),1),.15))}
-function sMax(s){var own=sc(s.id),b=mul(s.c,pw(1.15,toNum(own)));var x=div(mul(S.m,.15),b);if(cmp(x,1e-12)<0)return 0;return Math.max(0,Math.floor(Math.log10(1+toNum(x))/Math.log10(1.15)+1e-9))}
+function sf(){return Math.pow(SHOTS[S.shot][2]*(RACK[S.rack][2]+BALL[S.ball][2]-1),CFG.SP)}
+function sCost(s,k){var own=sc(s.id),b=mul(mul(s.c,sf()),pw(1.15,toNum(own)));return mul(b,div(sub(pw(1.15,k),1),.15))}
+function sMax(s){var own=sc(s.id),b=mul(mul(s.c,sf()),pw(1.15,toNum(own)));var x=div(mul(S.m,.15),b);if(cmp(x,1e-12)<0)return 0;return Math.max(0,Math.floor(Math.log10(1+toNum(x))/Math.log10(1.15)+1e-9))}
 function tickGain(dt){calc();var g=mul(CA.inc,dt);S.m=add(S.m,g);S.tot=add(S.tot,g);S.ok=add(S.ok,g);if(cmp(S.tot,S.best)>0)S.best=S.tot}
 function addMoney(v){S.m=add(S.m,v);S.tot=add(S.tot,v);S.ok=add(S.ok,v)}
 function pay(c){if(cmp(S.m,c)<0)return false;S.m=mx(0,sub(S.m,c));return true}
@@ -314,7 +318,7 @@ function canBuyAny(){return false}
 function renderTop(){
   calc();
   $('mn').textContent='€ '+fmt(S.m);
-  $('ms').textContent=fmt(CA.inc)+' €/s · colpo '+fmt(CA.H)+' €'+(S.troph?' · trofei ×'+trophMult().toFixed(1).replace('.',','):'');
+  $('ms').textContent=fmt(CA.inc)+' €/s · colpo '+fmt(CA.H)+' €'+(S.troph?' · trofei ×'+Qp(trophMult()).toFixed(2).replace('.',','):'');
 }
 function renderTabs(){
   var h='';TABS.forEach(function(t){var dot='';
@@ -325,26 +329,27 @@ function renderTabs(){
 }
 function bb(ok,label,sub,cls,data){return '<button class="btn by '+(ok?(cls||'gr'):'')+'" '+data+' '+(ok?'':'disabled')+'>'+label+(sub?'<small>'+sub+'</small>':'')+'</button>'}
 function renderShot(){
-  var h='<div class="card row"><div class="inf"><div class="nm">Tecnica<i>liv. '+S.tech+'</i></div><div class="ds">Ogni livello rende ogni colpo +12%. Non finisce mai.</div></div>'+bb(cmp(S.m,techCost())>=0,fmt(techCost())+' €','×1.12','or','data-a="tech"')+'</div>';
+  var h='<div class="card row"><div class="inf"><div class="nm">Tecnica<i>liv. '+S.tech+'</i></div><div class="ds">Ogni livello rende ogni colpo '+pc(1.12)+'. Non finisce mai.</div></div>'+bb(cmp(S.m,techCost())>=0,fmt(techCost())+' €','×'+Qp(1.12).toFixed(2).replace('.',','),'or','data-a="tech"')+'</div>';
   h+='<div class="sec">Repertorio</div>';
   SHOTS.forEach(function(s,i){
     var own=i<=S.shot,cur=i===S.shot,next=i===S.shot+1;
-    h+='<div class="card row '+(cur?'cur':(own?'':(next?'':'lock')))+'"><div class="inf"><div class="nm">'+s[0]+(cur?'<span class="tag">in uso</span>':'')+'</div><div class="ds">'+(own||next?s[3]:'???')+'</div><div class="pr">'+fmt(s[2])+' € a colpo</div></div>'+
+    h+='<div class="card row '+(cur?'cur':(own?'':(next?'':'lock')))+'"><div class="inf"><div class="nm">'+s[0]+(cur?'<span class="tag">in uso</span>':'')+'</div><div class="ds">'+(own||next?s[3]:'???')+'</div><div class="pr">'+fmt(hv(i))+' € a colpo'+(i>S.shot?' (con questo colpo)':'')+'</div></div>'+
       (own?'<span class="mu" style="font-weight:800">✓</span>':(next?bb(cmp(S.m,s[1])>=0,fmt(s[1])+' €','','gr','data-a="shot" data-v="'+i+'"'):'<span class="mu">🔒</span>'))+'</div>';
   });
   return h;
 }
+function gm(rk,bl,x,isBall){var cur=RACK[S.rack][2]+BALL[S.ball][2]-1,nw=RACK[isBall?S.rack:rk][2]+BALL[isBall?bl:S.ball][2]-1;return Qp(nw).toFixed(2).replace('.',',')}
 function renderGear(){
   var h='<div class="sec">Racchette</div>';
   RACK.forEach(function(r,i){if(i>S.rack+2)return;var own=i<=S.rack,cur=i===S.rack,next=i===S.rack+1;
-    h+='<div class="card row '+(cur?'cur':(next?'':(own?'':'lock')))+'"><div class="inf"><div class="nm">'+r[0]+(cur?'<span class="tag">in uso</span>':'')+'</div><div class="pr">Guadagno ×'+r[2]+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':(next?bb(cmp(S.m,r[1])>=0,fmt(r[1])+' €','','gr','data-a="rack" data-v="'+i+'"'):'<span class="mu">🔒</span>'))+'</div>'});
+    h+='<div class="card row '+(cur?'cur':(next?'':(own?'':'lock')))+'"><div class="inf"><div class="nm">'+r[0]+(cur?'<span class="tag">in uso</span>':'')+'</div><div class="pr">Colpi ×'+gm(i,S.ball,S.rack===i?S.rack:S.rack,0)+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':(next?bb(cmp(S.m,r[1])>=0,fmt(r[1])+' €','','gr','data-a="rack" data-v="'+i+'"'):'<span class="mu">🔒</span>'))+'</div>'});
   h+='<div class="sec">Palline</div>';
   BALL.forEach(function(r,i){if(i>S.ball+2)return;var own=i<=S.ball,cur=i===S.ball,next=i===S.ball+1;
-    h+='<div class="card row '+(cur?'cur':(next?'':(own?'':'lock')))+'"><div class="inf"><div class="nm">'+r[0]+(cur?'<span class="tag">in uso</span>':'')+'</div><div class="pr">Guadagno ×'+r[2]+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':(next?bb(cmp(S.m,r[1])>=0,fmt(r[1])+' €','','gr','data-a="ball" data-v="'+i+'"'):'<span class="mu">🔒</span>'))+'</div>'});
+    h+='<div class="card row '+(cur?'cur':(next?'':(own?'':'lock')))+'"><div class="inf"><div class="nm">'+r[0]+(cur?'<span class="tag">in uso</span>':'')+'</div><div class="pr">Colpi ×'+gm(S.rack,i,0,1)+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':(next?bb(cmp(S.m,r[1])>=0,fmt(r[1])+' €','','gr','data-a="ball" data-v="'+i+'"'):'<span class="mu">🔒</span>'))+'</div>'});
   return h;
 }
 function renderSpar(){
-  var h='<div class="card row"><div class="inf"><div class="nm">Preparazione atletica<i>liv. '+S.fit+'</i></div><div class="ds">Ogni livello: +10% di colpi automatici al secondo.</div></div>'+bb(cmp(S.m,fitCost())>=0,fmt(fitCost())+' €','×1.10','or','data-a="fit"')+'</div>';
+  var h='<div class="card row"><div class="inf"><div class="nm">Preparazione atletica<i>liv. '+S.fit+'</i></div><div class="ds">Ogni livello: '+pc(1.1)+' di guadagno automatico.</div></div>'+bb(cmp(S.m,fitCost())>=0,fmt(fitCost())+' €','×'+Qp(1.1).toFixed(2).replace('.',','),'or','data-a="fit"')+'</div>';
   h+='<div class="modes">';[[1,'×1'],[10,'×10'],[100,'×100'],['max','Max']].forEach(function(m){h+='<button data-a="mode" data-v="'+m[0]+'" class="'+(S.mode===m[0]?'on':'')+'">'+m[1]+'</button>'});h+='</div>';
   var shown=0;
   SPAR.forEach(function(s,i){
@@ -358,16 +363,16 @@ function renderSpar(){
   return h;
 }
 function renderClub(){
-  var h='<div class="card"><div class="nm">Il tuo circolo</div><div class="ds">Ogni novità abbellisce il campo e aumenta il guadagno. Bonus totale: <b>+'+Math.round(decoBonus()*100)+'%</b></div></div>';
+  var h='<div class="card"><div class="nm">Il tuo circolo</div><div class="ds">Ogni novità abbellisce il campo e aumenta il guadagno. Bonus totale: <b>'+pc(1+decoBonus())+'</b></div></div>';
   DECO.forEach(function(d){
     var own=S.deco[d[0]];
-    h+='<div class="card row '+(own?'cur':'')+'"><div class="inf"><div class="nm">'+d[1]+(own?'<span class="tag">presente</span>':'')+'</div><div class="ds">'+d[4]+'</div><div class="pr">Guadagno +'+Math.round(d[3]*100)+'%</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':bb(cmp(S.m,d[2])>=0,fmt(d[2])+' €','','gr','data-a="deco" data-v="'+d[0]+'"'))+'</div>';
+    h+='<div class="card row '+(own?'cur':'')+'"><div class="inf"><div class="nm">'+d[1]+(own?'<span class="tag">presente</span>':'')+'</div><div class="ds">'+d[4]+'</div><div class="pr">Guadagno '+pc(1+d[3])+'</div></div>'+(own?'<span class="mu" style="font-weight:800">✓</span>':bb(cmp(S.m,d[2])>=0,fmt(d[2])+' €','','gr','data-a="deco" data-v="'+d[0]+'"'))+'</div>';
   });
   return h;
 }
 function renderAlt(){
   var g=seasonGain(),can=g>=1;
-  var h='<div class="card"><div class="nm">Nuova stagione</div><div class="ds">Si sblocca a '+fmt(SEASON_AT)+' € guadagnati. Riparti da zero con colpi, attrezzatura e sparring, ma il circolo resta com’è e ottieni <b>Trofei</b>: ogni trofeo vale +20% di guadagno per sempre.</div>'+
+  var h='<div class="card"><div class="nm">Nuova stagione</div><div class="ds">Si sblocca a '+fmt(SEASON_AT)+' € guadagnati. Riparti da zero con colpi, attrezzatura e sparring, ma il circolo resta com’è e ottieni <b>Trofei</b>: ogni trofeo vale circa +12% di guadagno per sempre.</div>'+
    '<div style="margin-top:8px;font-size:13px">Guadagnati in questa stagione: <b>'+fmt(S.tot)+' €</b></div>'+(can?'<div style="font-size:13px;margin-top:3px">Trofei ottenibili: <b>+'+g+'</b></div>':'')+
    '<button class="btn or" style="width:100%;margin-top:10px" data-a="season" '+(can?'':'disabled')+'>Inizia una nuova stagione'+(can?' · +'+g+' trofei':'')+'</button></div>';
   h+='<div class="card log"><b>Statistiche</b><br>Trofei: '+S.troph+' · Stagioni: '+S.seasons+'<br>Colpi con il tocco: '+S.hits.toLocaleString('it-IT')+'<br>Record in una stagione: '+fmt(S.best)+' €<br>Guadagni totali: '+fmt(S.ok)+' €<br>Tempo di gioco: '+fmtT(S.played)+'</div>';
@@ -399,7 +404,7 @@ document.addEventListener('click',function(ev){
   if(a==='ball'){var i3=+v;if(i3===S.ball+1&&pay(BALL[i3][1])){S.ball=i3;toast(BALL[i3][0]);render();save()}return}
   if(a==='spar'){var s=SPAR.filter(function(x){return x.id===v})[0],k=S.mode==='max'?sMax(s):S.mode;if(k>=1&&pay(sCost(s,k))){S.spar[v]=add(sc(v),k);render();save()}return}
   if(a==='deco'){var d=DECO.filter(function(x){return x[0]===v})[0];if(!S.deco[v]&&pay(d[2])){S.deco[v]=1;toast(d[1]+' aggiunto al circolo');render();save()}return}
-  if(a==='season'){var g=seasonGain();modal('<h2>Nuova stagione?</h2><p>Ottieni <b>+'+g+' trofei</b> (+'+(g*20)+'% di guadagno per sempre). Colpi, attrezzatura e sparring ripartono da zero; il circolo resta.</p><div class="col"><button class="btn or" data-a="season2">Inizia</button><button class="btn" data-a="close">Aspetta ancora</button></div>');return}
+  if(a==='season'){var g=seasonGain();modal('<h2>Nuova stagione?</h2><p>Ottieni <b>+'+g+' trofei</b> (circa +'+Math.round((Qp(1+.2*(S.troph+g))/Qp(1+.2*S.troph)-1)*100)+'% di guadagno). Colpi, attrezzatura e sparring ripartono da zero; il circolo resta.</p><div class="col"><button class="btn or" data-a="season2">Inizia</button><button class="btn" data-a="close">Aspetta ancora</button></div>');return}
   if(a==='season2'){var gg=newSeason();closeModal();render();save();if(gg)toast('+'+gg+' trofei');return}
   if(a==='export'){save();$('sv').value=btoa(unescape(encodeURIComponent(localStorage.getItem(KEY)||'')));return}
   if(a==='import'){var t=$('sv').value.trim();try{var raw=decodeURIComponent(escape(atob(t)));if(load(raw)){save();render();toast('Salvataggio caricato')}else toast('Codice non valido')}catch(e){toast('Codice non valido')}return}
@@ -423,7 +428,7 @@ fitCanvas();
 if(load()){var s0=(Date.now()-S.last)/1000;calc();if(s0>30)offline(s0)}
 else{S.m=n(0);modal('<h2>Tie-Break Club</h2><p>Un campo da tennis, una racchetta e tutto il tempo del mondo. Tocca il campo per colpire, poi migliora colpi, attrezzatura e circolo.</p><p class="mu">Nessuna fretta: qui non si perde mai.</p><div class="col"><button class="btn gr" data-a="close">Entriamo in campo</button></div>')}
 S.last=Date.now();calc();render();requestAnimationFrame(loop);
-window.TB={get S(){return S},set S(v){S=v},calc:calc,CA:CA,hit:hit,SHOTS:SHOTS,RACK:RACK,BALL:BALL,SPAR:SPAR,DECO:DECO,sCost:sCost,sMax:sMax,techCost:techCost,fitCost:fitCost,pay:pay,fmt:fmt,fresh:fresh,tickGain:tickGain,cmp:cmp,toNum:toNum,add:add,n:n,seasonGain:seasonGain,newSeason:newSeason,sc:sc,fmtT:fmtT};
+window.TB={CFG:CFG,get S(){return S},set S(v){S=v},calc:calc,CA:CA,hit:hit,SHOTS:SHOTS,RACK:RACK,BALL:BALL,SPAR:SPAR,DECO:DECO,sCost:sCost,sMax:sMax,techCost:techCost,fitCost:fitCost,pay:pay,fmt:fmt,fresh:fresh,tickGain:tickGain,cmp:cmp,toNum:toNum,add:add,n:n,seasonGain:seasonGain,newSeason:newSeason,sc:sc,fmtT:fmtT};
 })();
 if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){var hadC=!!navigator.serviceWorker.controller,rl=false;navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadC&&!rl){rl=true;location.reload()}});navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){r.update();document.addEventListener("visibilitychange",function(){if(!document.hidden)r.update()})}).catch(function(){})}
 </script>
