@@ -124,7 +124,7 @@ function fmtT(sec){sec=Math.max(0,Math.floor(sec));var d=Math.floor(sec/86400),h
 
 
 /* ================= DATI ================= */
-var CFG={G:1.5,R:1.8,tool:[2.5,5.5,1.3],soil:[7.6,6,1.9],light:[25,6.5,1.2],poll:[50,7,.3],mod:[16,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[316,3.2,1.15],K:1,Q:.5,rg:[10,.6,150],mg:1.2,SEASON:3e10};
+var CFG={G:1.5,R:1.8,up:{gro:[3,1.7],pru:[5,1.6],dbl:[40,1.8],chn:[30,1.8],ter:[10,2]},mod:[16,4.6],drone:[30,1.3],gen:[6,1.4,1.25],hub:[316,3.2,1.15],K:1,Q:.5,rg:[10,.6,150],mg:1.2,SEASON:3e10};
 var KINDS={leaf:1,herb:1,root:1,stem:1,low:1,vine:1,flower:1,spike:1,mush:1,alga:1,pond:1,bush:1,tree:1,stalk:1,hive:1,fish:1,bonsai:1,carn:1,cactus:1,cocoon:1,alien:1,moss:1,crystal:1,coral:1};
 var PL=[
 ['Lattuga','leaf','#7fd36a','#4fa84a'],['Ravanello','root','#62b455','#e0476b'],['Spinaci','leaf','#2f8a46','#1f6a36'],['Basilico','herb','#3fb35a','#2e8a44'],['Prezzemolo','herb','#2f9a4a','#4fb86a'],
@@ -144,36 +144,40 @@ var PL=[
 ['Albero gelatina','tree','#60d0e0','#e0ffff'],['Radice di meteorite','root','#8a7a7a','#ff9a4a'],['Corallo d’acqua','coral','#f07a6a','#ffd0c0'],['Cristallo vivente','crystal','#f08ad8','#ffe0f8'],['Giglio cosmico','flower','#e0e0ff','#8aa0ff'],
 ['Loto galattico','pond','#8a6af0','#f0a0ff'],['Pino aurorale','tree','#30e0b0','#a0ffe0'],['Fiore del big bang','alien','#ffffff','#ff8a3a'],['Seme dell’infinito','alien','#ffe070','#ffffff'],['Albero del mondo','tree','#50d060','#f0e070']
 ];
-var TOOLN=['Mani nude','Forbicine','Cesoie da giardino','Coltello da innesto','Raccoglitore ergonomico','Guanti a presa magnetica','Cesoie al plasma','Braccio meccanico','Raccolta a ultrasuoni','Micro-laser di precisione','Manipolatore quantico','Mani dell’universo'];
-var SOILN=['Terra comune','Torba','Humus','Compost orbitale','Idroponica','Aeroponica','Regolite fertilizzata','Microbioma attivo','Nutrienti sintetici','Biosfera chiusa','Substrato stellare','Terra primordiale'];
-var LIGHTN=['Luce dell’oblò','Lampada LED rossa','LED rosso e blu','Spettro pieno','Sole artificiale','Specchi orbitali','Riflettori solari','Anello luminoso','Fotosintesi potenziata','Mini stella','Luce cosmica'];
-var POLLN=['Nessuno','Api','Bombi','Farfalle','Colibrì','Moscerini selezionati','Droni impollinatori','Sciami programmati','Insetti stellari','Impollinatori quantici','Foresta di pollini'];
+var TERN=['Terra comune','Torba','Humus','Compost orbitale','Idroponica','Aeroponica','Regolite fertilizzata','Microbioma attivo','Nutrienti sintetici','Biosfera chiusa','Substrato stellare','Terra primordiale'];
+var UPS=[['gro','Crescita veloce'],['pru','Potatura veloce'],['dbl','Doppio raccolto'],['chn','Raccolto a catena'],['ter','Terreno']];
+function upCost(k){return mul(CFG.up[k][0],pw(CFG.up[k][1],S.up[k]))}
+function upL(k){return S.up[k]||0}
 var MODS=[['shelf','Mensola con vasetti','Piccoli vasi sulla parete.'],['solar','Pannelli solari','Ali blu fuori dall’oblò.'],['lamp','Lampada a spettro pieno','Appesa sopra la serra.'],['tank','Serbatoio d’acqua','Riserva per le irrigazioni.'],['belt','Nastro trasportatore','Il raccolto viaggia da solo.'],['ant','Antenna','Per parlare con la Terra.'],['aqua','Vasca di acquaponica','Pesci e piante insieme.'],['hive','Alveare orbitale','Api a gravità zero.'],['robot','Robot giardiniere','Un amico che gira per la serra.'],['dome','Cupola panoramica','Vista a 360 gradi sulle stelle.'],['lights','Luci stellari','Ghirlande per le serate.'],['zen','Angolo zen','Una panchina e un po’ di pace.'],['sat','Seconda stazione','Un modulo gemello in orbita.'],['ring','Anello rotante','Gravità artificiale per tutti.'],['wtree','Albero del mondo','Cresce al centro della serra.']];
 var SHOP=[['rich','Terreno ricco','Raccolti circa ×1,22 per livello.',3,2],['nurs','Vivaio','Ogni livello: riparti con 4 piante già sbloccate.',5,3],['drn','Droni efficienti','Automazione ×1,4 per livello.',4,2],['off','Ore offline','+2 ore di guadagno offline per livello (max 6).',3,2.5],['luck','Raccolto d’oro','+3% di probabilità di un raccolto ×8 per livello (max 10).',6,2.5]];
-var PLV=[],TOOL=[],SOIL=[],LIGHT=[],POLL=[],MODC=[],DR=[];
+var PLV=[],MODC=[],DR=[];
 function build(){
  PLV=[];DR=[];PL.forEach(function(p,i){var v=mul(CFG.K,pw(CFG.G,i)),c=Z;if(i){var nn=reqGen(i);c=mul(mul(CFG.gen[0]*CFG.mg,pw(CFG.R,i-1)),(Math.pow(CFG.gen[1],Math.min(nn,400))-1)/(CFG.gen[1]-1))}PLV.push({v:v,c:c});DR.push(i?mul(c,CFG.drone[0]):n(253))});
- function lad(L,names,pr,add){var a=[];names.forEach(function(nm,k){a.push([nm,k?mul(pr[0],pw(pr[1],k-1)):Z,add?(1+pr[2]*k):Math.pow(pr[2],k)])});return a}
- TOOL=lad(0,TOOLN,CFG.tool);SOIL=lad(0,SOILN,CFG.soil);LIGHT=lad(0,LIGHTN,CFG.light);POLL=lad(0,POLLN,CFG.poll,1);
  MODC=MODS.map(function(m,i){return[m[0],mul(CFG.mod[0],pw(CFG.mod[1],i)),.05+i*.012]});
 }
 var KEY='giardino-orbitale-v1';
 /* ================= STATO ================= */
-function fresh(){return{v:1,m:Z,tot:Z,ok:Z,best:Z,np:1,sel:0,gen:{},tool:0,soil:0,light:0,poll:0,mods:{},dr:{},hub:0,semi:Z,shop:{},orbits:0,hits:0,played:0,tab:'serra',mode:1,last:Date.now(),gold:0,gr:0}}
+function fresh(){return{v:1,m:Z,tot:Z,ok:Z,best:Z,np:1,sel:0,gen:{},mods:{},dr:{},hub:0,up:{gro:0,pru:0,dbl:0,chn:0,ter:0},semi:Z,shop:{},orbits:0,hits:0,played:0,tab:'serra',mode:1,last:Date.now(),gold:0,gr:0,chain:0}}
 var S=fresh();
 function applyShop(){var L=S.shop.nurs||0;if(L)S.np=Math.max(S.np,Math.min(PL.length,1+4*L))}
 function serS(o){var r={};for(var k in o)r[k]=ser(o[k]);return r}
-function save(){try{var o={v:1,m:ser(S.m),tot:ser(S.tot),ok:ser(S.ok),best:ser(S.best),semi:ser(S.semi),np:S.np,sel:S.sel,gen:S.gen,tool:S.tool,soil:S.soil,light:S.light,poll:S.poll,mods:S.mods,dr:S.dr,hub:S.hub,shop:S.shop,orbits:S.orbits,hits:S.hits,played:S.played,tab:S.tab,gold:S.gold,last:Date.now()};localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
-function load(raw){try{var o=JSON.parse(raw||localStorage.getItem(KEY));if(!o||o.v!==1)return false;var s=fresh();['m','tot','ok','best','semi'].forEach(function(k){s[k]=par(o[k])});['np','sel','tool','soil','light','poll','hub','orbits','hits','played','gold','last'].forEach(function(k){if(o[k]!==undefined)s[k]=o[k]});['gen','mods','dr','shop'].forEach(function(k){s[k]=o[k]||{}});s.tab=o.tab||'serra';S=s;return true}catch(e){return false}}
+function save(){try{var o={v:1,m:ser(S.m),tot:ser(S.tot),ok:ser(S.ok),best:ser(S.best),semi:ser(S.semi),np:S.np,sel:S.sel,gen:S.gen,up:S.up,mods:S.mods,dr:S.dr,hub:S.hub,shop:S.shop,orbits:S.orbits,hits:S.hits,played:S.played,tab:S.tab,gold:S.gold,last:Date.now()};localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+function load(raw){try{var o=JSON.parse(raw||localStorage.getItem(KEY));if(!o||o.v!==1)return false;var s=fresh();['m','tot','ok','best','semi'].forEach(function(k){s[k]=par(o[k])});['np','sel','hub','orbits','hits','played','gold','last'].forEach(function(k){if(o[k]!==undefined)s[k]=o[k]});['gen','mods','dr','shop'].forEach(function(k){s[k]=o[k]||{}});s.up=Object.assign({gro:0,pru:0,dbl:0,chn:0,ter:0},o.up||{});s.tab=o.tab||'serra';S=s;return true}catch(e){return false}}
 /* ================= CALCOLI ================= */
 function gl(i){return S.gen[i]||0}
 function shopL(k){return S.shop[k]||0}
 function modBonus(){var b=0;MODC.forEach(function(m){if(S.mods[m[0]])b+=m[2]});return b}
 function semiMult(){return add(1,mul(S.semi,.1))}
 var PR={lock:0,tot:1.5};
-function power(){return Math.min(100,10*TOOL[S.tool][2]*LIGHT[S.light][2])}
-function pruneT(){return Math.max(.4,1.5/(1+.06*(S.tool+S.light)))}
-function baseMult(){var m=mul(SOIL[S.soil][2],(POLL[S.poll][2]+modBonus()));m=mul(m,semiMult());m=mul(m,Math.pow(1.5,shopL('rich')));return m}
+function power(){return Math.min(100,10*Math.pow(1.15,upL('gro')))}
+function pruneT(){return Math.max(.4,1.5/(1+.08*upL('pru')))}
+function growMax(){return 10*Math.pow(1.15,upL('gro'))>=100}
+function pruMax(){return 1.5/(1+.08*upL('pru'))<=.4}
+function dblCh(){return .02*upL('dbl')}
+function chainMult(){return 1+Math.min(S.chain,20)*.005*upL('chn')}
+function terMult(){return Math.pow(1.25,upL('ter'))}
+function terName(){var l=upL('ter');return TERN[Math.min(l,TERN.length-1)]+(l>=TERN.length?' +'+(l-TERN.length+1):'')}
+function baseMult(){var m=mul(terMult(),1+modBonus());m=mul(m,semiMult());m=mul(m,Math.pow(1.5,shopL('rich')));return m}
 function plantMult(i){return mul(baseMult(),Math.pow(CFG.gen[2],gl(i)))}
 function tapVal(i){return pw(mx(mul(PLV[i].v,plantMult(i)),1e-9),CFG.Q)}
 function drRate(L){return .25*L}
@@ -182,11 +186,10 @@ function autoInc(){var t=Z;for(var k in S.dr){var L=S.dr[k];if(L>0&&+k<S.np)t=ad
 var CA={tap:Z,inc:Z};
 function calc(){CA.tap=tapVal(S.sel);CA.inc=autoInc();return CA}
 function addMoney(v){S.m=add(S.m,v);S.tot=add(S.tot,v);S.ok=add(S.ok,v);if(cmp(S.tot,S.best)>0)S.best=S.tot}
-function tickGain(dt){if(PR.lock>0){PR.lock=Math.max(0,PR.lock-dt);if(PR.lock<=0)S.gr=0}calc();if(CA.inc.m)addMoney(mul(CA.inc,dt))}
+var chainIdle=0;
+function tickGain(dt){if(S.chain>0){if(PR.lock>0)chainIdle=0;else{chainIdle+=dt;if(chainIdle>4)S.chain=0}}if(PR.lock>0){PR.lock=Math.max(0,PR.lock-dt);if(PR.lock<=0)S.gr=0}calc();if(CA.inc.m)addMoney(mul(CA.inc,dt))}
 function pay(c){if(cmp(S.m,c)<0)return false;S.m=mx(0,sub(S.m,c));return true}
 function reqGen(i){return Math.min(CFG.rg[0]+Math.floor(i*CFG.rg[1]),CFG.rg[2])}
-function reqUp(i){return Math.min(Math.floor(i*.45),40)}
-function upTot(){return S.tool+S.soil+S.light+S.poll}
 function plantOk(){var i=S.np;return i<PL.length&&cmp(S.m,PLV[i].c)>=0}
 function genCost(i){return mul(mul(CFG.gen[0],pw(CFG.R,i)),pw(CFG.gen[1],gl(i)))}
 function drCost(i){var L=S.dr[i]||0;return mul(DR[i],pw(CFG.drone[1]||1.3,L))}
@@ -196,7 +199,7 @@ function shopMax(k){return k==='off'?3:(k==='luck'?10:(k==='nurs'?19:999))}
 function offCap(){return(8+2*shopL('off'))*3600}
 function autoUnlocked(){return S.np>=10||S.orbits>0}
 function semiGain(){if(cmp(S.tot,CFG.SEASON)<0)return Z;return floor(pw(div(S.tot,CFG.SEASON),.4))}
-function newOrbit(){var g=semiGain();if(!g.m)return Z;S.semi=add(S.semi,g);S.orbits++;S.m=Z;S.tot=Z;S.np=1;S.sel=0;S.gen={};S.tool=0;S.soil=0;S.light=0;S.poll=0;S.dr={};S.hub=0;applyShop();S.sel=S.np-1;return g}
+function newOrbit(){var g=semiGain();if(!g.m)return Z;S.semi=add(S.semi,g);S.orbits++;S.m=Z;S.tot=Z;S.np=1;S.sel=0;S.gen={};S.up={gro:0,pru:0,dbl:0,chn:0,ter:0};S.chain=0;S.dr={};S.hub=0;applyShop();S.sel=S.np-1;return g}
 /* ================= GRAFICA ================= */
 var cv=$('cv'),cx=cv.getContext('2d'),VW=360,VH=250;
 function fitCanvas(){var w=Math.min(window.innerWidth,520),d=Math.min(2,window.devicePixelRatio||1);cv.style.width=w+'px';cv.style.height=(w*VH/VW)+'px';cv.width=Math.round(w*d);cv.height=Math.round(w*VH/VW*d)}
@@ -287,8 +290,9 @@ function frame(dt){T+=dt;bump=Math.max(0,bump-dt*6);parts.forEach(function(a){a.
 function burst(n,p,gold){for(var i=0;i<n;i++)parts.push({x:180+(Math.random()-.5)*40,y:135+(Math.random()-.5)*40,vx:(Math.random()-.5)*80,vy:-30-Math.random()*50,r:2+Math.random()*2,c:i%2?p[3]:p[2],t:0});if(parts.length>70)parts.splice(0,parts.length-70)}
 function hit(x,y){
  if(PR.lock>0)return;var p=PL[S.sel];S.hits++;bump=1;S.gr=Math.min(100,S.gr+power());burst(2,p);
- if(S.gr>=100-1e-9){calc();var v=CA.tap,gold=false,lk=shopL('luck');if(lk&&Math.random()<.03*lk){v=mul(v,8);gold=true}
-  addMoney(v);S.gr=100;PR.tot=PR.lock=pruneT();burst(gold?18:10,p,gold);floats.push({x:180,y:112,t:0,s:'+'+fmt(v),gold:gold});if(floats.length>8)floats.shift()}
+ if(S.gr>=100-1e-9){calc();var v=mul(CA.tap,Math.pow(chainMult(),CFG.Q)),gold=false,lk=shopL('luck');if(lk&&Math.random()<.03*lk){v=mul(v,8);gold=true}
+  var dc=dblCh(),ex=Math.floor(dc)+(Math.random()<dc-Math.floor(dc)?1:0);if(ex){v=mul(v,1+ex)}S.chain++;chainIdle=0;
+  addMoney(v);S.gr=100;PR.tot=PR.lock=pruneT();burst(gold?18:10,p,gold);floats.push({x:180,y:112,t:0,s:'+'+fmt(v)+(ex?' ×'+(1+ex):''),gold:gold||ex>0});if(floats.length>8)floats.shift()}
 }
 cv.addEventListener('pointerdown',function(ev){ev.preventDefault();var r=cv.getBoundingClientRect();hit((ev.clientX-r.left)/r.width*VW,(ev.clientY-r.top)/r.height*VH);renderTop()},{passive:false});
 /* ================= INTERFACCIA ================= */
@@ -296,7 +300,7 @@ var TABS=[['serra','Serra'],['pot','Potenziamenti'],['mod','Stazione'],['dr','Dr
 function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(function(){e.style.display='none'},2000)}
 function modal(h){$('modal').innerHTML='<div class="box">'+h+'</div>';$('modal').classList.add('on')}
 function closeModal(){$('modal').classList.remove('on')}
-function renderTop(){calc();$('mn').textContent=fmt(S.m)+' Linfa';$('ms').textContent=PL[S.sel][0]+' · '+fmt(CA.tap)+' Linfa · '+Math.ceil(100/power()-1e-9)+' tocchi'+(CA.inc.m?' · auto '+fmt(CA.inc)+'/s':'')}
+function renderTop(){calc();$('mn').textContent=fmt(S.m)+' Linfa';$('ms').textContent=PL[S.sel][0]+' · '+fmt(CA.tap)+' Linfa · '+Math.ceil(100/power()-1e-9)+' tocchi'+(S.chain>1?' · catena '+S.chain:'')+(CA.inc.m?' · auto '+fmt(CA.inc)+'/s':'')}
 function renderTabs(){var h='';TABS.forEach(function(t){var dot='';
  if(t[0]==='serra'&&plantOk())dot='<span class="dot"></span>';
  if(t[0]==='dr'&&!autoUnlocked())return;
@@ -317,14 +321,16 @@ function renderSerra(){
   h+='<div class="card row '+(cur?'cur':'')+'"><div class="inf"><div class="nm">'+q[0]+(cur?'<span class="tag">in coltivazione</span>':'')+'<i>sel. '+gl(k)+'</i></div><div class="pr">'+fmt(tapVal(k))+' Linfa a raccolto</div></div><div style="display:flex;flex-direction:column;gap:6px">'+(cur?'':'<button class="btn" data-a="sel" data-v="'+k+'">Coltiva</button>')+bb(can(genCost(k)),fmt(genCost(k))+' Linfa','Selezione','or','data-a="gen" data-v="'+k+'"')+'</div></div>'}
  return h}
 var KIND_IT={leaf:'Ortaggio a foglia',herb:'Erba aromatica',root:'Ortaggio da radice',stem:'Ortaggio da frutto',low:'Frutto di bosco',vine:'Rampicante',flower:'Fiore',spike:'Fiore a spiga',mush:'Fungo',alga:'Alga',pond:'Pianta acquatica',bush:'Arbusto da frutto',tree:'Albero',stalk:'Cereale o canna',hive:'Prodotto dell’alveare',fish:'Acquaponica',bonsai:'Bonsai',carn:'Pianta carnivora',cactus:'Succulenta',cocoon:'Seta',alien:'Specie aliena',moss:'Muschio',crystal:'Pianta di cristallo',coral:'Corallo vivente'};
-function ladCard(title,desc,arr,idx,key,isB,sp){var nx=arr[idx+1],h='<div class="card"><div class="nm">'+title+'<i>'+arr[idx][0]+'</i></div>';
- if(nx)h+='<div style="margin-top:8px" class="row"><div class="inf"><div class="nm" style="font-size:14px">'+nx[0]+'</div><div class="pr">'+(sp?'Crescita per tocco '+rm(nx[2]/arr[idx][2]):(isB?'Raccolti '+pc(nx[2]/arr[idx][2]):'Raccolti '+rm(Qp(nx[2]/arr[idx][2]))))+'</div></div>'+bb(can(nx[1]),fmt(nx[1])+' Linfa','','gr','data-a="lad" data-v="'+key+'"')+'</div>';else h+='<div class="pr">Livello massimo</div>';return h+'</div>'}
+function upDesc(k){var L=upL(k);
+ if(k==='gro')return growMax()?'Massimo: 1 tocco':Math.ceil(100/power()-1e-9)+' → '+Math.ceil(100/Math.min(100,10*Math.pow(1.15,L+1))-1e-9)+' tocchi per crescere';
+ if(k==='pru')return pruMax()?'Massimo: 0,4 s':(pruneT().toFixed(2)+' → '+Math.max(.4,1.5/(1+.08*(L+1))).toFixed(2)+' s di potatura').replace(/\./g,',');
+ if(k==='dbl')return 'Raccolto doppio: '+Math.round(dblCh()*100)+'% → '+Math.round(.02*(L+1)*100)+'%';
+ if(k==='chn')return 'Bonus per potatura di fila: +'+(L*.5).toFixed(1).replace('.',',')+'% → +'+((L+1)*.5).toFixed(1).replace('.',',')+'% (max 20 di fila)';
+ return 'Linfa di tutte le specie '+rm(Qp(1.25))+' per livello'}
+function upMax(k){return(k==='gro'&&growMax())||(k==='pru'&&pruMax())}
 function renderPot(){
- var h='<div class="card"><div class="nm">Raccolto<i>×'+fmt(pw(mx(baseMult(),1e-9),CFG.Q))+'</i></div><div class="pr">Tocchi per crescita: '+Math.ceil(100/power()-1e-9)+' · Potatura '+pruneT().toFixed(1).replace('.',',')+' s</div></div>';
- h+=ladCard('Attrezzi','Per raccogliere meglio e più in fretta.',TOOL,S.tool,'tool',0,1);
- h+=ladCard('Terreno','Più nutriente = più resa.',SOIL,S.soil,'soil');
- h+=ladCard('Illuminazione','La luce fa crescere tutto.',LIGHT,S.light,'light',0,1);
- h+=ladCard('Impollinatori','Aggiungono un bonus in percentuale.',POLL,S.poll,'poll',true);
+ var h='';UPS.forEach(function(u){var k=u[0],c=upCost(k),nm=k==='ter'?terName():u[1];
+  h+='<div class="card row"><div class="inf"><div class="nm">'+(k==='ter'?'Terreno':u[1])+'<i>liv. '+upL(k)+(k==='ter'?' · '+nm:'')+'</i></div><div class="pr">'+upDesc(k)+'</div></div>'+(upMax(k)?'<span class="mu">max</span>':bb(can(c),fmt(c)+' Linfa','','gr','data-a="up" data-v="'+k+'"'))+'</div>'});
  return h}
 function renderMod(){
  var h='<div class="card"><div class="nm">Stazione<i>'+pc(1+modBonus())+'</i></div></div>';
@@ -355,7 +361,6 @@ function render(){renderTop();renderTabs();
  var m=$('main'),h=S.tab==='serra'?renderSerra():(S.tab==='pot'?renderPot():(S.tab==='mod'?renderMod():(S.tab==='dr'?renderDr():renderAlt())));
  var t=document.createElement('div');t.innerHTML=h;var st=m.scrollTop;if(shownTab!==S.tab){m.innerHTML='';shownTab=S.tab}morph(m,t);m.scrollTop=st}
 /* ================= EVENTI ================= */
-function ladOf(v){return{tool:[TOOL,'tool'],soil:[SOIL,'soil'],light:[LIGHT,'light'],poll:[POLL,'poll']}[v]}
 document.addEventListener('click',function(ev){
  var b=ev.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,v=b.dataset.v;
  if(a==='close'){closeModal();return}
@@ -363,7 +368,7 @@ document.addEventListener('click',function(ev){
  if(a==='sel'){S.sel=+v;render();return}
  if(a==='plant'){if(S.np<PL.length&&pay(PLV[S.np].c)){S.sel=S.np;S.np++;toast('Nuova specie: '+PL[S.sel][0]);render();save()}return}
  if(a==='gen'){var i=+v;if(pay(genCost(i))){S.gen[i]=gl(i)+1;render();save()}return}
- if(a==='lad'){var arr=ladOf(v)[0],k=ladOf(v)[1],nx=arr[S[k]+1];if(nx&&pay(nx[1])){S[k]++;toast(nx[0]);render();save()}return}
+ if(a==='up'){if(!upMax(v)&&pay(upCost(v))){S.up[v]=upL(v)+1;render();save()}return}
  if(a==='mod'){var mi=MODS.map(function(m){return m[0]}).indexOf(v);if(!S.mods[v]&&pay(MODC[mi][1])){S.mods[v]=1;toast(MODS[mi][1]+' montato');render();save()}return}
  if(a==='hub'){if(pay(hubCost())){S.hub++;render();save()}return}
  if(a==='dr'){var d=+v;if(pay(drCost(d))){S.dr[d]=(S.dr[d]||0)+1;render();save()}return}
@@ -388,7 +393,7 @@ build();fitCanvas();
 if(load()){var s0=(Date.now()-S.last)/1000;if(s0>30)offline(s0)}
 else{modal('<h2>Giardino Orbitale</h2><p>Tocca per far crescere la pianta. Quando è pronta viene potata e incassi.</p><div class="col"><button class="btn gr" data-a="close">Inizia</button></div>')}
 S.last=Date.now();calc();render();requestAnimationFrame(loop);
-window.TB={PR:PR,power:power,reqGen:reqGen,reqUp:reqUp,upTot:upTot,get S(){return S},set S(v){S=v},CFG:CFG,build:build,calc:calc,CA:CA,hit:hit,PL:PL,PLV:function(){return PLV},TOOL:function(){return TOOL},SOIL:function(){return SOIL},LIGHT:function(){return LIGHT},POLL:function(){return POLL},MODS:MODS,MODC:function(){return MODC},DR:function(){return DR},pay:pay,fmt:fmt,fresh:fresh,tickGain:tickGain,cmp:cmp,add:add,n:n,genCost:genCost,drCost:drCost,hubCost:hubCost,semiGain:semiGain,newOrbit:newOrbit,render:render,tapVal:tapVal,fmtT:fmtT,mul:mul,toNum:toNum};
+window.TB={PR:PR,power:power,reqGen:reqGen,upCost:upCost,upL:upL,upMax:upMax,get S(){return S},set S(v){S=v},CFG:CFG,build:build,calc:calc,CA:CA,hit:hit,PL:PL,PLV:function(){return PLV},MODS:MODS,MODC:function(){return MODC},DR:function(){return DR},pay:pay,fmt:fmt,fresh:fresh,tickGain:tickGain,cmp:cmp,add:add,n:n,genCost:genCost,drCost:drCost,hubCost:hubCost,semiGain:semiGain,newOrbit:newOrbit,render:render,tapVal:tapVal,fmtT:fmtT,mul:mul,toNum:toNum};
 })();
 if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){var hadC=!!navigator.serviceWorker.controller,rl=false;navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadC&&!rl){rl=true;location.reload()}});navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){r.update();document.addEventListener("visibilitychange",function(){if(!document.hidden)r.update()})}).catch(function(){})}
 </script>
