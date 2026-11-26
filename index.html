@@ -931,7 +931,7 @@ function islandWin(){
 }
 function doAwake(){
   var gain=essGain(),o=p,n=migrate(fresh());
-  ['story','stv','stb','stm','cnt','hist','tower','tcp','tw','noArise','sx','et','isl','beru','sid','trv','shv','wv','qv','tv'].forEach(function(k){n[k]=o[k]});
+  ['story','stv','stb','stm','cnt','hist','noArise','sx','et','isl','beru','sid','trv','shv','wv','qv','tv'].forEach(function(k){n[k]=o[k]});
   n.awk=o.awk+1;n.ess=o.ess+gain;n.essT=o.essT+gain;n.qr=genQr();
   p=n;p.lv=1+2*el('s');p.pts=2*(p.lv-1);p.gold=30+40*(p.lv-1);
   if(p.beru)addBeru();
@@ -1548,7 +1548,7 @@ function vStato(){
   }
   if(p.sc||p.awk){
     h+='<div class="panel"><div class="lbl"><span>Risveglio</span><em>Risvegli: '+p.awk+' · Essenza: '+fmt(p.ess)+'</em></div>';
-    if(p.sc)h+='<p class="sm" style="margin:0 0 6px">Torni al livello '+(1+2*el('s'))+': ombre, oggetti, oro e Gate si azzerano. Restano Essenza, albero, Isola e Beru. Guadagni <b>'+essGain()+' Essenza</b> (livello, settore dell’isola, Gate S'+(p.ib?', capitano sconfitto':'')+').</p>'+
+    if(p.sc)h+='<p class="sm" style="margin:0 0 6px">Torni al livello '+(1+2*el('s'))+': ombre, oggetti, oro e Gate si azzerano. Anche la Torre riparte da zero. Restano Essenza, albero, Isola e Beru. Guadagni <b>'+essGain()+' Essenza</b> (livello, settore dell’isola, Gate S'+(p.ib?', capitano sconfitto':'')+').</p>'+
      '<button class="btn '+(awkArm?'dng':'gld')+' full" data-a="awake">'+(awkArm?'Conferma il Risveglio':'Risvegliati')+'</button>'+(awkArm?'<button class="btn full" style="margin-top:6px" data-a="awakeno">Annulla</button>':'');
     else h+='<p class="sm" style="margin:0">Completa un Gate di grado S per poterti risvegliare.</p>';
     h+='</div>';
