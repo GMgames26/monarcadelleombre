@@ -590,6 +590,7 @@ function migrate(o){
   if(o.sc===undefined)o.sc=!!(o.gtc&&o.gtc[5]&&o.gtc[5].some(function(x){return x>0}));
   var d=fresh();for(var k in d){if(o[k]===undefined)o[k]=d[k]}
   if(!o.qr)o.qr=genQr();
+  if(o.twr!==1){if(o.awk>=1){o.tower=0;o.tcp=0;o.tw=0}o.twr=1}
   if(!hadCnt){o.cnt.kill=o.kills||0;o.cnt.gate=o.gates||0}
   var ic=o.st.int,cp0=(ic>=5?1:0)+(ic>=15?1:0)+(ic>=25?1:0)+(ic>=40?1:0),act0=0;
   o.shadows.forEach(function(s,i){
